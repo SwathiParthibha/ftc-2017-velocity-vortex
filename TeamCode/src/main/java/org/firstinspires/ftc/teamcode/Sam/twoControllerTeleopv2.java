@@ -207,10 +207,6 @@ public class twoControllerTeleopv2 extends OpMode {
             //power=0.7;
             //startrunnning=true;
         }
-        else if(gamepad2.y)
-        {
-            //EncoderShooter(0.2);
-        }
         else {
             EncoderShooter(RPM0);
         }

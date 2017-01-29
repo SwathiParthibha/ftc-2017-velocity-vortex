@@ -120,17 +120,22 @@ public class StateMachineOp extends OpMode {
         else if(beaconColor == null)
             telemetry.log().add("Beacon color is: NULL");
 
-        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.TO_WHITE_LINE);
+        //AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.TO_WHITE_LINE);
 
-        autoStateMachineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.FOLLOW_lINE, leftMotor, rightMotor, lightSensor);
-        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
-        autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.WAIT, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
-        autoStateMachineBuilder.addWait(S.WAIT, S._2ND_TO_WHITE_LINE, 3000);
-        autoStateMachineBuilder.addToWhiteLine(S._2ND_TO_WHITE_LINE, S._2ND_FOLLOW_lINE, leftMotor, rightMotor, lightSensor);
-        autoStateMachineBuilder.addLineFollow(telemetry, S._2ND_FOLLOW_lINE, S._2ND_PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
-        autoStateMachineBuilder.addPressBeacon(telemetry, S._2ND_PRESS_BEACON, S.STOP, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+        //autoStateMahineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.FOLLOW_lINE, leftMotor, rightMotor, lightSensor);
+        //autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
+        //autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.WAIT, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+        //autoStateMachineBuilder.addWait(S.WAIT, S._2ND_TO_WHITE_LINE, 3000);
+        ///autoStateMachineBuilder.addToWhiteLine(S._2ND_TO_WHITE_LINE, S._2ND_FOLLOW_lINE, leftMotor, rightMotor, lightSensor);
+        //autoStateMachineBuilder.addLineFollow(telemetry, S._2ND_FOLLOW_lINE, S._2ND_PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
+        //autoStateMachineBuilder.addPressBeacon(telemetry, S._2ND_PRESS_BEACON, S.STOP, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+        //autoStateMachineBuilder.addStop(S.STOP);
+
+        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.WAIT);
+
+        autoStateMachineBuilder.addWait(S.WAIT, S.PRESS_BEACON, 3000);
+        autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.STOP, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
         autoStateMachineBuilder.addStop(S.STOP);
-
         stateMachine = autoStateMachineBuilder.build();
 
         runtime.reset();

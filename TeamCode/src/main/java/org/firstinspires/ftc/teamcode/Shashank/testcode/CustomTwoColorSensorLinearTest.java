@@ -19,9 +19,10 @@ public class CustomTwoColorSensorLinearTest extends LinearOpMode
     {
         leftColorSensor  = hardwareMap.colorSensor.get("lcs");
         I2cAddr i2cAddr = I2cAddr.create8bit(0x4c);
-        leftColorSensor.setI2cAddress(i2cAddr);
+
 
         rightColorSensor = hardwareMap.colorSensor.get("rcs");
+        rightColorSensor.setI2cAddress(i2cAddr);
 
         waitForStart();
 
