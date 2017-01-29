@@ -97,7 +97,7 @@ public class twoControllerTeleopv2 extends OpMode {
 
     }
 
-    private boolean USE_TELEMETRY=false;
+    private boolean USE_TELEMETRY=true;
 
 
 
@@ -201,7 +201,7 @@ public class twoControllerTeleopv2 extends OpMode {
         }
 
         if(gamepad2.a){
-            EncoderShooter(RPM955);
+            EncoderShooter(RPM800);
         } else if(gamepad2.b) {
             EncoderShooter(RPM955);//0.6//0.7
             //power=0.7;
