@@ -1,10 +1,16 @@
 package org.firstinspires.ftc.teamcode.Sam;
 
+import android.media.MediaPlayer;
+
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.teamcode.R;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
 
 
 @TeleOp(name = "Two Controller Teleop V2", group = "Teleop")
@@ -110,9 +116,11 @@ public class twoControllerTeleopv2 extends OpMode {
     public double startShootingtime=0;
     public double prevTime=0;
 
+    private MediaPlayer wrongBallSound = null;
+    private ColorSensor sweeperColorSensor;
+    private BeaconColor beaconColor = null;
 
-
-
+    private boolean ballSensed = false;
 
     @Override
     public void init() {
@@ -122,6 +130,7 @@ public class twoControllerTeleopv2 extends OpMode {
         shooter1 = this.hardwareMap.dcMotor.get("shooter1");
         shooter2 = this.hardwareMap.dcMotor.get("shooter2");
         sweeper = this.hardwareMap.dcMotor.get("sweeper");
+        sweeperColorSensor = this.hardwareMap.colorSensor.get("slcs");
         state = false;
 
 
@@ -217,6 +226,18 @@ public class twoControllerTeleopv2 extends OpMode {
 
             if(gamepad2.right_bumper){
                 sweeper.setPower(0.7);
+
+                if(beaconColor == null) {
+                    if (sweeperColorSensor.red() > 15) {
+                        if (sweeperColorSensor.red() > sweeperColorSensor.blue())
+                            beaconColor = BeaconColor.RED;
+                    } else if(sweeperColorSensor.blue() > 15){
+                        if (sweeperColorSensor.red() < sweeperColorSensor.blue())
+                            beaconColor = BeaconColor.BLUE;
+                    } else
+                            beaconColor = BeaconColor.BLUE;
+                    telemetry.log().add("Beacon Color Set");
+                }
             } else if(gamepad2.right_trigger > 0){
                 sweeper.setPower(-0.7);
             } else {
@@ -224,6 +245,17 @@ public class twoControllerTeleopv2 extends OpMode {
 
             }
 
+        if(isWrongBall()){
+            if(!wrongBallSound.isPlaying()){
+                wrongBallSound.release();
+                wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
+                wrongBallSound.start();
+            }
+            //sweeper.setPower(0.5);
+        } else {
+            wrongBallSound.stop();
+            //sweeper.setPower(0);
+        }
 
         telemetry.addData("left joystick",  "%.2f", left);
         telemetry.addData("right joystick", "%.2f", right);
@@ -235,7 +267,21 @@ public class twoControllerTeleopv2 extends OpMode {
         super.stop();
     }
 
-
+    private boolean isWrongBall() {
+        if(sweeperColorSensor.red() > 11 || sweeperColorSensor.blue() > 11){
+            ballSensed = true;
+            if(sweeperColorSensor.red() > sweeperColorSensor.blue() && beaconColor == BeaconColor.BLUE){
+                return true;
+            } else if(sweeperColorSensor.blue() > sweeperColorSensor.red() && beaconColor == BeaconColor.RED){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            ballSensed = false;
+            return false;
+        }
+    }
 
     public void EncoderShooter(shooterSettings settings)
     {
