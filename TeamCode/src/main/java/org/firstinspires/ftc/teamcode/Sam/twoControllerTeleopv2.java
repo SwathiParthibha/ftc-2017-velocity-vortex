@@ -116,7 +116,7 @@ public class twoControllerTeleopv2 extends OpMode {
     public double startShootingtime=0;
     public double prevTime=0;
 
-    private MediaPlayer wrongBallSound = null;
+    private MediaPlayer wrongBallSound = null, correctBallSound = null;
     private ColorSensor sweeperColorSensor;
     private BeaconColor beaconColor = null;
 
@@ -130,7 +130,7 @@ public class twoControllerTeleopv2 extends OpMode {
         shooter1 = this.hardwareMap.dcMotor.get("shooter1");
         shooter2 = this.hardwareMap.dcMotor.get("shooter2");
         sweeper = this.hardwareMap.dcMotor.get("sweeper");
-        sweeperColorSensor = this.hardwareMap.colorSensor.get("slcs");
+        sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
         state = false;
 
 
@@ -161,8 +161,8 @@ public class twoControllerTeleopv2 extends OpMode {
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-
+        wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
+        correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
     }
 
     @Override
@@ -253,6 +253,14 @@ public class twoControllerTeleopv2 extends OpMode {
             }
             //sweeper.setPower(0.5);
         } else {
+            isWrongBall();
+            if(ballSensed){
+                correctBallSound.release();
+                correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
+                correctBallSound.start();
+            } else {
+                correctBallSound.stop();
+            }
             wrongBallSound.stop();
             //sweeper.setPower(0);
         }
