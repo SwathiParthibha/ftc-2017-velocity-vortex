@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode.Mrinali;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -71,7 +72,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  */
 
 @Autonomous(name="Beacons Autonomous Red Shooter", group="Pushbot")
-//@Disabled
+@Disabled
 public class DriveToBeaconsRedShooter extends LinearOpMode {
 
     //To change blue to red: negative angles, color sensors sense red, left side range sensor

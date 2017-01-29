@@ -103,7 +103,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.pushRedButton();
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3);
         auto.turn(0);
-        auto.encoderDrive(auto.APPROACH_SPEED, 8, 8, 5);
+        auto.encoderDrive(auto.APPROACH_SPEED, 10, 10, 5);
 
         auto.turn(0);
         auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);

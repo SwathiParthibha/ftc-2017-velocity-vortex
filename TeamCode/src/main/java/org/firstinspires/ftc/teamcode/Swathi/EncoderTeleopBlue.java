@@ -23,7 +23,6 @@ public class EncoderTeleopBlue extends OpMode {
     private boolean state;
     boolean swap=false;
 
-
     @Override
     public void init() {
         leftMotor = this.hardwareMap.dcMotor.get("l");
@@ -121,17 +120,19 @@ public class EncoderTeleopBlue extends OpMode {
 
         int red = colorSensor.red();
 
-        ElapsedTime time = new ElapsedTime();
         if (red > 50) {
-            time.reset();
-        } if (time.seconds() < 0.5 && !gamepad2.x){
-            sweeper.setPower(0.7);
-        } else if(gamepad2.right_bumper){
-            sweeper.setPower(0.7);
-        } else if(gamepad2.right_trigger > 0){
-            sweeper.setPower(-0.7);
-        } else {
-            sweeper.setPower(0);
+            telemetry.addData("wrong ball", "%.2f", left);
+            telemetry.update();
+            if (gamepad2.x || gamepad1.x) {
+            }
+            else {
+                sweeper.setPower(0.7);
+                ElapsedTime time = new ElapsedTime();
+                time.reset();
+                while (time.seconds() > 0.5) {
+
+                }
+            }
         }
     }
 
