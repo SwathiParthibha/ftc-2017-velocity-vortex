@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by spmeg on 10/22/2016.
  */
-@TeleOp(name = "Two Controller Teleop BLUE", group = "Teleop")
+@TeleOp(name = "Two Controller Teleop BLUE Swathi", group = "Teleop")
 public class EncoderTeleopBlue extends OpMode {
     private DcMotor leftMotor;
     private DcMotor rightMotor;

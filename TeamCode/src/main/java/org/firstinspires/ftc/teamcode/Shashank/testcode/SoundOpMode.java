@@ -16,7 +16,7 @@ public class SoundOpMode extends OpMode {
     @Override
     public void init() {
         Activity activity = (Activity) this.hardwareMap.appContext;
-        mediaPlayer = MediaPlayer.create(hardwareMap.appContext, R.raw.fresh_eyes);
+        mediaPlayer = MediaPlayer.create(hardwareMap.appContext, R.raw.police_siren);
         mediaPlayer.start();
         telemetry.log().add("duration: " + mediaPlayer.getDuration());
         telemetry.update();
@@ -26,6 +26,7 @@ public class SoundOpMode extends OpMode {
 
     @Override
     public void loop() {
+        telemetry.addData("is Playing", mediaPlayer.isPlaying());
         telemetry.addData("Current position: ",mediaPlayer.getCurrentPosition());
         telemetry.update();
     }

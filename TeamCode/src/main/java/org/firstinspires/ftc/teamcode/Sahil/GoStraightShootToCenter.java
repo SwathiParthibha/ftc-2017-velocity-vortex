@@ -1,31 +1,62 @@
-package org.firstinspires.ftc.teamcode.Sam;
+package org.firstinspires.ftc.teamcode.Sahil;
 
-import android.media.MediaPlayer;
-
-import com.qualcomm.ftccommon.DbgLog;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.I2cDevice;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
+import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
+import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+/**
+ * Created by SahilDoshi on 1/20/17.
+ */
 
-@TeleOp(name = "Two Controller Teleop V2", group = "Teleop")
-public class twoControllerTeleopv2 extends OpMode {
-    private DcMotor leftMotor;
-    private DcMotor rightMotor;
-    private DcMotor scooper;
+@Autonomous(name="GoStraightShootToCenter", group="Pushbot")
+public class GoStraightShootToCenter extends LinearOpMode {
+
+    //To change red to blue: negative angles, color sensors sense blue, right side range sensor
+    /* Declare OpMode members. */
+    HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
+    // could also use HardwarePushbotMatrix class.
     private DcMotor shooter1;
     private DcMotor shooter2;
-    private DcMotor sweeper;
-
     private boolean state;
-    boolean swap=false;
+    private DcMotor scooper;
+    LightSensor lightSensor;      // Primary LEGO Light sensor,
+    I2cDeviceSynchImpl rangeSensor;
+    I2cDeviceSynchImpl sideRangeSensor;
+    double sideRange;
+    //ModernRoboticsI2cGyro gyro;   // Hardware Device Object
+    ColorSensor leftColorSensor;
+    ColorSensor rightColorSensor;
+    BNO055IMU imu;
+    Orientation angles;
 
+    // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
+    double angleZ = 0;
 
+    static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
+    static final double APPROACH_SPEED = 0.5;
+    double WHEEL_SIZE_IN = 4;
+    public int ROTATION = 1220; // # of ticks
+    double COUNTS_PER_INCH = ROTATION /
+            (WHEEL_SIZE_IN * Math.PI);
+    double DIST = 18;
+    double SIDE_DIST = 30;
+    byte[] rangeSensorCache;
+    byte[] sideRangeSensorCache;
+    I2cDevice rangeA;
+    I2cDevice rangeB;
     public class shooterSettings{//data members can be replaced, but default values are for 1750 ETPS = 955 RPM
 
         public shooterSettings(){}
@@ -103,7 +134,7 @@ public class twoControllerTeleopv2 extends OpMode {
 
     }
 
-    private boolean USE_TELEMETRY=true;
+    private boolean USE_TELEMETRY=false;
 
 
 
@@ -116,180 +147,6 @@ public class twoControllerTeleopv2 extends OpMode {
     public double startShootingtime=0;
     public double prevTime=0;
 
-    private MediaPlayer wrongBallSound = null, correctBallSound = null;
-    private ColorSensor sweeperColorSensor;
-    private BeaconColor beaconColor = null;
-
-    private boolean ballSensed = false;
-
-    @Override
-    public void init() {
-        leftMotor = this.hardwareMap.dcMotor.get("l");
-        rightMotor = this.hardwareMap.dcMotor.get("r");
-        scooper = this.hardwareMap.dcMotor.get("scooper");
-        shooter1 = this.hardwareMap.dcMotor.get("shooter1");
-        shooter2 = this.hardwareMap.dcMotor.get("shooter2");
-        sweeper = this.hardwareMap.dcMotor.get("sweeper");
-        sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
-        state = false;
-
-
-        RPM955= new shooterSettings();//default settings are for 955, 0.43,0.43
-        RPM0 = new shooterSettings(0,0,0);
-        RPM800 = new shooterSettings(800,0.35,0.35);
-
-
-        shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
-        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
-        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-
-        leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        swap=true;
-
-        shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
-        correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
-    }
-
-    @Override
-    public void loop() {
-
-        double left = -gamepad1.left_stick_y;
-        double right = -gamepad1.right_stick_y;
-        int shooting1= shooter1.getCurrentPosition();
-        int shooting2= shooter2.getCurrentPosition();
-
-        if(swap==true)
-        {
-            double temp=left;
-            left=right;
-            right=temp;
-        }
-
-        left=scaleInput(left);
-        right=scaleInput(right);
-
-        leftMotor.setPower(left);
-        rightMotor.setPower(right);
-
-        if(gamepad1.dpad_down){
-            leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-            rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            swap=false;
-        } else if(gamepad1.dpad_up){
-            leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-            swap=true;
-        }
-
-        if(gamepad2.dpad_right){
-            sweeper.setPower(0.7);
-            scooper.setPower(1);
-        }
-
-        if(gamepad2.left_trigger > 0){
-            scooper.setPower(-0.7);
-        } else if(gamepad2.left_bumper){
-            scooper.setPower(1);
-        } else {
-            scooper.setPower(0);
-        }
-
-        if(gamepad2.a){
-            EncoderShooter(RPM800);
-        } else if(gamepad2.b) {
-            EncoderShooter(RPM955);//0.6//0.7
-            //power=0.7;
-            //startrunnning=true;
-        }
-        else {
-            EncoderShooter(RPM0);
-        }
-
-
-
-
-
-            if(gamepad2.right_bumper){
-                sweeper.setPower(0.7);
-
-                if(beaconColor == null) {
-                    if (sweeperColorSensor.red() > 15) {
-                        if (sweeperColorSensor.red() > sweeperColorSensor.blue())
-                            beaconColor = BeaconColor.RED;
-                    } else if(sweeperColorSensor.blue() > 15){
-                        if (sweeperColorSensor.red() < sweeperColorSensor.blue())
-                            beaconColor = BeaconColor.BLUE;
-                    } else
-                            beaconColor = BeaconColor.BLUE;
-                    telemetry.log().add("Beacon Color Set");
-                }
-            } else if(gamepad2.right_trigger > 0){
-                sweeper.setPower(-0.7);
-            } else {
-                sweeper.setPower(0);
-
-            }
-
-        if(isWrongBall()){
-            if(!wrongBallSound.isPlaying()){
-                wrongBallSound.release();
-                wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
-                wrongBallSound.start();
-            }
-            //sweeper.setPower(0.5);
-        } else {
-            isWrongBall();
-            if(ballSensed){
-                correctBallSound.release();
-                correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
-                correctBallSound.start();
-            } else {
-                correctBallSound.stop();
-            }
-            wrongBallSound.stop();
-            //sweeper.setPower(0);
-        }
-
-        telemetry.addData("left joystick",  "%.2f", left);
-        telemetry.addData("right joystick", "%.2f", right);
-        telemetry.update();
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
-    }
-
-    private boolean isWrongBall() {
-        if(sweeperColorSensor.red() > 11 || sweeperColorSensor.blue() > 11){
-            ballSensed = true;
-            if(sweeperColorSensor.red() > sweeperColorSensor.blue() && beaconColor == BeaconColor.BLUE){
-                return true;
-            } else if(sweeperColorSensor.blue() > sweeperColorSensor.red() && beaconColor == BeaconColor.RED){
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            ballSensed = false;
-            return false;
-        }
-    }
 
     public void EncoderShooter(shooterSettings settings)
     {
@@ -449,7 +306,6 @@ public class twoControllerTeleopv2 extends OpMode {
         }
 
     }
-
     public void outputTelemetry(shooterSettings settings) {
         telemetry.addData("requiredPWR1: ", String.format("%.4f", settings.requiredPWR1));
         telemetry.addData("requiredPWR2: ", String.format("%.4f", settings.requiredPWR2));
@@ -541,58 +397,195 @@ public class twoControllerTeleopv2 extends OpMode {
 
     }
 
+    public void runOpMode() throws InterruptedException {
 
+        /* Initialize the drive system variables.
+         * The init() method of the hardware class does all the work here
+         */
+        robot.init(hardwareMap);
+        RPM955= new shooterSettings();//default settings are for 955, 0.43,0.43
+        RPM0 = new shooterSettings(0,0,0);
+        RPM800 = new shooterSettings(800,0.35,0.35);
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
+        // robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        shooter1 = this.hardwareMap.dcMotor.get("shooter1");
+        shooter2 = this.hardwareMap.dcMotor.get("shooter2");
+        scooper = this.hardwareMap.dcMotor.get("scooper");
 
+        state = false;
 
+        shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        // Send telemetry message to signify robot waiting;
 
-
-
-
-
-
-
-
-
-    /*
-     * This method scales the joystick input so for low joystick values, the
-     * scaled value is less than linear.  This is to make it easier to drive
-     * the robot more precisely at slower speeds.
-     */
-    double scaleInput(double dVal)  {
-        double[] scaleArray = { 0.0, 0.05, 0.09, 0.10, 0.12, 0.15, 0.18, 0.24,
-                0.30, 0.36, 0.43, 0.50, 0.60, 0.72, 0.85, 1.00, 1.00 };
-
-        // get the corresponding index for the scaleInput array.
-        int index = (int) (dVal * 16.0);
-
-        // index should be positive.
-        if (index < 0) {
-            index = -index;
+        // Wait for the game to start (driver presses PLAY)
+        while (!isStarted()) {
+            idle();
         }
 
-        // index cannot exceed size of array minus 1.
-        if (index > 16) {
-            index = 16;
+        // sleep(10000);
+        encoderDrive(APPROACH_SPEED, 20 / 2, 20 / 2, 3);
+        shoot();
+        encoderDrive(APPROACH_SPEED, 40 / 2, 40 / 2, 10);
+    }
+
+
+
+    private boolean verify() {
+        if (leftColorSensor.alpha() == 255 || rightColorSensor.alpha() == 255)
+            throw new RuntimeException("Color Sensor problems");
+        /*else if (leftColorSensor.red() == rightColorSensor.red()
+                && leftColorSensor.blue() == rightColorSensor.blue()
+                && leftColorSensor.red() > 2
+                && rightColorSensor.red() > 2)
+            throw new RuntimeException("Color Sensor problems");*/
+
+        if (leftColorSensor.blue() > leftColorSensor.red() && rightColorSensor.blue() > rightColorSensor.red()) {
+            telemetry.addLine("Beacon is blue");
+            return true;
+        }
+        /*else if(Math.abs(leftColorSensor.blue() - rightColorSensor.blue()) < 2){
+            return true;
+        }*/
+        telemetry.addLine("Beacon is red");
+        return false;
+    }
+
+
+
+    public void drive(double distance, double speed) throws InterruptedException {
+        //1220 ticks per rotation
+        //how many rotations? depends on distance
+        //distance in cm - convert distance to encoder ticks
+        //distance for each encoder tick == circumference / 1220
+        //target distance / distance for each encoder tick == number of encoder ticks needed
+        telemetry.addData("Starting to Drive", robot.leftMotor.getCurrentPosition() / ROTATION);
+        telemetry.update();
+
+        runUsingEncoder();
+
+        stopAndResetEncoder();
+
+        robot.leftMotor.setPower(speed);
+        robot.rightMotor.setPower(speed);
+
+        robot.leftMotor.setTargetPosition(CMtoEncoderTicks(distance));
+        robot.rightMotor.setTargetPosition(CMtoEncoderTicks(distance));
+
+        runToPosition();
+
+        while (robot.leftMotor.isBusy() && robot.rightMotor.isBusy() && opModeIsActive()) {
+            //telemetry.addData("Heading", heading);
         }
 
-        // get value from the array.
-        double dScale = 0;
-        if (dVal < 0) {
-            dScale = -scaleArray[index];
-        } else {
-            dScale = scaleArray[index];
+        stopRobot();
+
+        runUsingEncoder();
+
+        telemetry.addData("Finished Driving", robot.leftMotor.getCurrentPosition() / ROTATION);
+        telemetry.update();
+    }
+
+    int CMtoEncoderTicks(double cm) {
+        return (int) (cm * ROTATION / WHEEL_SIZE_IN / Math.PI);
+        //(target dist * ticks per rotation) / (circumference)
+    }
+
+    public void stopRobot() {
+        robot.leftMotor.setPower(0);
+        robot.rightMotor.setPower(0);
+    }
+
+    public void stopAndResetEncoder() {
+        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+    public void runToPosition() {
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void runUsingEncoder() {
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void encoderDrive(double speed,
+                             double leftInches, double rightInches,
+                             double timeoutS) {
+
+        ElapsedTime runtime = new ElapsedTime();
+        int newLeftTarget;
+        int newRightTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftTarget = robot.leftMotor.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+            newRightTarget = robot.rightMotor.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
+            robot.leftMotor.setTargetPosition(newLeftTarget);
+            robot.rightMotor.setTargetPosition(newRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+
+            robot.leftMotor.setPower(Math.abs(speed));
+            robot.rightMotor.setPower(Math.abs(speed));
+
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.leftMotor.isBusy() && robot.rightMotor.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
+                telemetry.addData("Path2", "Running at %7d :%7d",
+                        robot.leftMotor.getCurrentPosition(),
+                        robot.rightMotor.getCurrentPosition());
+                telemetry.addData("Left motor busy", robot.leftMotor.isBusy());
+                telemetry.addData("Right motor busy", robot.rightMotor.isBusy());
+                telemetry.update();
+            }
+            // Stop all motion;
+            robot.leftMotor.setPower(0);
+            robot.rightMotor.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //  sleep(250);   // optional pause after each move
+        }
+    }
+    public void shoot() {
+
+        while(opModeIsActive())
+        {
+            EncoderShooter(RPM955);
+            if(checkIfReadyToShoot(RPM955)){
+                scooper.setPower(1);
+                sleep(3000);
+                break;
+            }
         }
 
-        // return scaled value.
-        return dScale;
+        telemetry.addData("Finish", "After");
     }
 
 
 }
-
-
-
