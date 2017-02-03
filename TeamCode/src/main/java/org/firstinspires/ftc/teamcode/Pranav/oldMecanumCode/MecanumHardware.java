@@ -1,8 +1,7 @@
-package org.firstinspires.ftc.teamcode.Pranav;
+package org.firstinspires.ftc.teamcode.Pranav.oldMecanumCode;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,8 +11,6 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 /**
@@ -46,10 +43,9 @@ public class MecanumHardware extends LinearOpMode
     public ModernRoboticsI2cGyro sensorGyro = null;
     public LightSensor sensorLine = null;
     public UltrasonicSensor sensorUltra = null;
-    public ModernRoboticsI2cRangeSensor sensorRange = null;
+    //public ModernRoboticsI2cRangeSensor sensorRange = null;
     public ColorSensor sensorColorRight = null;
     public ColorSensor sensorColorLeft = null;
-    //public ModernRoboticsI2cRangeSensor rangeSensor = null;
 
     //1000 Milliseconds
     public int SECOND = 1000;
@@ -59,7 +55,7 @@ public class MecanumHardware extends LinearOpMode
     public int MOTOR_POWER = 1;
 
     //Line Sensor Thresholds
-    double WHITE_THRESHOLD = 0.3;
+    double WHITE_THRESHOLD = 0.5;
 
     //Z-Axis of the Modern Robotics Gyro Sensor
     int heading = 0;
@@ -114,7 +110,7 @@ public class MecanumHardware extends LinearOpMode
         sensorGyro = hwMap.get(ModernRoboticsI2cGyro.class, "gyro");
         sensorLine = hwMap.lightSensor.get("line");
         sensorUltra = hwMap.ultrasonicSensor.get("ultra");
-        sensorRange = hwMap.get(ModernRoboticsI2cRangeSensor.class, "range");
+        //sensorRange = hwMap.get(ModernRoboticsI2cRangeSensor.class, "range");
         sensorColorLeft = hwMap.get(ModernRoboticsI2cColorSensor.class, "colorLeft");
         sensorColorRight = hwMap.get(ModernRoboticsI2cColorSensor.class, "colorRight");
     }
@@ -201,7 +197,7 @@ public class MecanumHardware extends LinearOpMode
     }
 
     //A basic go straight function that uses encoders to track its distance
-    public void drive(int distance, double speed) throws InterruptedException
+    public void drive(int distance, double speed)
     {
         telemetry.addData("Starting to Drive", frontRight.getCurrentPosition() / ROTATION);
         telemetry.update();
@@ -326,7 +322,7 @@ public class MecanumHardware extends LinearOpMode
     }
 
     //Reverses the configuration of the motor directions
-    public void ReverseMotors()
+    public void reverseDirectionMotors()
     {
 
         frontRight.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
@@ -478,29 +474,36 @@ public class MecanumHardware extends LinearOpMode
 
     }
 
-    //Detects the white line
-    public void approachWhiteLine(boolean wall) throws InterruptedException
+    public void detectWhiteLine(int distance, double speed)
     {
-
-        if (!wall)
-        {
-            setMotorPower(0.4);
-        }
-
-        while (opModeIsActive() && (sensorLine.getLightDetected() < WHITE_THRESHOLD))
-        {
-
-            // Display the light level while we are looking for the line
-            telemetry.addData("Light Level", sensorLine.getLightDetected());
-            telemetry.update();
-            idle();
-        }
-
-        telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+        telemetry.addData("Starting to Drive", frontRight.getCurrentPosition() / ROTATION);
         telemetry.update();
 
+        runUsingEncoder();
+
+        stopAndResetEncoder();
+
+        setMotorPower(speed);
+
+        //Robot is turned around and has to drive the opposite direction
+        frontRight.setTargetPosition(distance);
+        backRight.setTargetPosition(distance);
+        frontLeft.setTargetPosition(distance);
+        backLeft.setTargetPosition(distance);
+
+        runToPosition();
+
+        while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy() && opModeIsActive())
+        {
+                /*if(sensorLine.getLightDetected() < WHITE_THRESHOLD)
+                    break;*/
+        }
+
         stopRobot();
+
+        runUsingEncoder();
     }
+
 
     //A basic Turn function that uses the Modern Robotics Gyro Sensor to calculate the angle
     public void turnGyro(String direction, int angle, double speed) throws InterruptedException
@@ -540,7 +543,7 @@ public class MecanumHardware extends LinearOpMode
     }
 
     //The init cycle of the robot
-    public void init(HardwareMap ahwMap)
+    public boolean init(HardwareMap ahwMap)
     {
         //Save reference to Hardware Map
         hwMap = ahwMap;
@@ -556,6 +559,7 @@ public class MecanumHardware extends LinearOpMode
         runUsingEncoder();
 
         initializeSensors();
+        return false;
     }
     @Override
     public void runOpMode() throws InterruptedException

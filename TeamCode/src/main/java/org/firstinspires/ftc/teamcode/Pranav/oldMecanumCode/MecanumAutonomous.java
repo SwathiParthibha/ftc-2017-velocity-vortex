@@ -23,7 +23,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-package org.firstinspires.ftc.teamcode.Pranav;
+package org.firstinspires.ftc.teamcode.Pranav.oldMecanumCode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -50,21 +50,17 @@ public class MecanumAutonomous extends MecanumHardware
         Thread.sleep(50);
       }
 
-      /*
-      drive((ROTATION/2)/2, 0.5);
+
+      drive((ROTATION/2), 0.5);
 
       turnGyro("left", 315, 0.2);
 
-      drive((ROTATION * 3) + (ROTATION/4 * 3), 1);
+      detectWhiteLine(ROTATION * 4, 0.5);
 
-      turnGyro("right", 72, 0.2);
-
-      approachWhiteLine(false);
-
-      drive((ROTATION/2)/2, 0.5);
+      turnGyro("right", 68 , 0.2);
 
       pushButton("red");
-      */
+
     }
   }
 }
