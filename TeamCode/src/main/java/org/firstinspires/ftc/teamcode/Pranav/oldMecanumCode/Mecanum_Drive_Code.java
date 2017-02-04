@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Pranav;
+package org.firstinspires.ftc.teamcode.Pranav.oldMecanumCode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Mecanum TeleOp", group="TeleOp")
-@Disabled
+//@Disabled
 public class Mecanum_Drive_Code extends OpMode {
 
     /* Declare OpMode members. */
@@ -28,7 +28,7 @@ public class Mecanum_Drive_Code extends OpMode {
     double threshold = .2;
 
     //Change Speed
-    double speedRatio = 1.0;
+    double speedRatio = 0.4;
 
     public Mecanum_Drive_Code()
     {
@@ -38,13 +38,13 @@ public class Mecanum_Drive_Code extends OpMode {
     @Override
     public void init() {
 
-        frontRight = hardwareMap.dcMotor.get("motor_2");
-        backRight = hardwareMap.dcMotor.get("motor_4");
+        frontRight = hardwareMap.dcMotor.get("fr");
+        backRight = hardwareMap.dcMotor.get("br");
         //frontRight
         // setDirection(DcMotor.Direction.REVERSE);
         //backRight.setDirection(DcMotor.Direction.REVERSE);
-        frontLeft = hardwareMap.dcMotor.get("motor_3");
-        backLeft = hardwareMap.dcMotor.get("motor_1");
+        frontLeft = hardwareMap.dcMotor.get("fl");
+        backLeft = hardwareMap.dcMotor.get("bl");
         frontRight.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         backRight.setDirection(DcMotor.Direction.REVERSE); // Set to FORWARD if using AndyMark motors
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
