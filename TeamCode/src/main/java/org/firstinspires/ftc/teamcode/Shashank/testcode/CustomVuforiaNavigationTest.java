@@ -87,7 +87,7 @@ import java.util.List;
  */
 
 @Autonomous(name="CustomVuforiaNavigationTest", group ="Tests")
-@Disabled
+//@Disabled
 public class CustomVuforiaNavigationTest extends LinearOpMode {
 
     public static final String TAG = "Vuforia Sample";

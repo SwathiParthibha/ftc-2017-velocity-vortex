@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <MotorController name="drive" serialNumber="AL00VCAZ">
+        <Motor name="r" port="1" />
+        <Motor name="l" port="2" />
+    </MotorController>
+    <DeviceInterfaceModule name="Device Interface Module 2" serialNumber="AL00VBYV">
+        <AdafruitBNO055IMU name="imu" port="0" />
+        <I2cDevice name="r side range" port="1" />
+        <I2cDevice name="range sensor" port="2" />
+        <I2cDevice name="l side range" port="3" />
+        <ColorSensor name="lcs" port="4" />
+        <ColorSensor name="rcs" port="5" />
+    </DeviceInterfaceModule>
+    <MotorController name="shooter" serialNumber="AL00XV7P">
+        <Motor name="shooter1" port="1" />
+        <Motor name="shooter2" port="2" />
+    </MotorController>
+    <LegacyModuleController name="Legacy Module 1" serialNumber="AL00VCK3">
+        <LightSensor name="light sensor" port="5" />
+    </LegacyModuleController>
+    <MotorController name="sweeping" serialNumber="AL00VHMP">
+        <Motor name="sweeper" port="1" />
+        <Motor name="scooper" port="2" />
+    </MotorController>
+</Robot>

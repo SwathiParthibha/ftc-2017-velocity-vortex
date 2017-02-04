@@ -306,14 +306,14 @@ public class Shoot extends LinearOpMode {
 
             telemetry.update();
 
-            if(leftColorSensor.blue() > rightColorSensor.blue()){// && !verify()){
+            if(leftColorSensor.blue() > rightColorSensor.blue()){// && !verifyBlue()){
                 //write the code here to press the left button
                 telemetry.log().add("left is blue");
                 telemetry.update();
 
                 robot.rightMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
                 robot.leftMotor.setPower(0);
-            } else if(rightColorSensor.blue() > leftColorSensor.blue()) {// && !verify()){
+            } else if(rightColorSensor.blue() > leftColorSensor.blue()) {// && !verifyBlue()){
                 //write the code here to press the right button
                 telemetry.log().add("right is blue");
                 telemetry.update();

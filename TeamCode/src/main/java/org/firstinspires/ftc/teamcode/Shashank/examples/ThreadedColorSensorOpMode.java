@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode.Shashank.examples;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -60,7 +61,7 @@ import org.firstinspires.ftc.teamcode.Shashank.utils.ThreadSharedObject;
  */
 
 @TeleOp(name="ThreadedColorSensorOpMode", group="Tests")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class ThreadedColorSensorOpMode extends OpMode
 {
     /* Declare OpMode members. */

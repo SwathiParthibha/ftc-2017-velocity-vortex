@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Shashank.examples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cAddr;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Shashank.utils.ThreadSharedObject;
  * Created by spmeg on 1/17/2017.
  */
 @Autonomous(name = "ThreadedLineFollowingOpmode", group = "custom examples")
+@Disabled
 public class ThreadedLineFollowingOpmode extends OpMode {
     private DcMotor leftMotor = null;
     private DcMotor rightMotor = null;

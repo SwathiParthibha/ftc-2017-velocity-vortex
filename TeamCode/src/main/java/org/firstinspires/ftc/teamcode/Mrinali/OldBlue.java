@@ -185,7 +185,7 @@ public class OldBlue extends LinearOpMode {
             telemetry.addData("Side Range Sensor", sideRangeSensor.getDistance(DistanceUnit.CM));
 
             //telemetry.addData("Angle", angleZ);
-            //telemetry.addData("verify", verify());
+            //telemetry.addData("verifyBlue", verifyBlue());
             //telemetry.addData("leftColorSensor", leftColorSensor.argb());
             //telemetry.addData("rightColorSensor", rightColorSensor.argb());
             telemetry.update();

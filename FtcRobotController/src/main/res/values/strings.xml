@@ -59,5 +59,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <string name="toastWifiConfigurationComplete">Configuration Complete</string>
   <string name="toastRestartingRobot">Restarting Robot</string>
   <string name="toastConfigureRobotBeforeProgrammingMode">You must Configure Robot before starting Programming Mode.</string>
+  <string-array name="allianceColor">
+    <item>Blue</item>
+    <item>Red</item>
+  </string-array>
+  <string name="pickColor">Pick an Alliance Color</string>
 
 </resources>

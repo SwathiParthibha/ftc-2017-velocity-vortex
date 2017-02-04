@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Saransh;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Basic Mecanum Code", group="MecanumBot")
+@Disabled
 public class Mecanum_Drive_Code extends OpMode {
 
     /* Declare OpMode members. */

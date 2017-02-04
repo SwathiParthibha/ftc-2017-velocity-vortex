@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode.Mrinali;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -71,7 +72,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  */
 
 @Autonomous(name="Beacons Autonomous Blue Shooter", group="Pushbot")
-//@Disabled
+@Disabled
 public class DriveToBeaconsBlueShooter extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
@@ -170,7 +171,7 @@ public class DriveToBeaconsBlueShooter extends LinearOpMode {
         rightColorSensor = hardwareMap.colorSensor.get("rcs");
 
         verify();
-        telemetry.addData("verify", verify()); //checks color sensors
+        telemetry.addData("verifyBlue", verify()); //checks color sensors
 
         // turn on LED of light sensor.
         lightSensor.enableLed(true);
@@ -188,7 +189,7 @@ public class DriveToBeaconsBlueShooter extends LinearOpMode {
             angleZ = IMUheading();
             telemetry.addData("Side Ultrasonic", getcmUltrasonic(sideRangeSensor));
             telemetry.addData("Angle", angleZ);
-            //telemetry.addData("verify", verify());
+            //telemetry.addData("verifyBlue", verifyBlue());
             telemetry.addData("leftColorSensor", leftColorSensor.argb());
             telemetry.addData("rightColorSensor", rightColorSensor.argb());
             telemetry.update();
@@ -415,14 +416,14 @@ public class DriveToBeaconsBlueShooter extends LinearOpMode {
 
             telemetry.update();
 
-            if(leftColorSensor.blue() > rightColorSensor.blue()){// && !verify()){
+            if(leftColorSensor.blue() > rightColorSensor.blue()){// && !verifyBlue()){
                 //write the code here to press the left button
                 telemetry.log().add("left is blue");
                 telemetry.update();
 
                 robot.rightMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
                 robot.leftMotor.setPower(0);
-            } else if(rightColorSensor.blue() > leftColorSensor.blue()) {// && !verify()){
+            } else if(rightColorSensor.blue() > leftColorSensor.blue()) {// && !verifyBlue()){
                 //write the code here to press the right button
                 telemetry.log().add("right is blue");
                 telemetry.update();
