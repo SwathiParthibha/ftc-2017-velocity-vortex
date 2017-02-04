@@ -339,7 +339,7 @@ public class MecanumHardware extends LinearOpMode
     public void drivePID(int distance, double speed, double angle)
     {
         double currentHeading, headingError;
-        double DRIVE_KP = 0.05; // This value relates the degree of error to percentage of motor speed
+        double DRIVE_KP =0.05; //This value relates the degree of error to percentage of motor speed
         double correction, steeringSpeedRight, steeringSpeedLeft;
 
         telemetry.addData("Starting to Drive Straight", frontRight.getCurrentPosition() / ROTATION);
