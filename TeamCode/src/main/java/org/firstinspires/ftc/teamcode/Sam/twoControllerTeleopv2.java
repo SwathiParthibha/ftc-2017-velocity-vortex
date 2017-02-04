@@ -110,7 +110,7 @@ public class twoControllerTeleopv2 extends OpMode {
     shooterSettings RPM955;
     shooterSettings RPM0;
     shooterSettings RPM800;
-
+    shooterSettings RPM1300;
 
 
     public double startShootingtime=0;
@@ -137,6 +137,7 @@ public class twoControllerTeleopv2 extends OpMode {
         RPM955= new shooterSettings();//default settings are for 955, 0.43,0.43
         RPM0 = new shooterSettings(0,0,0);
         RPM800 = new shooterSettings(800,0.35,0.35);
+        RPM1300 = new shooterSettings(1300,0.57,0.57);
 
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -213,6 +214,10 @@ public class twoControllerTeleopv2 extends OpMode {
             EncoderShooter(RPM800);
         } else if(gamepad2.b) {
             EncoderShooter(RPM955);//0.6//0.7
+            //power=0.7;
+            //startrunnning=true;
+        } else if(gamepad2.y) {
+            EncoderShooter(RPM1300);//0.6//0.7
             //power=0.7;
             //startrunnning=true;
         }
@@ -301,7 +306,7 @@ public class twoControllerTeleopv2 extends OpMode {
             }
 
             settings.dt=getRuntime()-prevTime;
-            if (settings.dt> 0.01) {//only update every 10ms
+            if (settings.dt> 0.05) {//only update every 50ms
                 settings.current_position1 = shooter1.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
                 settings.current_position2 = shooter2.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
                 prevTime = getRuntime();//MUST BE FIRST - time sensitive measurement
@@ -309,11 +314,12 @@ public class twoControllerTeleopv2 extends OpMode {
                 updateRPM1and2(settings);
 
                 if(getRuntime()-startShootingtime>settings.rampUpTime) {//only update Kalmin and PID after ramp up
-                    timeUpdate(settings);
-                    measurementUpdate(settings);
+                    //timeUpdate(settings);
+                    //measurementUpdate(settings);
 
 
-                    //DbgLog.msg("Time: "+getRuntime()+"RPM1: " + current_rpm1+"RPM2: " + current_rpm2);
+                    //DbgLog.msg("Time: "+getRuntime()+"RPM1: " + settings.current_rpm1+"RPM2: " + settings.current_rpm2+"Kalmin1: " + settings.Xk1+"Kalmin2: " + settings.Xk2);
+                    DbgLog.msg("Time: "+getRuntime()+"Encoder: " + settings.current_position2+"Encoder2: " + settings.current_position2);
 
                     PID1Update(settings);
                     PID2Update(settings);
@@ -340,6 +346,7 @@ public class twoControllerTeleopv2 extends OpMode {
             shooter2.setPower(settings.requiredPWR2);
 
 
+
         }
         else
         {
@@ -359,7 +366,8 @@ public class twoControllerTeleopv2 extends OpMode {
     }
 
     public void PID1Update(shooterSettings settings){
-        settings.error1=-(settings.Xk1- settings.requestedEncoderTicksPerSecond);
+        //settings.error1=-(settings.Xk1- settings.requestedEncoderTicksPerSecond);
+        settings.error1=-(settings.current_rpm1- settings.requestedEncoderTicksPerSecond);
         settings.integral1 = settings.integral1 + settings.error1 * settings.dt;//calculate integral of error
         settings.derivative1 = (settings.error1 - settings.previous_error1) / settings.dt;//calculate derivative of data
 
@@ -377,7 +385,8 @@ public class twoControllerTeleopv2 extends OpMode {
 
     public void PID2Update(shooterSettings settings){
 
-        settings.error2=-(settings.Xk2- settings.requestedEncoderTicksPerSecond);
+        //settings.error2=-(settings.Xk2- settings.requestedEncoderTicksPerSecond);
+        settings.error2=-(settings.current_rpm2- settings.requestedEncoderTicksPerSecond);
         settings.integral2 = settings.integral2 + settings.error2 * settings.dt;//calculate integral of error
         settings.derivative2 = (settings.error2 - settings.previous_error2) / settings.dt;//calculate derivative of data
 
