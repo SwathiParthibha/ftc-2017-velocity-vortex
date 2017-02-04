@@ -171,6 +171,8 @@ public class CustomVuforiaNavigationTest extends LinearOpMode {
         float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your robot
         float mmFTCFieldWidth  = (12*12 - 2) * mmPerInch;   // the FTC field is ~11'10" center-to-center of the glass panels
         float mmFTCFieldTileWidth  = (5.0f/8.0f) * mmPerInch;   // the FTC field is ~11'10" center-to-center of the glass panels
+        float mmWallHeight     = 12.125f * mmPerInch;
+        float mmwallFrameHeight= 2f * mmPerInch;
 
         /**
          * In order for localization to work, we need to tell the system where each target we
@@ -231,7 +233,7 @@ public class CustomVuforiaNavigationTest extends LinearOpMode {
         OpenGLMatrix gearsRedTargetLocationOnField = OpenGLMatrix
                 /* Then we translate the target off to the RED WALL. Our translation here
                 is a negative translation in X.*/
-                .translation(-mmFTCFieldWidth/2, -mmFTCFieldTileWidth/2, 0)
+                .translation(-mmFTCFieldWidth/2, -mmFTCFieldTileWidth/2, mmWallHeight/2)
                 .multiplied(Orientation.getRotationMatrix(
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X, then 90 in Z */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
@@ -241,7 +243,7 @@ public class CustomVuforiaNavigationTest extends LinearOpMode {
         OpenGLMatrix toolsRedTargetLocationOnField = OpenGLMatrix
                 /* Then we translate the target off to the RED WALL. Our translation here
                 is a negative translation in X.*/
-                .translation(-mmFTCFieldWidth/2, (mmFTCFieldTileWidth + (mmFTCFieldTileWidth/2)), 0)
+                .translation(-mmFTCFieldWidth/2, (mmFTCFieldTileWidth + (mmFTCFieldTileWidth/2)), mmWallHeight/2)
                 .multiplied(Orientation.getRotationMatrix(
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X, then 90 in Z */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
@@ -259,7 +261,7 @@ public class CustomVuforiaNavigationTest extends LinearOpMode {
         OpenGLMatrix wheelsBlueTargetLocationOnField = OpenGLMatrix
                 /* Then we translate the target off to the Blue Audience wall.
                 Our translation here is a positive translation in Y.*/
-                .translation(mmFTCFieldTileWidth/2, mmFTCFieldWidth/2, 0)
+                .translation(mmFTCFieldTileWidth/2, mmwallFrameHeight/2, mmWallHeight/2)
                 .multiplied(Orientation.getRotationMatrix(
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
@@ -269,7 +271,7 @@ public class CustomVuforiaNavigationTest extends LinearOpMode {
         OpenGLMatrix legosBlueTargetLocationOnField = OpenGLMatrix
                 /* Then we translate the target off to the Blue Audience wall.
                 Our translation here is a positive translation in Y.*/
-                .translation((-mmFTCFieldTileWidth-(mmFTCFieldTileWidth/2)), mmFTCFieldWidth/2, 0)
+                .translation((-mmFTCFieldTileWidth-(mmFTCFieldTileWidth/2)), mmFTCFieldWidth/2, mmWallHeight/2)
                 .multiplied(Orientation.getRotationMatrix(
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,

@@ -42,13 +42,16 @@ public class StateMachineOp extends OpMode {
 
     enum S implements StateName {
         TO_WHITE_LINE,
+        WHITE_LINE_PIVOT_WAIT,
+        PIVOT_TO_LINE,
         FOLLOW_lINE,
         PRESS_BEACON,
         WAIT,
         _2ND_TO_WHITE_LINE,
+        _2ND_WHITE_LINE_PIVOT_WAIT,
+        _2ND_PIVOT_TO_LINE,
         _2ND_FOLLOW_lINE,
         _2ND_PRESS_BEACON,
-        _2ND_WAIT,
         STOP
     };
 
@@ -76,9 +79,12 @@ public class StateMachineOp extends OpMode {
 
         leftColorSensor  = hardwareMap.colorSensor.get("lcs");
         I2cAddr i2cAddr = I2cAddr.create8bit(0x4c);
-        leftColorSensor.setI2cAddress(i2cAddr);
 
         rightColorSensor = hardwareMap.colorSensor.get("rcs");
+        rightColorSensor.setI2cAddress(i2cAddr);
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         Activity activity = (Activity) hardwareMap.appContext;
         activity.runOnUiThread(new Runnable() {
@@ -120,22 +126,22 @@ public class StateMachineOp extends OpMode {
         else if(beaconColor == null)
             telemetry.log().add("Beacon color is: NULL");
 
-        //AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.TO_WHITE_LINE);
+        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.TO_WHITE_LINE);
 
-        //autoStateMahineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.FOLLOW_lINE, leftMotor, rightMotor, lightSensor);
-        //autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
-        //autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.WAIT, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
-        //autoStateMachineBuilder.addWait(S.WAIT, S._2ND_TO_WHITE_LINE, 3000);
-        ///autoStateMachineBuilder.addToWhiteLine(S._2ND_TO_WHITE_LINE, S._2ND_FOLLOW_lINE, leftMotor, rightMotor, lightSensor);
-        //autoStateMachineBuilder.addLineFollow(telemetry, S._2ND_FOLLOW_lINE, S._2ND_PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
-        //autoStateMachineBuilder.addPressBeacon(telemetry, S._2ND_PRESS_BEACON, S.STOP, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
-        //autoStateMachineBuilder.addStop(S.STOP);
-
-        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.WAIT);
-
-        autoStateMachineBuilder.addWait(S.WAIT, S.PRESS_BEACON, 3000);
-        autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.STOP, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+        autoStateMachineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.PIVOT_TO_LINE, leftMotor, rightMotor, lightSensor);
+        //autoStateMachineBuilder.addWait(S.WHITE_LINE_PIVOT_WAIT, S.PIVOT_TO_LINE, 300);
+        autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.PIVOT_TO_LINE, S.FOLLOW_lINE, beaconColor);
+        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
+        autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.WAIT, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+        autoStateMachineBuilder.addWait(S.WAIT, S._2ND_TO_WHITE_LINE, 3000);
+        autoStateMachineBuilder.addToWhiteLine(S._2ND_TO_WHITE_LINE, S._2ND_PIVOT_TO_LINE, leftMotor, rightMotor, lightSensor);
+        //autoStateMachineBuilder.addWait(S._2ND_WHITE_LINE_PIVOT_WAIT, S._2ND_PIVOT_TO_LINE, 300);
+        autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S._2ND_PIVOT_TO_LINE, S._2ND_FOLLOW_lINE, beaconColor);
+        autoStateMachineBuilder.addLineFollow(telemetry, S._2ND_FOLLOW_lINE, S._2ND_PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
+        autoStateMachineBuilder.addPressBeacon(telemetry, S._2ND_PRESS_BEACON, S.STOP, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+        //autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.PIVOT_TO_LINE, S.STOP, beaconColor);
         autoStateMachineBuilder.addStop(S.STOP);
+
         stateMachine = autoStateMachineBuilder.build();
 
         runtime.reset();
@@ -168,6 +174,8 @@ public class StateMachineOp extends OpMode {
         telemetry.addData("right red", String.format("r=%d", rightColorSensor.red()));
         telemetry.addData("right green", String.format("g=%d", rightColorSensor.green()));
         telemetry.addData("right blue", String.format("b=%d", rightColorSensor.blue()));
+        telemetry.addData("left connec", leftColorSensor.getConnectionInfo());
+        telemetry.addData("right connec", rightColorSensor.getConnectionInfo());
         telemetry.update();
 
         stateMachine.act();

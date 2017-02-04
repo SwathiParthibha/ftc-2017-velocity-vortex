@@ -108,7 +108,7 @@ public class LineFollowState extends BasicAbstractState {
 
     @Override
     public boolean isDone() {
-        return threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) < 11 && threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) > 0;
+        return threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) < 13 && threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) > 0;
     }
 
     @Override

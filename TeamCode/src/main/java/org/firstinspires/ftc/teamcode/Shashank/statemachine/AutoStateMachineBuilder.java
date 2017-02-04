@@ -33,11 +33,18 @@ public class AutoStateMachineBuilder extends StateMachineBuilder {
     }
 
     public void addPressBeacon(Telemetry telemetry, StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, ColorSensor leftColorSensor, ColorSensor rightColorSensor, BeaconColor color){
+        telemetry.log().add("in add method");
+        telemetry.log().add("left motor name: " + leftColorSensor.getConnectionInfo() + " right motor name: "+ leftColorSensor.getConnectionInfo());
+        telemetry.update();
         add(stateName, AutoStates.pressBeacon(telemetry, stateName, nextStateName, leftMotor, rightMotor, leftColorSensor, rightColorSensor, color));
     }
 
     public void addToWhiteLine(StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor){
         add(stateName, AutoStates.toWhiteLine(stateName, nextStateName, leftMotor, rightMotor, lightSensor));
+    }
+
+    public void addPivotToWhiteLine(DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, StateName stateName, StateName nextStateName, BeaconColor beaconColor){
+        add(stateName, AutoStates.pivotToWhiteLineState(leftMotor, rightMotor, lightSensor, stateName, nextStateName, beaconColor));
     }
 
 }

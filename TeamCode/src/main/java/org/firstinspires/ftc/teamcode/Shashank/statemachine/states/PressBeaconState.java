@@ -48,12 +48,18 @@ public class PressBeaconState extends BasicAbstractState {
 
     @Override
     public void init() {
+        telemetry.log().add("in state init method");
+        telemetry.log().add("left motor name: " + leftMotor.getConnectionInfo() + " left motor name: "+ rightMotor.getConnectionInfo());
+        telemetry.update();
         elapsedTime = new ElapsedTime();
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        telemetry.log().add("in add method");
+        telemetry.log().add("left motor name: " + leftColorSensor.getDeviceName() + " right motor name: "+ rightColorSensor.getDeviceName());
+        telemetry.update();
         telemetry.log().add("Finished init");
     }
 
@@ -66,10 +72,18 @@ public class PressBeaconState extends BasicAbstractState {
             telemetry.update();
         }
 
+        telemetry.log().add("in act method");
+        telemetry.log().add("left motor name: " + leftColorSensor.getConnectionInfo() + " right motor name: "+ rightColorSensor.getConnectionInfo());
+        telemetry.update();
+
         telemetry.log().add("isSame(): " + isSameColor());
         telemetry.log().add("isDone(): " + isDone());
         telemetry.log().add("timeout: " + (elapsedTime.seconds() > timeout));
         telemetry.log().add("timeout value: " + timeout);
+        telemetry.log().add("leftColorSensor.red() < leftColorSensor.blue()\n" +
+                "                    && rightColorSensor.red() > rightColorSensor.blue()" + (leftColorSensor.red() < leftColorSensor.blue()
+                && rightColorSensor.red() > rightColorSensor.blue()));
+        telemetry.log().add("beacon color " + beaconColor);
         telemetry.update();
 
         if(isDone()) {
