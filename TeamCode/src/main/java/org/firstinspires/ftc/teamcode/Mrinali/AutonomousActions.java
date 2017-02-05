@@ -205,10 +205,10 @@ public class AutonomousActions extends LinearOpMode {
         //origAngle = angles.firstAngle;
 
         leftColorSensor  = hardwareMap.colorSensor.get("lcs");
-        I2cAddr i2cAddr = I2cAddr.create8bit(0x4c);
-        leftColorSensor.setI2cAddress(i2cAddr);
 
         rightColorSensor = hardwareMap.colorSensor.get("rcs");
+        I2cAddr i2cAddr = I2cAddr.create8bit(0x4c);
+        rightColorSensor.setI2cAddress(i2cAddr);
 
         lightSensor.enableLed(true);
 
@@ -249,7 +249,7 @@ public class AutonomousActions extends LinearOpMode {
         stopRobot();
 
         if (!wall) {
-            encoderDrive(APPROACH_SPEED * .4, 1, 1, 1);
+            encoderDrive(APPROACH_SPEED * .4, 1.25, 1.25, 1);
         }
         else
             encoderDrive(APPROACH_SPEED * .4, 2, 2, 2);
@@ -259,6 +259,10 @@ public class AutonomousActions extends LinearOpMode {
         //leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        int leftPos = leftMotor.getCurrentPosition();
+        int rightPos = rightMotor.getCurrentPosition();
+
+        double startAngle = IMUheading();
         angleZ = IMUheading();
 
         double angDiff = turnAngle-angleZ; //positive: turn left
@@ -284,6 +288,13 @@ public class AutonomousActions extends LinearOpMode {
 
                 telemetry.addData("Angle", angleZ);
                 telemetry.update();
+
+                if (leftMotor.getCurrentPosition() > leftPos
+                        && rightMotor.getCurrentPosition() < rightPos
+                        && IMUheading() == startAngle) {
+                    resetIMuandPos(leftPos, rightPos);
+                }
+
                 idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
             }
             leftMotor.setPower(0);
@@ -310,6 +321,13 @@ public class AutonomousActions extends LinearOpMode {
 
                 telemetry.addData("Angle", angleZ);
                 telemetry.update();
+
+                if (leftMotor.getCurrentPosition() < leftPos
+                        && rightMotor.getCurrentPosition() > rightPos
+                        && IMUheading() == startAngle) {
+                    resetIMuandPos(leftPos, rightPos);
+                }
+
                 idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
             }
             leftMotor.setPower(0);
@@ -317,6 +335,45 @@ public class AutonomousActions extends LinearOpMode {
         }
         //leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    void resetIMuandPos(int left, int right) { //resets IMU to 0 at starting position of turn
+
+        telemetry.addLine("IMU Problem");
+        telemetry.update();
+
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+
+        leftMotor.setTargetPosition(left);
+        rightMotor.setTargetPosition(right);
+
+        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        rightMotor.setPower(.2);
+        leftMotor.setPower(.2);
+
+        while (opModeIsActive() &&
+                (leftMotor.isBusy() && rightMotor.isBusy())) {
+
+            // Display it for the driver.
+            telemetry.addData("Path1", "Running to %7d :%7d", left, right);
+            telemetry.addData("Path2", "Running at %7d :%7d",
+                    leftMotor.getCurrentPosition(),
+                    rightMotor.getCurrentPosition());
+            telemetry.update();
+        }
+
+        rightMotor.setPower(0);
+        leftMotor.setPower(0);
+
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        telemetry.addLine("Initializing IMU");
+        telemetry.update();
+        imu.initialize();
     }
 
     void approachBeacon() {
@@ -401,6 +458,7 @@ public class AutonomousActions extends LinearOpMode {
                 leftMotor.setPower(0);
                 rightMotor.setPower(0.2);
             }
+            telemetry.update();
         }
         stopRobot();
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -432,6 +490,7 @@ public class AutonomousActions extends LinearOpMode {
                 leftMotor.setPower(0.2);
                 rightMotor.setPower(0);
             }
+            telemetry.update();
         }
         stopRobot();
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -462,15 +521,15 @@ public class AutonomousActions extends LinearOpMode {
                 telemetry.log().add("left is blue");
                 telemetry.update();
 
-                rightMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
-                leftMotor.setPower(0);
+                leftMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
+                rightMotor.setPower(0);
             } else if(rightColorSensor.blue() > leftColorSensor.blue()) {// && !verifyBlue()){
                 //write the code here to press the right button
                 telemetry.log().add("right is blue");
                 telemetry.update();
 
-                leftMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
-                rightMotor.setPower(0);
+                rightMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
+                leftMotor.setPower(0);
             } else if(leftColorSensor.red() > leftColorSensor.blue() &&
                     rightColorSensor.red() > rightColorSensor.blue()){
                 //red button has been pressed
@@ -479,7 +538,7 @@ public class AutonomousActions extends LinearOpMode {
 
                 //sleep(4000); // wait 5 seconds total
                 leftMotor.setPower(APPROACH_SPEED);
-                rightMotor.setPower(0);
+                rightMotor.setPower(APPROACH_SPEED);
 
             } else if(getcmUltrasonic(rangeSensor) > 8) {
                 encoderDrive(APPROACH_SPEED, 1, 1, 1);
@@ -500,7 +559,7 @@ public class AutonomousActions extends LinearOpMode {
 
             leftMotor.setPower(-APPROACH_SPEED * .8);
             rightMotor.setPower(-APPROACH_SPEED * .8);
-            sleep(40);
+            sleep(100);
             leftMotor.setPower(0);
             rightMotor.setPower(0);
 
@@ -542,15 +601,15 @@ public class AutonomousActions extends LinearOpMode {
                 telemetry.log().add("left is red");
                 telemetry.update();
 
-                rightMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
-                leftMotor.setPower(0);
+                leftMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
+                rightMotor.setPower(0);
             } else if(rightColorSensor.red() > leftColorSensor.red()) {// && !verifyBlue()){
                 //write the code here to press the right button
                 telemetry.log().add("right is red");
                 telemetry.update();
 
-                leftMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
-                rightMotor.setPower(0);
+                rightMotor.setPower(APPROACH_SPEED); //motors seem to work in reverse
+                leftMotor.setPower(0);
             } else if(leftColorSensor.blue() > leftColorSensor.red() && rightColorSensor.blue() > rightColorSensor.red()){
                 //red button has been pressed
                 telemetry.log().add("beacon is blue");
@@ -558,7 +617,7 @@ public class AutonomousActions extends LinearOpMode {
 
                 //sleep(4000); // wait 5 seconds total
                 leftMotor.setPower(APPROACH_SPEED);
-                rightMotor.setPower(0);
+                rightMotor.setPower(APPROACH_SPEED);
             } else if(getcmUltrasonic(rangeSensor) > 8) {
                 encoderDrive(APPROACH_SPEED, 1, 1, 1);
             } else{
@@ -853,7 +912,6 @@ public class AutonomousActions extends LinearOpMode {
             resetPID(settings);
         }
     }
-
 
     public void updateRPM1and2(shooterSettings settings){
         settings.current_rpm1 = (settings.current_position1 - settings.previous_position1) / (settings.dt);

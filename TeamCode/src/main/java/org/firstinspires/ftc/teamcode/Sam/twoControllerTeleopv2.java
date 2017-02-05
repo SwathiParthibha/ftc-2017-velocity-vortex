@@ -111,12 +111,15 @@ public class twoControllerTeleopv2 extends OpMode {
     shooterSettings RPM0;
     shooterSettings RPM800;
 
+    shooterSettings RPM1200;
+    shooterSettings RPM1100;
+    shooterSettings RPM1135;
 
 
     public double startShootingtime=0;
     public double prevTime=0;
 
-    private MediaPlayer wrongBallSound = null, correctBallSound = null;
+    private MediaPlayer wrongBallSound = null;
     private ColorSensor sweeperColorSensor;
     private BeaconColor beaconColor = null;
 
@@ -137,6 +140,9 @@ public class twoControllerTeleopv2 extends OpMode {
         RPM955= new shooterSettings();//default settings are for 955, 0.43,0.43
         RPM0 = new shooterSettings(0,0,0);
         RPM800 = new shooterSettings(800,0.35,0.35);
+        RPM1200 = new shooterSettings(1200,0.52,0.52 );
+        RPM1100 = new shooterSettings(1100, 0.5,0.5);
+        RPM1135 = new shooterSettings(1135, 0.51,0.51);
 
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -161,8 +167,8 @@ public class twoControllerTeleopv2 extends OpMode {
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+
         wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
-        correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
     }
 
     @Override
@@ -215,6 +221,11 @@ public class twoControllerTeleopv2 extends OpMode {
             EncoderShooter(RPM955);//0.6//0.7
             //power=0.7;
             //startrunnning=true;
+        } else if(gamepad2.y) {
+            EncoderShooter(RPM1100);
+        }
+        else if(gamepad2.x) {
+            EncoderShooter(RPM1135);
         }
         else {
             EncoderShooter(RPM0);
@@ -253,14 +264,6 @@ public class twoControllerTeleopv2 extends OpMode {
             }
             //sweeper.setPower(0.5);
         } else {
-            isWrongBall();
-            if(ballSensed){
-                correctBallSound.release();
-                correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
-                correctBallSound.start();
-            } else {
-                correctBallSound.stop();
-            }
             wrongBallSound.stop();
             //sweeper.setPower(0);
         }
