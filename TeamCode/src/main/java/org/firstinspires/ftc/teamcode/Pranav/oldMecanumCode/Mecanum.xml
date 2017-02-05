@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <DeviceInterfaceModule name="Device Interface Module 1" serialNumber="AL00VDMC">
+        <Gyro name="gyro" port="0" />
+        <ColorSensor name="colorRight" port="3" />
+        <ColorSensor name="colorLeft" port="4" />
+    </DeviceInterfaceModule>
+    <MotorController name="Motor Controller Right" serialNumber="AL00XULS">
+        <Motor name="motor_4" port="1" />
+        <Motor name="motor_2" port="2" />
+    </MotorController>
+    <LegacyModuleController name="Legacy Module 1" serialNumber="AL00YDCG">
+        <LightSensor name="line" port="0" />
+        <UltrasonicSensor name="ultra" port="5" />
+    </LegacyModuleController>
+    <MotorController name="Motor Controller Left" serialNumber="AL00XT5C">
+        <Motor name="motor_1" port="1" />
+        <Motor name="motor_3" port="2" />
+    </MotorController>
+</Robot>
