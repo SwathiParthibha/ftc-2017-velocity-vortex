@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Shashank.statemachine.states;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.LightSensor;
 
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 import ftc.electronvolts.statemachine.BasicAbstractState;
 import ftc.electronvolts.statemachine.StateName;
@@ -21,11 +21,11 @@ public class PivotToWhiteLineState extends BasicAbstractState {
 
     private static final double WHITE_LINE_THRESHOLD = 0.3;
 
-    private BeaconColor beaconColor;
+    private AllianceColor beaconColor;
 
     private boolean hasInitialized = false;
 
-    public PivotToWhiteLineState(DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, StateName stateName, StateName nextStateName, BeaconColor beaconColor) {
+    public PivotToWhiteLineState(DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, StateName stateName, StateName nextStateName, AllianceColor beaconColor) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
         this.lightSensor = lightSensor;
@@ -46,7 +46,7 @@ public class PivotToWhiteLineState extends BasicAbstractState {
             rightMotor.setPower(0);
             return getNextStateName();
         } else {
-            if(beaconColor == BeaconColor.BLUE){
+            if(beaconColor == AllianceColor.BLUE){
                 leftMotor.setPower(0.4);
                 rightMotor.setPower(-0.4);
             } else {

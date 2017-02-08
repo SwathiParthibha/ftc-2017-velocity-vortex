@@ -3,20 +3,19 @@ package org.firstinspires.ftc.teamcode.Shashank.testcode;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.Looper;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 /**
  * Created by spmeg on 1/27/2017.
  */
 @Autonomous(name = "AlertDialogOpmode", group = "test Opmodes")
 public class AlertDialogOpmode extends OpMode {
-    private BeaconColor beaconColor = null;
+    private AllianceColor beaconColor = null;
 
     @Override
     public void init() {
@@ -31,9 +30,9 @@ public class AlertDialogOpmode extends OpMode {
                                 // The 'which' argument contains the index position
                                 // of the selected item
                                 if(itemPos == 0){
-                                    beaconColor = BeaconColor.BLUE;
+                                    beaconColor = AllianceColor.BLUE;
                                 } else {
-                                    beaconColor = BeaconColor.RED;
+                                    beaconColor = AllianceColor.RED;
                                 }
                             }
                         });

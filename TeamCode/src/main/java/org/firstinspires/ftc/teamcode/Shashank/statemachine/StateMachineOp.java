@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.Shashank.statemachine;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.Looper;
-import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -57,7 +55,7 @@ public class StateMachineOp extends OpMode {
 
     private StateMachine stateMachine;
 
-    private BeaconColor beaconColor = null;
+    private AllianceColor beaconColor = null;
 
     @Override
     public void init() {
@@ -97,9 +95,9 @@ public class StateMachineOp extends OpMode {
                                 // The 'which' argument contains the index position
                                 // of the selected item
                                 if(itemPos == 0){
-                                    beaconColor = BeaconColor.BLUE;
+                                    beaconColor = AllianceColor.BLUE;
                                 } else {
-                                    beaconColor = BeaconColor.RED;
+                                    beaconColor = AllianceColor.RED;
                                 }
                             }
                         });
@@ -119,9 +117,9 @@ public class StateMachineOp extends OpMode {
             }
         }
 
-        if(beaconColor == BeaconColor.RED)
+        if(beaconColor == AllianceColor.RED)
             telemetry.log().add("Beacon color is: RED");
-        else if(beaconColor == BeaconColor.BLUE)
+        else if(beaconColor == AllianceColor.BLUE)
             telemetry.log().add("Beacon color is: BLUE");
         else if(beaconColor == null)
             telemetry.log().add("Beacon color is: NULL");
