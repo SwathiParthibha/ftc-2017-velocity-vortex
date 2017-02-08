@@ -1,20 +1,69 @@
 package org.firstinspires.ftc.teamcode.Sam;
 
+import android.media.MediaPlayer;
+
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 
-import static java.lang.Thread.sleep;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.R;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
 
 
-@TeleOp(name = "Encoder Test", group = "Teleop")
+@TeleOp(name = "Two Controller Teleop V3", group = "Teleop")
 @Disabled
-public class EncoderTest extends OpMode {
+public class twoControllerTeleopv3 extends OpMode {
+    private DcMotor leftMotor;
+    private DcMotor rightMotor;
+    private DcMotor scooper;
+    private DcMotor shooter1;
+    private DcMotor shooter2;
+    private DcMotor sweeper;
+
+    private boolean state;
+    boolean swap=false;
+    boolean ShooterPowerCont=true;
+
+
+    final  Runnable ShooterPower = new Runnable() {
+        public void run() {
+
+            while (ShooterPowerCont) {
+
+                currTime=System.currentTimeMillis();
+                RPM955.dt=(currTime-prevTime)/1000;
+                RPM955.current_position1 = shooter1.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
+                RPM955.current_position2 = shooter2.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
+                prevTime = currTime;//MUST BE FIRST - time sensitive measurement
+
+                telemetry.addData("dt: ", RPM955.dt);
+                telemetry.addData("RPM1: ", RPM955.current_rpm1);
+                telemetry.addData("RPM2: ", RPM955.current_rpm2);
+
+                updateRPM1and2(RPM955);
+
+
+
+
+
+                try {
+                    telemetry.addData("Hello: ", "Hello");
+                    Thread.sleep((long)0.5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    };
+    final Thread Shooter = new Thread(ShooterPower);
+
+
 
 
     public class shooterSettings{//data members can be replaced, but default values are for 1750 ETPS = 955 RPM
@@ -92,34 +141,49 @@ public class EncoderTest extends OpMode {
 
 
 
+
+
+
     }
 
     private boolean USE_TELEMETRY=true;
 
 
-    private DcMotor shooter1;
-    private DcMotor shooter2;
 
     shooterSettings RPM955;
     shooterSettings RPM0;
     shooterSettings RPM800;
-
+    shooterSettings RPM1300;
 
 
     public double startShootingtime=0;
     public double prevTime=0;
+    public double currTime=0;
+
+    private MediaPlayer wrongBallSound = null, correctBallSound = null;
+    private ColorSensor sweeperColorSensor;
+    private BeaconColor beaconColor = null;
+
+    private boolean ballSensed = false;
+
+
 
     @Override
     public void init() {
+        leftMotor = this.hardwareMap.dcMotor.get("l");
+        rightMotor = this.hardwareMap.dcMotor.get("r");
+        scooper = this.hardwareMap.dcMotor.get("scooper");
+        shooter1 = this.hardwareMap.dcMotor.get("shooter1");
+        shooter2 = this.hardwareMap.dcMotor.get("shooter2");
+        sweeper = this.hardwareMap.dcMotor.get("sweeper");
+        sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
+        state = false;
+
+
         RPM955= new shooterSettings();//default settings are for 955, 0.43,0.43
         RPM0 = new shooterSettings(0,0,0);
         RPM800 = new shooterSettings(800,0.35,0.35);
-
-
-
-        shooter1 = this.hardwareMap.dcMotor.get("shooter1");
-        shooter2 = this.hardwareMap.dcMotor.get("shooter2");
-
+        RPM1300 = new shooterSettings(1300,0.57,0.57);
 
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -128,11 +192,9 @@ public class EncoderTest extends OpMode {
         shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
-        shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        swap=true;
 
         shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -140,38 +202,132 @@ public class EncoderTest extends OpMode {
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-
+        wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
+        correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
+        Shooter.start();
     }
 
     @Override
     public void loop() {
 
-
-        if(getRuntime()<15)
-        EncoderShooter(RPM955);
-        else if (getRuntime()>20)
-        EncoderShooter(RPM955);
-        else
-        EncoderShooter(RPM0);
+        double left = -gamepad1.left_stick_y;
+        double right = -gamepad1.right_stick_y;
 
 
+        if(swap==true)
+        {
+            double temp=left;
+            left=right;
+            right=temp;
+        }
+
+        left=scaleInput(left);
+        right=scaleInput(right);
+
+        leftMotor.setPower(left);
+        rightMotor.setPower(right);
+
+        if(gamepad1.dpad_down){
+            leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+            rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            swap=false;
+        } else if(gamepad1.dpad_up){
+            leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+            swap=true;
+        }
 
 
-        telemetry.addData("","");//forces telemetry to always update
+        if(gamepad2.left_trigger > 0){
+            scooper.setPower(-0.7);
+        } else if(gamepad2.left_bumper){
+            scooper.setPower(1);
+        } else {
+            scooper.setPower(0);
+        }
+
+        if(gamepad2.a){
+            EncoderShooter(RPM800);
+        } else if(gamepad2.b) {
+            EncoderShooter(RPM955);
+        } else if(gamepad2.y) {
+            EncoderShooter(RPM1300);
+        }
+        else {
+            EncoderShooter(RPM0);
+        }
+
+
+
+
+
+        if(gamepad2.right_bumper){
+            sweeper.setPower(0.7);
+
+            if(beaconColor == null) {
+                if (sweeperColorSensor.red() > 15) {
+                    if (sweeperColorSensor.red() > sweeperColorSensor.blue())
+                        beaconColor = BeaconColor.RED;
+                } else if(sweeperColorSensor.blue() > 15){
+                    if (sweeperColorSensor.red() < sweeperColorSensor.blue())
+                        beaconColor = BeaconColor.BLUE;
+                } else
+                    beaconColor = BeaconColor.BLUE;
+                telemetry.log().add("Beacon Color Set");
+            }
+        } else if(gamepad2.right_trigger > 0){
+            sweeper.setPower(-0.7);
+        } else {
+            sweeper.setPower(0);
+
+        }
+
+        if(isWrongBall()){
+            if(!wrongBallSound.isPlaying()){
+                wrongBallSound.release();
+                wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
+                wrongBallSound.start();
+            }
+            //sweeper.setPower(0.5);
+        } else {
+            isWrongBall();
+            if(ballSensed){
+                correctBallSound.release();
+                correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
+                correctBallSound.start();
+            } else {
+                correctBallSound.stop();
+            }
+            wrongBallSound.stop();
+            //sweeper.setPower(0);
+        }
+
+        telemetry.addData("left joystick",  "%.2f", left);
+        telemetry.addData("right joystick", "%.2f", right);
         telemetry.update();
     }
 
-
     @Override
     public void stop() {
-
         super.stop();
+        ShooterPowerCont=false;
     }
 
-
-
-
+    private boolean isWrongBall() {
+        if(sweeperColorSensor.red() > 11 || sweeperColorSensor.blue() > 11){
+            ballSensed = true;
+            if(sweeperColorSensor.red() > sweeperColorSensor.blue() && beaconColor == BeaconColor.BLUE){
+                return true;
+            } else if(sweeperColorSensor.blue() > sweeperColorSensor.red() && beaconColor == BeaconColor.RED){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            ballSensed = false;
+            return false;
+        }
+    }
 
     public void EncoderShooter(shooterSettings settings)
     {
@@ -182,27 +338,20 @@ public class EncoderTest extends OpMode {
                 startShootingtime = getRuntime();
             }
 
-            settings.dt=getRuntime()-prevTime;
-            if (settings.dt> 0.01) {//only update every 10ms
-                settings.current_position1 = shooter1.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
-                settings.current_position2 = shooter2.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
-                prevTime = getRuntime();//MUST BE FIRST - time sensitive measurement
 
-                updateRPM1and2(settings);
-
-                if(getRuntime()-startShootingtime>settings.rampUpTime) {//only update Kalmin and PID after ramp up
-                    timeUpdate(settings);
-                    measurementUpdate(settings);
+                    //timeUpdate(settings);
+                    //measurementUpdate(settings);
 
 
-                    //DbgLog.msg("Time: "+getRuntime()+"RPM1: " + current_rpm1+"RPM2: " + current_rpm2);
+                    //DbgLog.msg("Time: "+getRuntime()+"RPM1: " + settings.current_rpm1+"RPM2: " + settings.current_rpm2+"Kalmin1: " + settings.Xk1+"Kalmin2: " + settings.Xk2);
+                    DbgLog.msg("Time: "+System.currentTimeMillis()+"Encoder: " + settings.current_position2+"Encoder2: " + settings.current_position2);
 
                     PID1Update(settings);
                     PID2Update(settings);
 
                     applyAdjustment1(settings);
                     applyAdjustment2(settings);
-                }
+
                 clipPower1(settings);
                 clipPower2(settings);
 
@@ -210,16 +359,17 @@ public class EncoderTest extends OpMode {
                 previous2Update(settings);
 
 
-            }
-
             checkIfReadyToShoot(settings);
             if(USE_TELEMETRY) {
                 outputTelemetry(settings);
             }
 
+            clipPower1(settings);
+            clipPower2(settings);
 
             shooter1.setPower(settings.requiredPWR1);
             shooter2.setPower(settings.requiredPWR2);
+
 
 
         }
@@ -241,7 +391,8 @@ public class EncoderTest extends OpMode {
     }
 
     public void PID1Update(shooterSettings settings){
-        settings.error1=-(settings.Xk1- settings.requestedEncoderTicksPerSecond);
+        //settings.error1=-(settings.Xk1- settings.requestedEncoderTicksPerSecond);
+        settings.error1=-(settings.current_rpm1- settings.requestedEncoderTicksPerSecond);
         settings.integral1 = settings.integral1 + settings.error1 * settings.dt;//calculate integral of error
         settings.derivative1 = (settings.error1 - settings.previous_error1) / settings.dt;//calculate derivative of data
 
@@ -259,7 +410,8 @@ public class EncoderTest extends OpMode {
 
     public void PID2Update(shooterSettings settings){
 
-        settings.error2=-(settings.Xk2- settings.requestedEncoderTicksPerSecond);
+        //settings.error2=-(settings.Xk2- settings.requestedEncoderTicksPerSecond);
+        settings.error2=-(settings.current_rpm2- settings.requestedEncoderTicksPerSecond);
         settings.integral2 = settings.integral2 + settings.error2 * settings.dt;//calculate integral of error
         settings.derivative2 = (settings.error2 - settings.previous_error2) / settings.dt;//calculate derivative of data
 
@@ -304,6 +456,8 @@ public class EncoderTest extends OpMode {
             settings.requiredPWR1=settings.originalPWR1+settings.allowedPowerDifference;
         }
 
+
+
     }
 
     public void clipPower2(shooterSettings settings){
@@ -316,13 +470,21 @@ public class EncoderTest extends OpMode {
             settings.requiredPWR2=settings.originalPWR2+settings.allowedPowerDifference;
         }
 
+
+
+
     }
 
 
-    public void checkIfReadyToShoot(shooterSettings settings) {
+    public boolean checkIfReadyToShoot(shooterSettings settings) {
         if(Math.abs(settings.error1)<settings.deadband && Math.abs(settings.error2)<settings.deadband && getRuntime()-startShootingtime>settings.rampUpTime)
         {
             telemetry.addData("READY TO SHOOT", "");
+            return true;
+        }
+        else
+        {
+            return false;
         }
 
     }
@@ -381,7 +543,7 @@ public class EncoderTest extends OpMode {
         settings.prevPk1=1;
         settings.Xk1=0;
         settings.Pk1=1;
-       // Kk1=0;
+        // Kk1=0;
 
 
         settings.input2=0;
@@ -389,7 +551,7 @@ public class EncoderTest extends OpMode {
         settings.prevPk2=1;
         settings.Xk2=0;
         settings.Pk2=1;
-       // Kk2=0;
+        // Kk2=0;
 
 
 
@@ -419,8 +581,57 @@ public class EncoderTest extends OpMode {
     }
 
 
-}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
+     * This method scales the joystick input so for low joystick values, the
+     * scaled value is less than linear.  This is to make it easier to drive
+     * the robot more precisely at slower speeds.
+     */
+    double scaleInput(double dVal)  {
+        double[] scaleArray = { 0.0, 0.05, 0.09, 0.10, 0.12, 0.15, 0.18, 0.24,
+                0.30, 0.36, 0.43, 0.50, 0.60, 0.72, 0.85, 1.00, 1.00 };
+
+        // get the corresponding index for the scaleInput array.
+        int index = (int) (dVal * 16.0);
+
+        // index should be positive.
+        if (index < 0) {
+            index = -index;
+        }
+
+        // index cannot exceed size of array minus 1.
+        if (index > 16) {
+            index = 16;
+        }
+
+        // get value from the array.
+        double dScale = 0;
+        if (dVal < 0) {
+            dScale = -scaleArray[index];
+        } else {
+            dScale = scaleArray[index];
+        }
+
+        // return scaled value.
+        return dScale;
+    }
+
+
+}
 
 
 
