@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 import org.firstinspires.ftc.teamcode.Shashank.utils.RPMRunnable;
-import org.firstinspires.ftc.teamcode.Shashank.utils.shooterSettings;
+import org.firstinspires.ftc.teamcode.Shashank.utils.ShooterSettings;
 import org.firstinspires.ftc.teamcode.Shashank.utils.ThreadSharedObject;
 
 /**
@@ -35,10 +35,10 @@ public class EncoderTeleop extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    shooterSettings RPM955;
-    shooterSettings RPM0;
-    shooterSettings RPM800;
-    shooterSettings RPM1300;
+    ShooterSettings RPM955;
+    ShooterSettings RPM0;
+    ShooterSettings RPM800;
+    ShooterSettings RPM1300;
 
 
     public double startShootingtime=0;
@@ -66,10 +66,10 @@ public class EncoderTeleop extends OpMode {
         state = false;
 
 
-        RPM955= new shooterSettings();//default settings are for 955, 0.43,0.43
-        RPM0 = new shooterSettings(0,0,0);
-        RPM800 = new shooterSettings(800,0.35,0.35);
-        RPM1300 = new shooterSettings(1100,0.59,0.59);
+        RPM955= new ShooterSettings();//default settings are for 955, 0.43,0.43
+        RPM0 = new ShooterSettings(0,0,0);
+        RPM800 = new ShooterSettings(800,0.35,0.35);
+        RPM1300 = new ShooterSettings(1100,0.59,0.59);
 
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -245,7 +245,7 @@ public class EncoderTeleop extends OpMode {
         }
     }
 
-    public void EncoderShooter(shooterSettings settings)
+    public void EncoderShooter(ShooterSettings settings)
     {
         if(settings.requestedRPM!=0) {
 
@@ -310,12 +310,12 @@ public class EncoderTeleop extends OpMode {
 
 
 
-    public void updateRPM1and2(shooterSettings settings){
+    public void updateRPM1and2(ShooterSettings settings){
         settings.current_rpm1 = (settings.current_position1 - settings.previous_position1) / (settings.dt);
         settings.current_rpm2 = (settings.current_position2 - settings.previous_position2) / (settings.dt);
     }
 
-    public void PID1Update(shooterSettings settings){
+    public void PID1Update(ShooterSettings settings){
         //settings.error1=-(settings.Xk1- settings.requestedEncoderTicksPerSecond);
         settings.error1=-(settings.current_rpm1- settings.requestedEncoderTicksPerSecond);
         settings.integral1 = settings.integral1 + settings.error1 * settings.dt;//calculate integral of error
@@ -333,7 +333,7 @@ public class EncoderTeleop extends OpMode {
 
     }
 
-    public void PID2Update(shooterSettings settings){
+    public void PID2Update(ShooterSettings settings){
 
         //settings.error2=-(settings.Xk2- settings.requestedEncoderTicksPerSecond);
         settings.error2=-(settings.current_rpm2- settings.requestedEncoderTicksPerSecond);
@@ -351,27 +351,27 @@ public class EncoderTeleop extends OpMode {
 
     }
 
-    public void previous1Update(shooterSettings settings){
+    public void previous1Update(ShooterSettings settings){
         settings.previous_error1=settings.error1;
         settings.previous_position1 = settings.current_position1;
         settings.previous_rpm1 = settings.current_rpm1;
     }
 
-    public void previous2Update(shooterSettings settings){
+    public void previous2Update(ShooterSettings settings){
         settings.previous_error2=settings.error2;
         settings.previous_position2 = settings.current_position2;
         settings.previous_rpm2 = settings.current_rpm2;
     }
 
-    public void applyAdjustment1(shooterSettings settings) {
+    public void applyAdjustment1(ShooterSettings settings) {
         settings.requiredPWR1+=settings.adjustment1;
     }
 
-    public void applyAdjustment2(shooterSettings settings) {
+    public void applyAdjustment2(ShooterSettings settings) {
         settings.requiredPWR2+=settings.adjustment2;
     }
 
-    public void clipPower1(shooterSettings settings){
+    public void clipPower1(ShooterSettings settings){
         if(settings.requiredPWR1<settings.originalPWR1-settings.allowedPowerDifference)
         {
             settings.requiredPWR1=settings.originalPWR1-settings.allowedPowerDifference;
@@ -383,7 +383,7 @@ public class EncoderTeleop extends OpMode {
 
     }
 
-    public void clipPower2(shooterSettings settings){
+    public void clipPower2(ShooterSettings settings){
         if(settings.requiredPWR2<settings.originalPWR2-settings.allowedPowerDifference)
         {
             settings.requiredPWR2=settings.originalPWR2-settings.allowedPowerDifference;
@@ -396,7 +396,7 @@ public class EncoderTeleop extends OpMode {
     }
 
 
-    public boolean checkIfReadyToShoot(shooterSettings settings) {
+    public boolean checkIfReadyToShoot(ShooterSettings settings) {
         if(Math.abs(settings.error1)<settings.deadband && Math.abs(settings.error2)<settings.deadband && getRuntime()-startShootingtime>settings.rampUpTime)
         {
             telemetry.addData("READY TO SHOOT", "");
@@ -409,7 +409,7 @@ public class EncoderTeleop extends OpMode {
 
     }
 
-    public void outputTelemetry(shooterSettings settings) {
+    public void outputTelemetry(ShooterSettings settings) {
         telemetry.addData("requiredPWR1: ", String.format("%.4f", settings.requiredPWR1));
         telemetry.addData("requiredPWR2: ", String.format("%.4f", settings.requiredPWR2));
         telemetry.addData("adjustment1: ", settings.adjustment1);
@@ -432,7 +432,7 @@ public class EncoderTeleop extends OpMode {
     }
 
     //Kalmin phase 1
-    public void timeUpdate(shooterSettings settings){
+    public void timeUpdate(ShooterSettings settings){
         settings.input1=settings.current_rpm1;
         settings.prevXk1=settings.Xk1;
         settings.prevPk1=settings.Pk1;
@@ -443,7 +443,7 @@ public class EncoderTeleop extends OpMode {
     }
 
     //Kalmin phase 2
-    public void measurementUpdate(shooterSettings settings){
+    public void measurementUpdate(ShooterSettings settings){
         //RPM1 calculations
         settings.Kk1=settings.prevPk1/(settings.prevPk1+settings.R1);
         settings.Xk1=settings.prevXk1+settings.Kk1*(settings.input1-settings.prevXk1);
@@ -457,7 +457,7 @@ public class EncoderTeleop extends OpMode {
 
     }
 
-    public void resetKalmin(shooterSettings settings){
+    public void resetKalmin(ShooterSettings settings){
         settings.input1=0;
         settings.prevXk1=0;
         settings.prevPk1=1;
@@ -477,7 +477,7 @@ public class EncoderTeleop extends OpMode {
 
     }
 
-    public void resetPID(shooterSettings settings){
+    public void resetPID(ShooterSettings settings){
         settings.previous_position1=0;
         settings.current_position1=0;
         settings.current_rpm1=0;
