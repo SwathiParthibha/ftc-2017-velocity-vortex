@@ -77,7 +77,7 @@ import org.firstinspires.ftc.teamcode.Mrinali.HardwarePushbot;
 public class DriveToBeaconsRedNoShooting extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
-    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX ShooterMotor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 5.0 ;     // For figuring circumference for the monster tires
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /

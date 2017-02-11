@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -130,7 +130,7 @@ public class twoControllerTeleopv4 extends OpMode {
 
     private MediaPlayer wrongBallSound = null, correctBallSound = null;
     private ColorSensor sweeperColorSensor;
-    private BeaconColor beaconColor = null;
+    private AllianceColor AllianceColor = null;
 
     private boolean ballSensed = false;
     boolean updatePWR=false;
@@ -266,15 +266,15 @@ public class twoControllerTeleopv4 extends OpMode {
         if(gamepad2.right_bumper){
             sweeper.setPower(0.7);
 
-            if(beaconColor == null) {
+            if(AllianceColor == null) {
                 if (sweeperColorSensor.red() > 15) {
                     if (sweeperColorSensor.red() > sweeperColorSensor.blue())
-                        beaconColor = BeaconColor.RED;
+                        AllianceColor = AllianceColor.RED;
                 } else if(sweeperColorSensor.blue() > 15){
                     if (sweeperColorSensor.red() < sweeperColorSensor.blue())
-                        beaconColor = BeaconColor.BLUE;
+                        AllianceColor = AllianceColor.BLUE;
                 } else
-                    beaconColor = BeaconColor.BLUE;
+                    AllianceColor = AllianceColor.BLUE;
                 telemetry.log().add("Beacon Color Set");
             }
         } else if(gamepad2.right_trigger > 0){
@@ -318,9 +318,9 @@ public class twoControllerTeleopv4 extends OpMode {
     private boolean isWrongBall() {
         if(sweeperColorSensor.red() > 11 || sweeperColorSensor.blue() > 11){
             ballSensed = true;
-            if(sweeperColorSensor.red() > sweeperColorSensor.blue() && beaconColor == BeaconColor.BLUE){
+            if(sweeperColorSensor.red() > sweeperColorSensor.blue() && AllianceColor == AllianceColor.BLUE){
                 return true;
-            } else if(sweeperColorSensor.blue() > sweeperColorSensor.red() && beaconColor == BeaconColor.RED){
+            } else if(sweeperColorSensor.blue() > sweeperColorSensor.red() && AllianceColor == AllianceColor.RED){
                 return true;
             } else {
                 return false;

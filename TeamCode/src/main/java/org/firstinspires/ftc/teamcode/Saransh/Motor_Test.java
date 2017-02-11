@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 /**
  * Created by Saransh on 10/22/2016.
  */
-@TeleOp(name="Motor Test", group="Tests")
+@TeleOp(name="ShooterMotor Test", group="Tests")
 @Disabled
 public class Motor_Test extends OpMode {
 

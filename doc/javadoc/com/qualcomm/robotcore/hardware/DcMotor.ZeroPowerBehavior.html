@@ -108,7 +108,7 @@
 <br>
 <pre>public static enum <span class="strong">DcMotor.ZeroPowerBehavior</span>
 extends java.lang.Enum&lt;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.ZeroPowerBehavior</a>&gt;</pre>
-<div class="block">ZeroPowerBehavior provides an indication as to a motor's behavior when a power level of zero
+<div class="block">ZeroPowerBehavior provides an indication as to a shooterMotor's behavior when a power level of zero
  is applied.</div>
 <dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setZeroPowerBehavior(com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior)"><code>DcMotor.setZeroPowerBehavior(ZeroPowerBehavior)</code></a>, 
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)"><code>DcMotorSimple.setPower(double)</code></a></dd></dl>
@@ -131,19 +131,19 @@ extends java.lang.Enum&lt;<a href="../../../../com/qualcomm/robotcore/hardware/D
 </tr>
 <tr class="altColor">
 <td class="colOne"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html#BRAKE">BRAKE</a></strong></code>
-<div class="block">The motor stops and then brakes, actively resisting any external force which attempts
- to turn the motor.</div>
+<div class="block">The shooterMotor stops and then brakes, actively resisting any external force which attempts
+ to turn the shooterMotor.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colOne"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html#FLOAT">FLOAT</a></strong></code>
-<div class="block">The motor stops and then floats: an external force attempting to turn the motor is not
+<div class="block">The shooterMotor stops and then floats: an external force attempting to turn the shooterMotor is not
  met with active resistence.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colOne"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html#UNKNOWN">UNKNOWN</a></strong></code>
-<div class="block">The behavior of the motor when zero power is applied is not currently known.</div>
+<div class="block">The behavior of the shooterMotor when zero power is applied is not currently known.</div>
 </td>
 </tr>
 </table>
@@ -210,7 +210,7 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>UNKNOWN</h4>
 <pre>public static final&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.ZeroPowerBehavior</a> UNKNOWN</pre>
-<div class="block">The behavior of the motor when zero power is applied is not currently known. This value
+<div class="block">The behavior of the shooterMotor when zero power is applied is not currently known. This value
  is mostly useful for your internal state variables. It may not be passed as a parameter
  to <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setZeroPowerBehavior(com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior)"><code>DcMotor.setZeroPowerBehavior(ZeroPowerBehavior)</code></a> and will never be returned from
  <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#getZeroPowerBehavior()"><code>DcMotor.getZeroPowerBehavior()</code></a></div>
@@ -223,8 +223,8 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>BRAKE</h4>
 <pre>public static final&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.ZeroPowerBehavior</a> BRAKE</pre>
-<div class="block">The motor stops and then brakes, actively resisting any external force which attempts
- to turn the motor.</div>
+<div class="block">The shooterMotor stops and then brakes, actively resisting any external force which attempts
+ to turn the shooterMotor.</div>
 </li>
 </ul>
 <a name="FLOAT">
@@ -234,7 +234,7 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>FLOAT</h4>
 <pre>public static final&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.ZeroPowerBehavior</a> FLOAT</pre>
-<div class="block">The motor stops and then floats: an external force attempting to turn the motor is not
+<div class="block">The shooterMotor stops and then floats: an external force attempting to turn the shooterMotor is not
  met with active resistence.</div>
 </li>
 </ul>

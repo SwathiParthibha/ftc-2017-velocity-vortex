@@ -99,7 +99,7 @@
 <br>
 <pre>public interface <span class="strong">DcMotorSimple</span>
 extends <a href="../../../../com/qualcomm/robotcore/hardware/HardwareDevice.html" title="interface in com.qualcomm.robotcore.hardware">HardwareDevice</a></pre>
-<div class="block">Instances of DcMotorSimple interface provide a most basic motor-like functionality</div>
+<div class="block">Instances of DcMotorSimple interface provide a most basic shooterMotor-like functionality</div>
 </li>
 </ul>
 </div>
@@ -122,7 +122,7 @@ extends <a href="../../../../com/qualcomm/robotcore/hardware/HardwareDevice.html
 <td class="colFirst"><code>static class&nbsp;</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a></strong></code>
 <div class="block">DcMotors can be configured to internally reverse the values
- to which, e.g., their motor power is set.</div>
+ to which, e.g., their shooterMotor power is set.</div>
 </td>
 </tr>
 </table>
@@ -150,27 +150,27 @@ extends <a href="../../../../com/qualcomm/robotcore/hardware/HardwareDevice.html
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a></code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getDirection()">getDirection</a></strong>()</code>
-<div class="block">Returns the current logical direction in which this motor is set as operating.</div>
+<div class="block">Returns the current logical direction in which this shooterMotor is set as operating.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>double</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getPower()">getPower</a></strong>()</code>
-<div class="block">Returns the current configured power level of the motor.</div>
+<div class="block">Returns the current configured power level of the shooterMotor.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setDirection(com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)">setDirection</a></strong>(<a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a>&nbsp;direction)</code>
-<div class="block">Sets the logical direction in which this motor operates.</div>
+<div class="block">Sets the logical direction in which this shooterMotor operates.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)">setPower</a></strong>(double&nbsp;power)</code>
-<div class="block">Sets the power level of the motor, expressed as a fraction of the maximum
+<div class="block">Sets the power level of the shooterMotor, expressed as a fraction of the maximum
  possible power / speed supported according to the run mode in which the
- motor is operating.</div>
+ shooterMotor is operating.</div>
 </td>
 </tr>
 </table>
@@ -202,8 +202,8 @@ extends <a href="../../../../com/qualcomm/robotcore/hardware/HardwareDevice.html
 <li class="blockList">
 <h4>setDirection</h4>
 <pre>void&nbsp;setDirection(<a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a>&nbsp;direction)</pre>
-<div class="block">Sets the logical direction in which this motor operates.</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>direction</code> - the direction to set for this motor</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getDirection()"><code>getDirection()</code></a></dd></dl>
+<div class="block">Sets the logical direction in which this shooterMotor operates.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>direction</code> - the direction to set for this shooterMotor</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getDirection()"><code>getDirection()</code></a></dd></dl>
 </li>
 </ul>
 <a name="getDirection()">
@@ -213,8 +213,8 @@ extends <a href="../../../../com/qualcomm/robotcore/hardware/HardwareDevice.html
 <li class="blockList">
 <h4>getDirection</h4>
 <pre><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a>&nbsp;getDirection()</pre>
-<div class="block">Returns the current logical direction in which this motor is set as operating.</div>
-<dl><dt><span class="strong">Returns:</span></dt><dd>the current logical direction in which this motor is set as operating.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setDirection(com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)"><code>setDirection(Direction)</code></a></dd></dl>
+<div class="block">Returns the current logical direction in which this shooterMotor is set as operating.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>the current logical direction in which this shooterMotor is set as operating.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setDirection(com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)"><code>setDirection(Direction)</code></a></dd></dl>
 </li>
 </ul>
 <a name="setPower(double)">
@@ -224,12 +224,12 @@ extends <a href="../../../../com/qualcomm/robotcore/hardware/HardwareDevice.html
 <li class="blockList">
 <h4>setPower</h4>
 <pre>void&nbsp;setPower(double&nbsp;power)</pre>
-<div class="block">Sets the power level of the motor, expressed as a fraction of the maximum
+<div class="block">Sets the power level of the shooterMotor, expressed as a fraction of the maximum
  possible power / speed supported according to the run mode in which the
- motor is operating.
+ shooterMotor is operating.
 
- <p>Setting a power level of zero will brake the motor</p></div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>power</code> - the new power level of the motor, a value in the interval [0.0, 1.0]</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getPower()"><code>getPower()</code></a>, 
+ <p>Setting a power level of zero will brake the shooterMotor</p></div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>power</code> - the new power level of the shooterMotor, a value in the interval [0.0, 1.0]</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getPower()"><code>getPower()</code></a>,
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode)"><code>DcMotor.setMode(DcMotor.RunMode)</code></a>, 
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setPowerFloat()"><code>DcMotor.setPowerFloat()</code></a></dd></dl>
 </li>
@@ -241,8 +241,8 @@ extends <a href="../../../../com/qualcomm/robotcore/hardware/HardwareDevice.html
 <li class="blockList">
 <h4>getPower</h4>
 <pre>double&nbsp;getPower()</pre>
-<div class="block">Returns the current configured power level of the motor.</div>
-<dl><dt><span class="strong">Returns:</span></dt><dd>the current level of the motor, a value in the interval [0.0, 1.0]</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)"><code>setPower(double)</code></a></dd></dl>
+<div class="block">Returns the current configured power level of the shooterMotor.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>the current level of the shooterMotor, a value in the interval [0.0, 1.0]</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)"><code>setPower(double)</code></a></dd></dl>
 </li>
 </ul>
 </li>

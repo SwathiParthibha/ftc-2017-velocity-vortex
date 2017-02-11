@@ -50,7 +50,7 @@ public class MecanumHardware extends LinearOpMode
     //1000 Milliseconds
     public int SECOND = 1000;
 
-    //Motor Variables
+    //ShooterMotor Variables
     public int ROTATION = 1220; // # of ticks
     public int MOTOR_POWER = 1;
 
@@ -388,7 +388,7 @@ public class MecanumHardware extends LinearOpMode
             telemetry.addData("Heading Error:", headingError);
             telemetry.addData("Correction:", correction);
 
-            telemetry.addData("Motor Power Values", null);
+            telemetry.addData("ShooterMotor Power Values", null);
             telemetry.addData("Steering Speed Right:", steeringSpeedRight);
             telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
             telemetry.addData("Front Right Power:", frontRight.getPower());

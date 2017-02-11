@@ -1,33 +1,33 @@
 package org.firstinspires.ftc.teamcode.Sam;
 
-import android.media.MediaPlayer;
 
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
-import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
 
 @TeleOp(name = "Encoder Time Test", group = "Teleop")
+
 public class EncoderTimeTest extends OpMode {
-    private DcMotor leftMotor;
-    private DcMotor rightMotor;
-    private DcMotor scooper;
+    private boolean USE_TELEMETRY=true;
+
     private DcMotor shooter1;
     private DcMotor shooter2;
-    private DcMotor sweeper;
 
-    private boolean state;
-    boolean swap=false;
     boolean ShooterPowerCont=true;
+    double timehistory[]={0,0,0,0,0,0,0,0,0,0};
+    public double startShootingtime=0;
+    public double prevTime=0;
+    public double currTime=0;
+
+    shooterSettings RPM955;
+
+    TimerTask timerTask = new getRPM();
+    Timer timer = new Timer(true);
 
     class getRPM extends TimerTask {
         @Override
@@ -36,37 +36,23 @@ public class EncoderTimeTest extends OpMode {
             RPM955.dt=(currTime-prevTime)/1000;
             RPM955.current_position1 = shooter1.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
             RPM955.current_position2 = shooter2.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
-            prevTime = currTime;//MUST BE FIRST - time sensitive measurement
+            if(Math.abs(RPM955.dt-RPM955.waittime)<RPM955.allowedTimeError) {//the data is acceptable; continue with algorithms
+                prevTime = currTime;//MUST BE FIRST - time sensitive measurement
 
-            telemetry.addData("dt: ", RPM955.dt);
-            telemetry.addData("RPM1: ", RPM955.current_rpm1);
-            telemetry.addData("RPM2: ", RPM955.current_rpm2);
+                telemetry.addData("dt: ", RPM955.dt);
+                telemetry.addData("RPM1: ", RPM955.current_rpm1);
+                telemetry.addData("RPM2: ", RPM955.current_rpm2);
+                updateRPM1and2(RPM955);
+                DbgLog.msg("key345:"+System.currentTimeMillis()+"," + RPM955.current_position1+ ","+RPM955.current_rpm1);
+                previousPositionUpdate(RPM955);
+                updateTimeHistory(RPM955.dt);
+            }
+            else{//timing is off; wait one more cycle to continue
 
-            updateRPM1and2(RPM955);
-            DbgLog.msg("Time: "+System.currentTimeMillis()+"Encoder: " + RPM955.current_position1+"RPM: " + RPM955.current_rpm1);
-            //
-            // DbgLog.msg("Time: "+getRuntime()+"RPM1: " + RPM955.current_rpm1+"RPM2: " + RPM955.current_rpm2);
-
-        }
-    }
-
-
-    final  Runnable ShooterPower = new Runnable() {
-        public void run() {
-
-            while (ShooterPowerCont) {
-
-                TimerTask timerTask = new getRPM();
-                Timer timer = new Timer(true);
-                timer.scheduleAtFixedRate(timerTask, 0, 50);
 
             }
         }
-    };
-    final Thread Shooter = new Thread(ShooterPower);
-
-
-
+    }
 
     public class shooterSettings{//data members can be replaced, but default values are for 1750 ETPS = 955 RPM
 
@@ -111,6 +97,8 @@ public class EncoderTimeTest extends OpMode {
 
         //Timing variables
         public double rampUpTime=1.5;
+        public double allowedTimeError=5;//allowed time error in ms
+        public double waittime=50; //time between updates in ms
 
         //Power Variables
         public double originalPWR1=0.42;
@@ -119,10 +107,6 @@ public class EncoderTimeTest extends OpMode {
         public double requiredPWR1=originalPWR1;
         public double requiredPWR2=originalPWR2;
         public double deadband=20;
-
-
-
-
 
         //Kalman Filter Variables
         double input1=0;
@@ -146,73 +130,40 @@ public class EncoderTimeTest extends OpMode {
 
 
 
+
+
     }
-
-    private boolean USE_TELEMETRY=true;
-
-
-
-    shooterSettings RPM955;
-    shooterSettings RPM0;
-    shooterSettings RPM800;
-    shooterSettings RPM1300;
-
-
-    public double startShootingtime=0;
-    public double prevTime=0;
-    public double currTime=0;
-
-    private MediaPlayer wrongBallSound = null, correctBallSound = null;
-    private ColorSensor sweeperColorSensor;
-    private BeaconColor beaconColor = null;
-
-    private boolean ballSensed = false;
-
-
-    TimerTask timerTask = new getRPM();
-    Timer timer = new Timer(true);
-
 
     @Override
     public void init() {
+
+
         shooter1 = this.hardwareMap.dcMotor.get("shooter1");
+
         shooter2 = this.hardwareMap.dcMotor.get("shooter2");
-        state = false;
 
 
         RPM955= new shooterSettings();//default settings are for 955, 0.43,0.43
-        RPM0 = new shooterSettings(0,0,0);
-        RPM800 = new shooterSettings(800,0.35,0.35);
-        RPM1300 = new shooterSettings(1300,0.57,0.57);
-
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
         shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-
-
-        swap=true;
-
         shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-  //      Shooter.start();
-
         timer.scheduleAtFixedRate(timerTask, 0, 50);
 
+
+        DbgLog.msg("key345:"+"Time,Encoder,RPM");
     }
 
     @Override
     public void loop() {
-
-
-            EncoderShooter(RPM955);
+       EncoderShooter(RPM955);
        telemetry.update();
     }
 
@@ -222,6 +173,7 @@ public class EncoderTimeTest extends OpMode {
         timer.cancel();
         ShooterPowerCont=false;
     }
+
     public void EncoderShooter(shooterSettings settings)
     {
         if(settings.requestedRPM!=0) {
@@ -248,8 +200,8 @@ public class EncoderTimeTest extends OpMode {
                 clipPower1(settings);
                 clipPower2(settings);
 
-                previous1Update(settings);
-                previous2Update(settings);
+                previousUpdate(settings);
+
 
 
             checkIfReadyToShoot(settings);
@@ -277,6 +229,16 @@ public class EncoderTimeTest extends OpMode {
 
     }
 
+    public void updateTimeHistory(double timeNow) {
+        for(int i=0; i<timehistory.length-1;i++)
+        {
+            timehistory[i+1]=timehistory[i];
+        }
+
+        timehistory[timehistory.length]=timeNow;
+
+
+    }
 
     public void updateRPM1and2(shooterSettings settings){
         settings.current_rpm1 = (settings.current_position1 - settings.previous_position1) / (settings.dt);
@@ -319,16 +281,17 @@ public class EncoderTimeTest extends OpMode {
 
     }
 
-    public void previous1Update(shooterSettings settings){
+    public void previousUpdate(shooterSettings settings){
         settings.previous_error1=settings.error1;
-        settings.previous_position1 = settings.current_position1;
         settings.previous_rpm1 = settings.current_rpm1;
+
+        settings.previous_error2=settings.error2;
+        settings.previous_rpm2 = settings.current_rpm2;
     }
 
-    public void previous2Update(shooterSettings settings){
-        settings.previous_error2=settings.error2;
+    public void previousPositionUpdate(shooterSettings settings){
+        settings.previous_position1 = settings.current_position1;
         settings.previous_position2 = settings.current_position2;
-        settings.previous_rpm2 = settings.current_rpm2;
     }
 
     public void applyAdjustment1(shooterSettings settings) {
@@ -472,20 +435,6 @@ public class EncoderTimeTest extends OpMode {
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

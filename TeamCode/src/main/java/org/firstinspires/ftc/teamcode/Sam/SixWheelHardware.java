@@ -51,7 +51,7 @@ public class SixWheelHardware extends LinearOpMode
     //1000 Milliseconds
     public int SECOND = 1000;
 
-    //Motor Variables
+    //ShooterMotor Variables
     public int ROTATION = 1220; // # of ticks
     public int MOTOR_POWER = 1;
 
@@ -277,7 +277,7 @@ public class SixWheelHardware extends LinearOpMode
             telemetry.addData("Heading Error:", headingError);
             telemetry.addData("Correction:", correction);
 
-            telemetry.addData("Motor Power Values", null);
+            telemetry.addData("ShooterMotor Power Values", null);
             telemetry.addData("Steering Speed Right:", steeringSpeedRight);
             telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
             telemetry.addData("Front Right Power:", frontRight.getPower());
@@ -345,7 +345,7 @@ public class SixWheelHardware extends LinearOpMode
             telemetry.addData("Line Error:", lineError);
             telemetry.addData("Line Correction:", lineCorrection);
 
-            telemetry.addData("Motor Powers", null);
+            telemetry.addData("ShooterMotor Powers", null);
             telemetry.addData("Front Right:",frontRight.getPower());
             telemetry.addData("Back Right:", backRight.getPower());
             telemetry.addData("Front Left:", frontLeft.getPower());

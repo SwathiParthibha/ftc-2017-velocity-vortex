@@ -86,8 +86,8 @@
 <hr>
 <br>
 <pre>public interface <span class="strong">DcMotorControllerEx</span></pre>
-<div class="block">DcMotorControllerEx is an optional motor controller interface supported by some hardware
- that provides enhanced motor functionality.</div>
+<div class="block">DcMotorControllerEx is an optional shooterMotor controller interface supported by some hardware
+ that provides enhanced shooterMotor functionality.</div>
 <dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorEx.html" title="interface in com.qualcomm.robotcore.hardware"><code>DcMotorEx</code></a></dd></dl>
 </li>
 </ul>
@@ -109,20 +109,20 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#isMotorEnabled(int)">isMotorEnabled</a></strong>(int&nbsp;motor)</code>
-<div class="block">Returns whether a particular motor on the controller is energized</div>
+<td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#isMotorEnabled(int)">isMotorEnabled</a></strong>(int&nbsp;shooterMotor)</code>
+<div class="block">Returns whether a particular shooterMotor on the controller is energized</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorDisable(int)">setMotorDisable</a></strong>(int&nbsp;motor)</code>
-<div class="block">Individually denergizes a particular motor</div>
+<td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorDisable(int)">setMotorDisable</a></strong>(int&nbsp;shooterMotor)</code>
+<div class="block">Individually denergizes a particular shooterMotor</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorEnable(int)">setMotorEnable</a></strong>(int&nbsp;motor)</code>
-<div class="block">Individually energizes a particular motor</div>
+<td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorEnable(int)">setMotorEnable</a></strong>(int&nbsp;shooterMotor)</code>
+<div class="block">Individually energizes a particular shooterMotor</div>
 </td>
 </tr>
 </table>
@@ -146,9 +146,9 @@
 <ul class="blockList">
 <li class="blockList">
 <h4>setMotorEnable</h4>
-<pre>void&nbsp;setMotorEnable(int&nbsp;motor)</pre>
-<div class="block">Individually energizes a particular motor</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>motor</code> - the port number of the motor on this controller</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorDisable(int)"><code>setMotorDisable(int)</code></a>, 
+<pre>void&nbsp;setMotorEnable(int&nbsp;shooterMotor)</pre>
+<div class="block">Individually energizes a particular shooterMotor</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>shooterMotor</code> - the port number of the shooterMotor on this controller</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorDisable(int)"><code>setMotorDisable(int)</code></a>,
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#isMotorEnabled(int)"><code>isMotorEnabled(int)</code></a></dd></dl>
 </li>
 </ul>
@@ -158,9 +158,9 @@
 <ul class="blockList">
 <li class="blockList">
 <h4>setMotorDisable</h4>
-<pre>void&nbsp;setMotorDisable(int&nbsp;motor)</pre>
-<div class="block">Individually denergizes a particular motor</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>motor</code> - the port number of the motor on this controller</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorEnable(int)"><code>setMotorEnable(int)</code></a>, 
+<pre>void&nbsp;setMotorDisable(int&nbsp;shooterMotor)</pre>
+<div class="block">Individually denergizes a particular shooterMotor</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>shooterMotor</code> - the port number of the shooterMotor on this controller</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorEnable(int)"><code>setMotorEnable(int)</code></a>,
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#isMotorEnabled(int)"><code>isMotorEnabled(int)</code></a></dd></dl>
 </li>
 </ul>
@@ -170,9 +170,9 @@
 <ul class="blockListLast">
 <li class="blockList">
 <h4>isMotorEnabled</h4>
-<pre>boolean&nbsp;isMotorEnabled(int&nbsp;motor)</pre>
-<div class="block">Returns whether a particular motor on the controller is energized</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>motor</code> - the port number of the motor on this controller</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorEnable(int)"><code>setMotorEnable(int)</code></a>, 
+<pre>boolean&nbsp;isMotorEnabled(int&nbsp;shooterMotor)</pre>
+<div class="block">Returns whether a particular shooterMotor on the controller is energized</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>shooterMotor</code> - the port number of the shooterMotor on this controller</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorEnable(int)"><code>setMotorEnable(int)</code></a>,
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotorControllerEx.html#setMotorDisable(int)"><code>setMotorDisable(int)</code></a></dd></dl>
 </li>
 </ul>

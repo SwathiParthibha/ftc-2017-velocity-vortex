@@ -239,7 +239,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html" ti
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a></code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/CRServoImpl.html#getDirection()">getDirection</a></strong>()</code>
-<div class="block">Returns the current logical direction in which this motor is set as operating.</div>
+<div class="block">Returns the current logical direction in which this shooterMotor is set as operating.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -251,13 +251,13 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html" ti
 <tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/CRServoImpl.html#getPortNumber()">getPortNumber</a></strong>()</code>
-<div class="block">Returns the port number on the underlying servo controller on which this motor is situated.</div>
+<div class="block">Returns the port number on the underlying servo controller on which this shooterMotor is situated.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>double</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/CRServoImpl.html#getPower()">getPower</a></strong>()</code>
-<div class="block">Returns the current configured power level of the motor.</div>
+<div class="block">Returns the current configured power level of the shooterMotor.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -275,15 +275,15 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html" ti
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/CRServoImpl.html#setDirection(com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)">setDirection</a></strong>(<a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a>&nbsp;direction)</code>
-<div class="block">Sets the logical direction in which this motor operates.</div>
+<div class="block">Sets the logical direction in which this shooterMotor operates.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/CRServoImpl.html#setPower(double)">setPower</a></strong>(double&nbsp;power)</code>
-<div class="block">Sets the power level of the motor, expressed as a fraction of the maximum
+<div class="block">Sets the power level of the shooterMotor, expressed as a fraction of the maximum
  possible power / speed supported according to the run mode in which the
- motor is operating.</div>
+ shooterMotor is operating.</div>
 </td>
 </tr>
 </table>
@@ -530,11 +530,11 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html" ti
 <h4>getPortNumber</h4>
 <pre>public&nbsp;int&nbsp;getPortNumber()</pre>
 <div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html#getPortNumber()">CRServo</a></code></strong></div>
-<div class="block">Returns the port number on the underlying servo controller on which this motor is situated.</div>
+<div class="block">Returns the port number on the underlying servo controller on which this shooterMotor is situated.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html#getPortNumber()">getPortNumber</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html" title="interface in com.qualcomm.robotcore.hardware">CRServo</a></code></dd>
-<dt><span class="strong">Returns:</span></dt><dd>the port number on the underlying servo controller on which this motor is situated.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html#getController()"><code>CRServo.getController()</code></a></dd></dl>
+<dt><span class="strong">Returns:</span></dt><dd>the port number on the underlying servo controller on which this shooterMotor is situated.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html#getController()"><code>CRServo.getController()</code></a></dd></dl>
 </li>
 </ul>
 <a name="setDirection(com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)">
@@ -545,11 +545,11 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html" ti
 <h4>setDirection</h4>
 <pre>public&nbsp;void&nbsp;setDirection(<a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a>&nbsp;direction)</pre>
 <div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setDirection(com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)">DcMotorSimple</a></code></strong></div>
-<div class="block">Sets the logical direction in which this motor operates.</div>
+<div class="block">Sets the logical direction in which this shooterMotor operates.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setDirection(com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)">setDirection</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html" title="interface in com.qualcomm.robotcore.hardware">DcMotorSimple</a></code></dd>
-<dt><span class="strong">Parameters:</span></dt><dd><code>direction</code> - the direction to set for this motor</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getDirection()"><code>DcMotorSimple.getDirection()</code></a></dd></dl>
+<dt><span class="strong">Parameters:</span></dt><dd><code>direction</code> - the direction to set for this shooterMotor</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getDirection()"><code>DcMotorSimple.getDirection()</code></a></dd></dl>
 </li>
 </ul>
 <a name="getDirection()">
@@ -560,11 +560,11 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html" ti
 <h4>getDirection</h4>
 <pre>public&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a>&nbsp;getDirection()</pre>
 <div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getDirection()">DcMotorSimple</a></code></strong></div>
-<div class="block">Returns the current logical direction in which this motor is set as operating.</div>
+<div class="block">Returns the current logical direction in which this shooterMotor is set as operating.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getDirection()">getDirection</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html" title="interface in com.qualcomm.robotcore.hardware">DcMotorSimple</a></code></dd>
-<dt><span class="strong">Returns:</span></dt><dd>the current logical direction in which this motor is set as operating.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setDirection(com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)"><code>DcMotorSimple.setDirection(Direction)</code></a></dd></dl>
+<dt><span class="strong">Returns:</span></dt><dd>the current logical direction in which this shooterMotor is set as operating.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setDirection(com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)"><code>DcMotorSimple.setDirection(Direction)</code></a></dd></dl>
 </li>
 </ul>
 <a name="setPower(double)">
@@ -575,15 +575,15 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html" ti
 <h4>setPower</h4>
 <pre>public&nbsp;void&nbsp;setPower(double&nbsp;power)</pre>
 <div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)">DcMotorSimple</a></code></strong></div>
-<div class="block">Sets the power level of the motor, expressed as a fraction of the maximum
+<div class="block">Sets the power level of the shooterMotor, expressed as a fraction of the maximum
  possible power / speed supported according to the run mode in which the
- motor is operating.
+ shooterMotor is operating.
 
- <p>Setting a power level of zero will brake the motor</p></div>
+ <p>Setting a power level of zero will brake the shooterMotor</p></div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)">setPower</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html" title="interface in com.qualcomm.robotcore.hardware">DcMotorSimple</a></code></dd>
-<dt><span class="strong">Parameters:</span></dt><dd><code>power</code> - the new power level of the motor, a value in the interval [0.0, 1.0]</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getPower()"><code>DcMotorSimple.getPower()</code></a>, 
+<dt><span class="strong">Parameters:</span></dt><dd><code>power</code> - the new power level of the shooterMotor, a value in the interval [0.0, 1.0]</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getPower()"><code>DcMotorSimple.getPower()</code></a>,
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode)"><code>DcMotor.setMode(DcMotor.RunMode)</code></a>, 
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setPowerFloat()"><code>DcMotor.setPowerFloat()</code></a></dd></dl>
 </li>
@@ -596,11 +596,11 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/CRServo.html" ti
 <h4>getPower</h4>
 <pre>public&nbsp;double&nbsp;getPower()</pre>
 <div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getPower()">DcMotorSimple</a></code></strong></div>
-<div class="block">Returns the current configured power level of the motor.</div>
+<div class="block">Returns the current configured power level of the shooterMotor.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getPower()">getPower</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html" title="interface in com.qualcomm.robotcore.hardware">DcMotorSimple</a></code></dd>
-<dt><span class="strong">Returns:</span></dt><dd>the current level of the motor, a value in the interval [0.0, 1.0]</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)"><code>DcMotorSimple.setPower(double)</code></a></dd></dl>
+<dt><span class="strong">Returns:</span></dt><dd>the current level of the shooterMotor, a value in the interval [0.0, 1.0]</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)"><code>DcMotorSimple.setPower(double)</code></a></dd></dl>
 </li>
 </ul>
 </li>

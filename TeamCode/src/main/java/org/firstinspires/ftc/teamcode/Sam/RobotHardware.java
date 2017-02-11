@@ -43,7 +43,7 @@ public class RobotHardware
     //Ultra Sonic Distance
     int ultraSonicDistance = 11;
 
-    //Motor Variables
+    //ShooterMotor Variables
     public int ROTATION = 1220; // # of ticks
     public int MOTOR_POWER = 1;
 

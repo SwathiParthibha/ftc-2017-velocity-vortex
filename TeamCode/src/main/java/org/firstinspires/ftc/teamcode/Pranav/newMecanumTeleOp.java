@@ -91,10 +91,10 @@ public class newMecanumTeleOp extends OpMode
         telemetry.addData("Right Joystick X Direction:", gamepad1.right_stick_x);
         telemetry.addData("Theta:", theta);
 
-        telemetry.addData("Front Left Motor Speed:", frontLeftMotor.getPower());
-        telemetry.addData("Front Right Motor Speed:", frontRightMotor.getPower());
-        telemetry.addData("Back Left Motor Speed:", backLeftMotor.getPower());
-        telemetry.addData("Back Right Motor Speed:", backRightMotor.getPower());
+        telemetry.addData("Front Left ShooterMotor Speed:", frontLeftMotor.getPower());
+        telemetry.addData("Front Right ShooterMotor Speed:", frontRightMotor.getPower());
+        telemetry.addData("Back Left ShooterMotor Speed:", backLeftMotor.getPower());
+        telemetry.addData("Back Right ShooterMotor Speed:", backRightMotor.getPower());
 
     }
 

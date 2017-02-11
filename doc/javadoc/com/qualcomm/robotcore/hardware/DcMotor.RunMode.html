@@ -108,7 +108,7 @@
 <br>
 <pre>public static enum <span class="strong">DcMotor.RunMode</span>
 extends java.lang.Enum&lt;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.RunMode</a>&gt;</pre>
-<div class="block">The run mode of a motor <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html" title="enum in com.qualcomm.robotcore.hardware"><code>DcMotor.RunMode</code></a> controls how the motor interprets the
+<div class="block">The run mode of a shooterMotor <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html" title="enum in com.qualcomm.robotcore.hardware"><code>DcMotor.RunMode</code></a> controls how the shooterMotor interprets the
  it's parameter settings passed through power- and encoder-related methods.
  Some of these modes internally use <a href="https://en.wikipedia.org/wiki/PID_controller">PID</a>
  control to achieve their function, while others do not. Those that do are referred
@@ -139,14 +139,14 @@ extends java.lang.Enum&lt;<a href="../../../../com/qualcomm/robotcore/hardware/D
 </tr>
 <tr class="rowColor">
 <td class="colOne"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html#RUN_TO_POSITION">RUN_TO_POSITION</a></strong></code>
-<div class="block">The motor is to attempt to rotate in whatever direction is necessary to cause the
+<div class="block">The shooterMotor is to attempt to rotate in whatever direction is necessary to cause the
  encoder reading to advance or retreat from its current setting to the setting which
  has been provided through the <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setTargetPosition(int)"><code>setTargetPosition()</code></a> method.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colOne"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html#RUN_USING_ENCODER">RUN_USING_ENCODER</a></strong></code>
-<div class="block">The motor is to do its best to run at targeted velocity.</div>
+<div class="block">The shooterMotor is to do its best to run at targeted velocity.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -158,8 +158,8 @@ extends java.lang.Enum&lt;<a href="../../../../com/qualcomm/robotcore/hardware/D
 </tr>
 <tr class="altColor">
 <td class="colOne"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html#RUN_WITHOUT_ENCODER">RUN_WITHOUT_ENCODER</a></strong></code>
-<div class="block">The motor is simply to run at whatever velocity is achieved by apply a particular
- power level to the motor.</div>
+<div class="block">The shooterMotor is simply to run at whatever velocity is achieved by apply a particular
+ power level to the shooterMotor.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -171,7 +171,7 @@ extends java.lang.Enum&lt;<a href="../../../../com/qualcomm/robotcore/hardware/D
 </tr>
 <tr class="altColor">
 <td class="colOne"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html#STOP_AND_RESET_ENCODER">STOP_AND_RESET_ENCODER</a></strong></code>
-<div class="block">The motor is to set the current encoder position to zero.</div>
+<div class="block">The shooterMotor is to set the current encoder position to zero.</div>
 </td>
 </tr>
 </table>
@@ -252,8 +252,8 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>RUN_WITHOUT_ENCODER</h4>
 <pre>public static final&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.RunMode</a> RUN_WITHOUT_ENCODER</pre>
-<div class="block">The motor is simply to run at whatever velocity is achieved by apply a particular
- power level to the motor.</div>
+<div class="block">The shooterMotor is simply to run at whatever velocity is achieved by apply a particular
+ power level to the shooterMotor.</div>
 </li>
 </ul>
 <a name="RUN_USING_ENCODER">
@@ -263,8 +263,8 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>RUN_USING_ENCODER</h4>
 <pre>public static final&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.RunMode</a> RUN_USING_ENCODER</pre>
-<div class="block">The motor is to do its best to run at targeted velocity. An encoder must be affixed
- to the motor in order to use this mode. This is a PID mode.</div>
+<div class="block">The shooterMotor is to do its best to run at targeted velocity. An encoder must be affixed
+ to the shooterMotor in order to use this mode. This is a PID mode.</div>
 </li>
 </ul>
 <a name="RUN_TO_POSITION">
@@ -274,10 +274,10 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>RUN_TO_POSITION</h4>
 <pre>public static final&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.RunMode</a> RUN_TO_POSITION</pre>
-<div class="block">The motor is to attempt to rotate in whatever direction is necessary to cause the
+<div class="block">The shooterMotor is to attempt to rotate in whatever direction is necessary to cause the
  encoder reading to advance or retreat from its current setting to the setting which
  has been provided through the <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setTargetPosition(int)"><code>setTargetPosition()</code></a> method.
- An encoder must be affixed to this motor in order to use this mode. This is a PID mode.</div>
+ An encoder must be affixed to this shooterMotor in order to use this mode. This is a PID mode.</div>
 </li>
 </ul>
 <a name="STOP_AND_RESET_ENCODER">
@@ -287,16 +287,16 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>STOP_AND_RESET_ENCODER</h4>
 <pre>public static final&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.RunMode</a> STOP_AND_RESET_ENCODER</pre>
-<div class="block">The motor is to set the current encoder position to zero. In contrast to
+<div class="block">The shooterMotor is to set the current encoder position to zero. In contrast to
  <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html#RUN_TO_POSITION"><code>RUN_TO_POSITION</code></a>,
- the motor is not rotated in order to achieve this; rather, the current rotational
- position of the motor is simply reinterpreted as the new zero value. However, as
- a side effect of placing a motor in this mode, power is removed from the motor, causing
- it to stop, though it is unspecified whether the motor enters brake or float mode.
+ the shooterMotor is not rotated in order to achieve this; rather, the current rotational
+ position of the shooterMotor is simply reinterpreted as the new zero value. However, as
+ a side effect of placing a shooterMotor in this mode, power is removed from the shooterMotor, causing
+ it to stop, though it is unspecified whether the shooterMotor enters brake or float mode.
 
- Further, it should be noted that setting a motor to<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html#STOP_AND_RESET_ENCODER"><code>STOP_AND_RESET_ENCODER</code></a> may or may not be a transient state: motors connected to some motor
+ Further, it should be noted that setting a shooterMotor to<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html#STOP_AND_RESET_ENCODER"><code>STOP_AND_RESET_ENCODER</code></a> may or may not be a transient state: motors connected to some shooterMotor
  controllers will remain in this mode until explicitly transitioned to a different one, while
- motors connected to other motor controllers will automatically transition to a different
+ motors connected to other shooterMotor controllers will automatically transition to a different
  mode after the reset of the encoder is complete.</div>
 </li>
 </ul>
