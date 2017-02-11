@@ -56,7 +56,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Push Button With Timeout", group="Pushbot")
+@Autonomous(name="Shooting Position", group="Pushbot")
 //@Disabled
 public class DriveToBeaconsBlue1 extends LinearOpMode {
 
@@ -96,7 +96,16 @@ public class DriveToBeaconsBlue1 extends LinearOpMode {
             idle();
         }
 
-        pushBlueButton();
+        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //Then it will back up
+        auto.turn(135);
+        auto.encoderDrive(auto.APPROACH_SPEED, 10, 10, 5);
+        ElapsedTime time = new ElapsedTime();
+        while (opModeIsActive() && time.seconds() < 5) {
+            auto.leftMotor.setPower(0);
+            auto.rightMotor.setPower(0);
+        }
+        auto.turn(130);
+        auto.encoderDrive(auto.APPROACH_SPEED, 12, 12, 5);
     }
 
     void pushBlueButton() throws InterruptedException {

@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.Shashank.utils;
 
-public class ShooterSettings {//data members can be replaced, but default values are for 1750 ETPS = 955 RPM
+public class shooterSettings {//data members can be replaced, but default values are for 1750 ETPS = 955 RPM
 
-        public ShooterSettings(){}
-        public ShooterSettings(double therequestedRPM, double theoriginalPWR1, double theoriginalPWR2){
+        public shooterSettings(){}
+        public shooterSettings(double therequestedRPM, double theoriginalPWR1, double theoriginalPWR2){
             requestedRPM=therequestedRPM;
             requestedEncoderTicksPerSecond =requestedRPM*110/60;
             originalPWR1=theoriginalPWR1;

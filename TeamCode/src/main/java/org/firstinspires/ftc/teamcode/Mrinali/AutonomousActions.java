@@ -100,8 +100,8 @@ public class AutonomousActions extends LinearOpMode {
 
     static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
     static final double APPROACH_SPEED = 0.5;
-    double TURN_POWER_1 = .1;
-    double TURN_POWER_2 = .03;
+    double TURN_POWER_1 = .2;
+    double TURN_POWER_2 = .05;
     double WHEEL_SIZE_IN = 4;
     public int ROTATION = 1220; // # of ticks for 40-1 gear ratio
     static final double     DRIVE_GEAR_REDUCTION    = 1.5 ;     // This is < 1.0 if geared UP
@@ -254,10 +254,9 @@ public class AutonomousActions extends LinearOpMode {
         angleZ = IMUheading();
 
         double angDiff = turnAngle-angleZ; //positive: turn left
-        angDiff = (angDiff + 180) % 360 - 180;
+        angDiff = (angDiff + 180) % 360 - 180; //changes to number between -180 and 180
         telemetry.log().add("Angle Difference: " + angDiff);
         telemetry.update();
-        sleep(2000);
 
         if (angDiff < 0) { //turns right
             leftMotor.setPower(APPROACH_SPEED * .6 );
@@ -293,7 +292,7 @@ public class AutonomousActions extends LinearOpMode {
             rightMotor.setPower(0);
         }
 
-        else if (angDiff > 0) { //turns left
+        else if (angDiff > 0) {; //turns left
             leftMotor.setPower(-APPROACH_SPEED);
             rightMotor.setPower(APPROACH_SPEED);
 

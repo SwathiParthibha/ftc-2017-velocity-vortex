@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -164,7 +164,7 @@ public class EncoderTimeTest extends OpMode {
 
     private MediaPlayer wrongBallSound = null, correctBallSound = null;
     private ColorSensor sweeperColorSensor;
-    private BeaconColor beaconColor = null;
+    private AllianceColor beaconColor = null;
 
     private boolean ballSensed = false;
 

@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Mrinali.Shoot;
 
 /**
  * Created by spmega on 1/5/17.
@@ -22,9 +21,9 @@ public class RPMRunnable implements Runnable {
 
     private ThreadSharedObject threadSharedObject;
 
-    private ShooterSettings settings;
+    private shooterSettings settings;
 
-    public RPMRunnable(DcMotor shooter1, DcMotor shooter2, ShooterSettings settings, Telemetry telemetry, ThreadSharedObject threadSharedObject, ElapsedTime runtime) {
+    public RPMRunnable(DcMotor shooter1, DcMotor shooter2, shooterSettings settings, Telemetry telemetry, ThreadSharedObject threadSharedObject, ElapsedTime runtime) {
         this.shooter1 = shooter1;
         this.shooter2 = shooter2;
         this.settings = settings;
@@ -112,7 +111,7 @@ public class RPMRunnable implements Runnable {
         return runtime.seconds();
     }
 
-    public boolean checkIfReadyToShoot(ShooterSettings settings) {
+    public boolean checkIfReadyToShoot(shooterSettings settings) {
         if(Math.abs(settings.error1)<settings.deadband && Math.abs(settings.error2)<settings.deadband && getRuntime()-startShootingtime>settings.rampUpTime)
         {
             telemetry.addData("READY TO SHOOT", "");
@@ -125,7 +124,7 @@ public class RPMRunnable implements Runnable {
 
     }
 
-    public void outputTelemetry(ShooterSettings settings) {
+    public void outputTelemetry(shooterSettings settings) {
         telemetry.addData("requiredPWR1: ", String.format("%.4f", settings.requiredPWR1));
         telemetry.addData("requiredPWR2: ", String.format("%.4f", settings.requiredPWR2));
         telemetry.addData("adjustment1: ", settings.adjustment1);
@@ -148,19 +147,19 @@ public class RPMRunnable implements Runnable {
     }
 
 
-    public void setSettings(ShooterSettings settings) {
+    public void setSettings(shooterSettings settings) {
         this.settings = settings;
     }
 
-    public void applyAdjustment1(ShooterSettings settings) {
+    public void applyAdjustment1(shooterSettings settings) {
         settings.requiredPWR1+=settings.adjustment1;
     }
 
-    public void applyAdjustment2(ShooterSettings settings) {
+    public void applyAdjustment2(shooterSettings settings) {
         settings.requiredPWR2+=settings.adjustment2;
     }
 
-    public void PID1Update(ShooterSettings settings){
+    public void PID1Update(shooterSettings settings){
         //settings.error1=-(settings.Xk1- settings.requestedEncoderTicksPerSecond);
         settings.error1=-(settings.current_rpm1- settings.requestedEncoderTicksPerSecond);
         settings.integral1 = settings.integral1 + settings.error1 * settings.dt;//calculate integral of error
@@ -178,7 +177,7 @@ public class RPMRunnable implements Runnable {
 
     }
 
-    public void resetKalmin(ShooterSettings settings){
+    public void resetKalmin(shooterSettings settings){
         settings.input1=0;
         settings.prevXk1=0;
         settings.prevPk1=1;
@@ -198,7 +197,7 @@ public class RPMRunnable implements Runnable {
 
     }
 
-    public void resetPID(ShooterSettings settings){
+    public void resetPID(shooterSettings settings){
         settings.previous_position1=0;
         settings.current_position1=0;
         settings.current_rpm1=0;
@@ -221,20 +220,20 @@ public class RPMRunnable implements Runnable {
 
     }
 
-    public void previous1Update(ShooterSettings settings){
+    public void previous1Update(shooterSettings settings){
         settings.previous_error1=settings.error1;
         settings.previous_position1 = settings.current_position1;
         settings.previous_rpm1 = settings.current_rpm1;
     }
 
-    public void previous2Update(ShooterSettings settings){
+    public void previous2Update(shooterSettings settings){
         settings.previous_error2=settings.error2;
         settings.previous_position2 = settings.current_position2;
         settings.previous_rpm2 = settings.current_rpm2;
     }
 
 
-    public void clipPower1(ShooterSettings settings){
+    public void clipPower1(shooterSettings settings){
         if(settings.requiredPWR1<settings.originalPWR1-settings.allowedPowerDifference)
         {
             settings.requiredPWR1=settings.originalPWR1-settings.allowedPowerDifference;
@@ -246,7 +245,7 @@ public class RPMRunnable implements Runnable {
 
     }
 
-    public void clipPower2(ShooterSettings settings){
+    public void clipPower2(shooterSettings settings){
         if(settings.requiredPWR2<settings.originalPWR2-settings.allowedPowerDifference)
         {
             settings.requiredPWR2=settings.originalPWR2-settings.allowedPowerDifference;
@@ -258,7 +257,7 @@ public class RPMRunnable implements Runnable {
 
     }
 
-    public void PID2Update(ShooterSettings settings){
+    public void PID2Update(shooterSettings settings){
 
         //settings.error2=-(settings.Xk2- settings.requestedEncoderTicksPerSecond);
         settings.error2=-(settings.current_rpm2- settings.requestedEncoderTicksPerSecond);
@@ -277,7 +276,7 @@ public class RPMRunnable implements Runnable {
     }
 
 
-    public void updateRPM1and2(ShooterSettings settings){
+    public void updateRPM1and2(shooterSettings settings){
         settings.current_rpm1 = (10^9)*(settings.current_position1 - settings.previous_position1) / (settings.dt);
         settings.current_rpm2 = (10^9)*(settings.current_position2 - settings.previous_position2) / (settings.dt);
     }
