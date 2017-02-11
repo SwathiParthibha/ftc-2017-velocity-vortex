@@ -1,5 +1,20 @@
 package org.firstinspires.ftc.teamcode.Shashank.utils;
 
+/**
+ * Created by spmeg on 2/10/2017.
+ */
+
+import com.qualcomm.ftccommon.DbgLog;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -8,11 +23,18 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mrinali.Shoot;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.Executors.*;
+
 /**
  * Created by spmega on 1/5/17.
  */
 
-public class RPMRunnable implements Runnable {
+public class RPMRunnableTest implements Runnable {
     private Telemetry telemetry = null;
     private ElapsedTime runtime = null;
     private boolean requestStop = false;
@@ -24,7 +46,7 @@ public class RPMRunnable implements Runnable {
 
     private ShooterSettings settings;
 
-    public RPMRunnable(DcMotor shooter1, DcMotor shooter2, ShooterSettings settings, Telemetry telemetry, ThreadSharedObject threadSharedObject, ElapsedTime runtime) {
+    public RPMRunnableTest(DcMotor shooter1, DcMotor shooter2, ShooterSettings settings, Telemetry telemetry, ThreadSharedObject threadSharedObject, ElapsedTime runtime) {
         this.shooter1 = shooter1;
         this.shooter2 = shooter2;
         this.settings = settings;
@@ -41,15 +63,76 @@ public class RPMRunnable implements Runnable {
     public static final String SHOOTER_1_TAG = "RPM_SHOOTER_1";
     public static final String SHOOTER_2_TAG = "RPM_SHOOTER_2";
 
+    private boolean scheduledRpmTask = false;
+
     @Override
     public void run() {
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        settings.dt=50000000L;
         //if you need to run a loop, make sure that you check that requestStop is still false
         while (!requestStop) {
             //simply printing out and updating the telemetry log here
-            int shooting1= shooter1.getCurrentPosition();
-            int shooting2= shooter2.getCurrentPosition();
 
             if(settings.requestedRPM!=0){
+                if(!scheduledRpmTask){
+                    executor.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            DbgLog.msg("Nano Time: "+ settings.dt);
+                            settings.current_position1 = shooter1.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
+                            settings.current_position2 = shooter2.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
+
+                            updateRPM1and2(settings);
+
+                            DbgLog.msg("RPM1: " + settings.current_rpm1+"\nRPM2: " + settings.current_rpm2);
+
+                            if(getRuntime()-startShootingtime>settings.rampUpTime) {//only update Kalmin and PID after ramp up
+                                //timeUpdate(settings);
+                                //measurementUpdate(settings);
+
+
+                                //DbgLog.msg("Time: "+getRuntime()+"RPM1: " + settings.current_rpm1+"RPM2: " + settings.current_rpm2+"Kalmin1: " + settings.Xk1+"Kalmin2: " + settings.Xk2);
+                                //DbgLog.msg("Time: "+getRuntime()+"Encoder: " + settings.current_position2+"Encoder2: " + settings.current_position2);
+
+                                PID1Update(settings);
+                                PID2Update(settings);
+
+                                applyAdjustment1(settings);
+                                applyAdjustment2(settings);
+                            }
+                            //clipPower1(settings);
+                            //clipPower2(settings);
+
+                            previous1Update(settings);
+                            previous2Update(settings);
+                            scheduledRpmTask = false;
+                        }
+                    }, (long) settings.dt, TimeUnit.NANOSECONDS);
+                    scheduledRpmTask = true;
+                }
+
+                checkIfReadyToShoot(settings);
+                if(USE_TELEMETRY) {
+                    outputTelemetry(settings);
+                }
+
+                if(Double.isNaN(settings.requiredPWR1)){
+                    settings.requiredPWR1 = 0;
+                    settings.requiredPWR2 = 0;
+                }
+
+                shooter1.setPower(Range.clip(settings.requiredPWR1, 0, 1));
+                shooter2.setPower(Range.clip(settings.requiredPWR2, 0, 1));
+            } else
+            {
+                shooter1.setPower(0);
+                shooter2.setPower(0);
+                startShootingtime=-999;
+                resetKalmin(settings);
+                resetPID(settings);
+            }
+
+            /*if(settings.requestedRPM!=0){
                 settings.dt=System.nanoTime()-prevTime;
                 if (settings.dt>= 50000000L) {//only update every 50ms
                     settings.current_position1 = shooter1.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
@@ -98,12 +181,14 @@ public class RPMRunnable implements Runnable {
                 startShootingtime=-999;
                 resetKalmin(settings);
                 resetPID(settings);
-            }
+            }*/
 
 
             threadSharedObject.setDouble(SHOOTER_1_TAG, settings.current_rpm1);
             threadSharedObject.setDouble(SHOOTER_2_TAG, settings.current_position2);
+
         }
+        executor.shutdown();
         //if you are not running a loop, make sure to periodically check if the requestStop is still false
         telemetry.log().add("This is ending a thread: " + runtime.toString());
     }
@@ -278,8 +363,8 @@ public class RPMRunnable implements Runnable {
 
 
     public void updateRPM1and2(ShooterSettings settings){
-        settings.current_rpm1 = ((10^7)*(settings.current_position1 - settings.previous_position1)) / (settings.dt);
-        settings.current_rpm2 = ((10^7)*(settings.current_position2 - settings.previous_position2)) / (settings.dt);
+        settings.current_rpm1 = (10^9)*(settings.current_position1 - settings.previous_position1) / (settings.dt);
+        settings.current_rpm2 = (10^9)*(settings.current_position2 - settings.previous_position2) / (settings.dt);
     }
 
     //call this method when you want to stop the thread

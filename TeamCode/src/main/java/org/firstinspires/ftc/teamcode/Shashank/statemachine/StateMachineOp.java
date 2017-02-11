@@ -131,7 +131,7 @@ public class StateMachineOp extends OpMode {
         autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.PIVOT_TO_LINE, S.FOLLOW_lINE, beaconColor);
         autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
         autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.WAIT, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
-        autoStateMachineBuilder.addWait(S.WAIT, S._2ND_TO_WHITE_LINE, 3000);
+        autoStateMachineBuilder.addWait(S.WAIT, S._2ND_TO_WHITE_LINE, 7000);
         autoStateMachineBuilder.addToWhiteLine(S._2ND_TO_WHITE_LINE, S._2ND_PIVOT_TO_LINE, leftMotor, rightMotor, lightSensor);
         //autoStateMachineBuilder.addWait(S._2ND_WHITE_LINE_PIVOT_WAIT, S._2ND_PIVOT_TO_LINE, 300);
         autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S._2ND_PIVOT_TO_LINE, S._2ND_FOLLOW_lINE, beaconColor);
