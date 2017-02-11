@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
 
 public class ThreadSharedObject {
     private volatile HashMap<String, Integer> intSensorValues = new HashMap<>();
+    private volatile HashMap<String, Long> longSensorValues = new HashMap<>();
     private volatile HashMap<String, Double> doubleSensorValues = new HashMap<>();
     private volatile HashMap<String, Boolean> booleanSensorValues = new HashMap<>();
     private volatile HashMap<String, String> stringSensorValues = new HashMap<>();
@@ -41,6 +42,17 @@ public class ThreadSharedObject {
             return stringSensorValues.get(tag);
         else
             return null;
+    }
+
+    public long getLong(String tag) {
+        if (longSensorValues.containsKey(tag))
+            return longSensorValues.get(tag);
+        else
+            return 0;
+    }
+
+    public void setLong(String tag, long value){
+        longSensorValues.put(tag, value);
     }
 
     public void setInteger(String tag, int value){

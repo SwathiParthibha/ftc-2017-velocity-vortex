@@ -128,7 +128,6 @@ public class DriveToBeaconsBlue extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
-
         // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
         // robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

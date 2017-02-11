@@ -11,9 +11,7 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AutoStateMachineBuilder;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
-import org.firstinspires.ftc.teamcode.Shashank.utils.RangeSensorRunnable;
-import org.firstinspires.ftc.teamcode.Shashank.utils.ThreadSharedObject;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 import ftc.electronvolts.statemachine.StateMachine;
 import ftc.electronvolts.statemachine.StateName;
@@ -65,7 +63,7 @@ public class LineFollowStateMachineOp extends OpMode {
         AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.WAIT);
 
         autoStateMachineBuilder.addWait(S.WAIT, S.FOLLOW_lINE, 3000);
-        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.STOP, leftMotor, rightMotor, lightSensor, rangeSensor, BeaconColor.BLUE);
+        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.STOP, leftMotor, rightMotor, lightSensor, rangeSensor, AllianceColor.BLUE);
         autoStateMachineBuilder.addStop(S.STOP);
 
         stateMachine = autoStateMachineBuilder.build();

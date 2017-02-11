@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Sam;
 
 import com.qualcomm.ftccommon.DbgLog;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
 @TeleOp(name = "Two Controller Teleop", group = "Teleop")
+@Disabled
 public class twoControllerTeleop extends OpMode {
     private DcMotor leftMotor;
     private DcMotor rightMotor;

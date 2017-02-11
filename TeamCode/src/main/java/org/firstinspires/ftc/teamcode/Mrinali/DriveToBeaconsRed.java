@@ -103,8 +103,9 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.pushRedButton();
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3);
         auto.turn(0);
-        auto.encoderDrive(auto.APPROACH_SPEED, 10, 10, 5);
+        auto.encoderDrive(auto.APPROACH_SPEED, 7, 7, 5);
 
+        sleep(1000);
         auto.turn(0);
         auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
@@ -123,6 +124,6 @@ public class DriveToBeaconsRed extends LinearOpMode {
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
 
-        auto.encoderDrive(auto.APPROACH_SPEED, 24, 24, 5);
+        auto.encoderDrive(auto.APPROACH_SPEED, 22, 22, 5);
     }
 }

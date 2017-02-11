@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.Shashank.statemachine.states;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 import org.firstinspires.ftc.teamcode.Shashank.utils.RangeSensorRunnable;
 import org.firstinspires.ftc.teamcode.Shashank.utils.ThreadSharedObject;
 
@@ -37,9 +36,9 @@ public class LineFollowState extends BasicAbstractState {
 
     ElapsedTime runtime = new ElapsedTime();
 
-    private BeaconColor color = null;
+    private AllianceColor color = null;
 
-    public LineFollowState(Telemetry telemetry, StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, I2cDeviceSynchImpl rangeSensor, BeaconColor color) {
+    public LineFollowState(Telemetry telemetry, StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, I2cDeviceSynchImpl rangeSensor, AllianceColor color) {
         this.stateName = stateName;
         this.nextStateName = nextStateName;
         this.leftMotor = leftMotor;
@@ -77,7 +76,7 @@ public class LineFollowState extends BasicAbstractState {
         telemetry.update();
 
         if(!isDone()) {
-            if(color == BeaconColor.BLUE){
+            if(color == AllianceColor.BLUE){
                 if (lightSensor.getLightDetected() > 0.3) {
                     leftMotor.setPower(0);
                     rightMotor.setPower(0.2);
@@ -86,7 +85,7 @@ public class LineFollowState extends BasicAbstractState {
                     rightMotor.setPower(0);
                 }
                 return stateName;
-            } else if(color == BeaconColor.RED){
+            } else if(color == AllianceColor.RED){
                 if (lightSensor.getLightDetected() > 0.3) {
                     leftMotor.setPower(0.2);
                     rightMotor.setPower(0);
@@ -108,7 +107,7 @@ public class LineFollowState extends BasicAbstractState {
 
     @Override
     public boolean isDone() {
-        return threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) < 11 && threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) > 0;
+        return threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) < 13 && threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) > 0;
     }
 
     @Override

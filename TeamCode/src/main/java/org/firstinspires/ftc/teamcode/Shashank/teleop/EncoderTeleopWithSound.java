@@ -7,15 +7,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.LightSensor;
 
 import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
-
-import java.io.IOException;
-
-import static java.lang.Thread.sleep;
-
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 @TeleOp(name = "Two Controller Teleop With Sound", group = "Teleop")
 public class EncoderTeleopWithSound extends OpMode {
@@ -26,137 +20,103 @@ public class EncoderTeleopWithSound extends OpMode {
     private DcMotor shooter2;
     private DcMotor sweeper;
 
-    private double RequestedRPM=1500;
-    private double power=0;
-    private long dt=1000;
-    private double previous_position1=0;
-    private double current_position1=0;
-    private double current_rpm1=0;
-    private double previous_rpm1=0;
-    private double error1=0;
-    private double previous_error1=0;
-    private double integral1=0;
-    private double derivative1=0;
-    private double adjustment1=0;
-    private double previous_position2=0;
-    private double current_position2=0;
-    private double current_rpm2=0;
-    private double previous_rpm2=0;
-    private double error2=0;
-    private double previous_error2=0;
-    private double integral2=0;
-    private double derivative2=0;
-    private double adjustment2=0;
-
-    private boolean startrunnning=false;
-    private boolean running=false;
-    private String output="";
-
-    double Kp=0.1;
-    double Ki=0.00001;
-    double Kd=0.00001;
-
-    private boolean ShooterPowerCont=true;
-
-    final Runnable ShooterPower = new Runnable() {
-        public void run() {
-
-            while (ShooterPowerCont) {
-                synchronized (this) {
-                    try {
-
-                       /* if(running) {
-                            current_position=shooter1.getCurrentPosition();
-
-                            current_rpm = (previous_position - current_position) / (int) dt;
-
-                            error = current_rpm - RequestedRPM;
-                            //abserror=(int)Math.abs(current_rpm-RequestedRPM);
-                            integral = integral + error * (int) dt;//calculate integral of error
-                            derivative = (error - previous_error) / (int) dt;//calculator derivative of data
-                            adjustment = Kp * error + Ki * integral + Kd * derivative;//summation of PID
-
-                            previous_rpm = current_rpm;
-                            previous_error = error;
-                            previous_position=current_position;
-
-                        }*/
-                        current_position1=shooter1.getCurrentPosition();
-
-                        current_rpm1 = (current_position1 - previous_position1) / (int) dt;
-
-                        adjustment1=Kp*(RequestedRPM-current_rpm1);
-                        previous_position1=current_position1;
-                        previous_rpm1=current_rpm1;
-
-                        output="error1: "+error1;
-                        output+="adjust: "+adjustment1;
-                        output+="curr"+current_rpm1;
-                        //output+="power: "+power;
-
-
-                        current_position2=shooter2.getCurrentPosition();
-
-                        current_rpm2 = (current_position2 - previous_position2) / (int) dt;
-
-                        adjustment2=Kp*(RequestedRPM-current_rpm2);
-                        previous_position2=current_position2;
-                        previous_rpm2=current_rpm2;
-
-                        output="error2: "+error2;
-                        output+="adjust: "+adjustment2;
-                        output+="curr"+current_rpm2;
-
-
-                        if(startrunnning)
-                        {
-                            startrunnning=false;
-                            running=true;
-                            shooter1.setPower(power);
-                            shooter2.setPower(power);
-                        }
-
-                        if(running)
-                        {
-                            shooter1.setPower(power-adjustment1);
-                            shooter2.setPower(power-adjustment2);
-                            //shooter2.setPower(power);
-                        }
-                        else
-                        {
-                            integral1=0;
-                            previous_rpm1=0;
-                            previous_error1=0;
-                            previous_position1=0;
-                            integral2=0;
-                            previous_rpm2=0;
-                            previous_error2=0;
-                            previous_position2=0;
-                            shooter1.setPower(0);
-                            shooter2.setPower(0);
-                            //shooter2.setPower(power);
-                        }
-
-
-
-                        sleep(dt);
-                    } catch (Exception e) {
-                    }
-                }
-            }
-        }
-    };
-    final Thread Shooter = new Thread(ShooterPower);
-
-
     private boolean state;
     boolean swap=false;
 
+
+    public class shooterSettings{//data members can be replaced, but default values are for 1750 ETPS = 955 RPM
+
+        public shooterSettings(){}
+        public shooterSettings(double therequestedRPM, double theoriginalPWR1, double theoriginalPWR2){
+            requestedRPM=therequestedRPM;
+            requestedEncoderTicksPerSecond =requestedRPM*110/60;
+            originalPWR1=theoriginalPWR1;
+            originalPWR2=theoriginalPWR2;
+            requiredPWR1=originalPWR1;
+            requiredPWR2=originalPWR2;
+        }
+
+        private double requestedRPM =955;//955;
+        private double requestedEncoderTicksPerSecond =requestedRPM*110/60;//1750
+
+        //PID variables
+        private double dt=0;
+        private double previous_position1=0;
+        private double current_position1=0;
+        private double current_rpm1=0;
+        private double previous_rpm1=0;
+        private double error1=0;
+        private double previous_error1=0;
+        private double integral1=0;
+        private double derivative1=0;
+        private double adjustment1=0;
+        private double previous_position2=0;
+        private double current_position2=0;
+        private double current_rpm2=0;
+        private double previous_rpm2=0;
+        private double error2=0;
+        private double previous_error2=0;
+        private double integral2=0;
+        private double derivative2=0;
+        private double adjustment2=0;
+
+        //PID Constants
+        double Kp = 0.000001;
+        double Ki = 0.0000001;//0.00000001
+        double Kd = 0.0000001;
+
+        //Timing variables
+        public double rampUpTime=1.5;
+
+        //Power Variables
+        public double originalPWR1=0.42;
+        public double originalPWR2=0.42;
+        public final double allowedPowerDifference=0.03;
+        public double requiredPWR1=originalPWR1;
+        public double requiredPWR2=originalPWR2;
+        public double deadband=20;
+
+
+
+
+
+        //Kalman Filter Variables
+        double input1=0;
+        double prevXk1=0;
+        double prevPk1=1;
+        double Xk1=0;
+        double Pk1=1;
+        double Kk1=0;
+        double R1=0.2;
+
+        double input2=0;
+        double prevXk2=0;
+        double prevPk2=1;
+        double Xk2=0;
+        double Pk2=1;
+        double Kk2=0;
+        double R2=0.2;
+
+
+
+    }
+
+    private boolean USE_TELEMETRY=true;
+
+
+
+    EncoderTeleopWithSound.shooterSettings RPM955;
+    EncoderTeleopWithSound.shooterSettings RPM0;
+    EncoderTeleopWithSound.shooterSettings RPM800;
+
+
+
+    public double startShootingtime=0;
+    public double prevTime=0;
+
     private MediaPlayer wrongBallSound = null, correctBallSound = null;
-
-    private ColorSensor sweeperColorSensor = null;
-
-    private BeaconColor beaconColor = null;
+    private ColorSensor sweeperColorSensor;
+    private AllianceColor beaconColor = null;
 
     private boolean ballSensed = false;
 
@@ -168,8 +128,14 @@ public class EncoderTeleopWithSound extends OpMode {
         shooter1 = this.hardwareMap.dcMotor.get("shooter1");
         shooter2 = this.hardwareMap.dcMotor.get("shooter2");
         sweeper = this.hardwareMap.dcMotor.get("sweeper");
-        sweeperColorSensor = this.hardwareMap.colorSensor.get("slcs");
+        sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
         state = false;
+
+
+        RPM955= new EncoderTeleopWithSound.shooterSettings();//default settings are for 955, 0.43,0.43
+        RPM0 = new EncoderTeleopWithSound.shooterSettings(0,0,0);
+        RPM800 = new EncoderTeleopWithSound.shooterSettings(800,0.35,0.35);
+
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -193,20 +159,8 @@ public class EncoderTeleopWithSound extends OpMode {
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        Shooter.start();
-
         wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
-        correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.alarm_ringing);
-
-        wrongBallSound.start();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        wrongBallSound.stop();
-        wrongBallSound.reset();
+        correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
     }
 
     @Override
@@ -254,38 +208,39 @@ public class EncoderTeleopWithSound extends OpMode {
         }
 
         if(gamepad2.a){
-            EncoderShooter(scaleShooterPower(0.55));//0.7//0.9
+            EncoderShooter(RPM800);
         } else if(gamepad2.b) {
-            //EncoderShooter(scaleShooterPower(0.8));//0.6//0.7
-            power=0.7;
-            startrunnning=true;
-        }
-        else if(gamepad2.y)
-        {
-            //EncoderShooter(0.2);
+            EncoderShooter(RPM955);//0.6//0.7
+            //power=0.7;
+            //startrunnning=true;
         }
         else {
-            EncoderShooter(0);
-            power=0;
-            running=false;
+            EncoderShooter(RPM0);
         }
 
-        if(gamepad2.right_trigger > 0){
-            sweeper.setPower(-0.5);
-            //set the initial color to watch out for
+
+
+
+
+        if(gamepad2.right_bumper){
+            sweeper.setPower(0.7);
+
             if(beaconColor == null) {
-                if (sweeperColorSensor.red() > 11 || sweeperColorSensor.blue() > 11)
+                if (sweeperColorSensor.red() > 15) {
                     if (sweeperColorSensor.red() > sweeperColorSensor.blue())
-                        beaconColor = BeaconColor.RED;
-                    else
-                        beaconColor = BeaconColor.BLUE;
+                        beaconColor = AllianceColor.RED;
+                } else if(sweeperColorSensor.blue() > 15){
+                    if (sweeperColorSensor.red() < sweeperColorSensor.blue())
+                        beaconColor = AllianceColor.BLUE;
+                } else
+                    beaconColor = AllianceColor.BLUE;
                 telemetry.log().add("Beacon Color Set");
             }
-
-        } else if(gamepad2.right_bumper){
-            sweeper.setPower(0.5);
+        } else if(gamepad2.right_trigger > 0){
+            sweeper.setPower(-0.7);
         } else {
             sweeper.setPower(0);
+
         }
 
         if(isWrongBall()){
@@ -293,38 +248,33 @@ public class EncoderTeleopWithSound extends OpMode {
                 wrongBallSound.release();
                 wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
                 wrongBallSound.start();
-                telemetry.log().add("Starting the sound file");
             }
-
-            telemetry.log().add("ITS THE WRONG BALL");
             //sweeper.setPower(0.5);
         } else {
             wrongBallSound.stop();
-            telemetry.log().add("STOPPED THE SIREN");
             //sweeper.setPower(0);
         }
 
         telemetry.addData("left joystick",  "%.2f", left);
         telemetry.addData("right joystick", "%.2f", right);
-        telemetry.addData("shooting1", shooting1);
-        telemetry.addData("shooting2", shooting2);
-        telemetry.addData("Out",output);
-        telemetry.addData("Set Color: ", beaconColor);
-        telemetry.addData("Ball Sensed", ballSensed);
-        telemetry.addData("Sweeper color sensor red: ", sweeperColorSensor.red());
-        telemetry.addData("Sweeper color sensor blue: ", sweeperColorSensor.blue());
-        telemetry.addData("Sweeper color sensor argb: ", sweeperColorSensor.argb());
-        telemetry.addData("wrong ball sound playing", wrongBallSound.isPlaying());
         telemetry.addData("is wrong ball", isWrongBall());
+        telemetry.addData("ball sensed",ballSensed);
+        telemetry.addData("wrong ball sound playing", wrongBallSound.isPlaying());
+        telemetry.addData("Beacon color", beaconColor);
         telemetry.update();
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
     }
 
     private boolean isWrongBall() {
         if(sweeperColorSensor.red() > 11 || sweeperColorSensor.blue() > 11){
             ballSensed = true;
-            if(sweeperColorSensor.red() > sweeperColorSensor.blue() && beaconColor == BeaconColor.BLUE){
+            if(sweeperColorSensor.red() > sweeperColorSensor.blue() && beaconColor == AllianceColor.BLUE){
                 return true;
-            } else if(sweeperColorSensor.blue() > sweeperColorSensor.red() && beaconColor == BeaconColor.RED){
+            } else if(sweeperColorSensor.blue() > sweeperColorSensor.red() && beaconColor == AllianceColor.RED){
                 return true;
             } else {
                 return false;
@@ -335,99 +285,270 @@ public class EncoderTeleopWithSound extends OpMode {
         }
     }
 
-    @Override
-    public void stop() {
-        ShooterPowerCont=false;
-        correctBallSound.release();
-        wrongBallSound.release();
-        correctBallSound = null;
-        wrongBallSound = null;
-        super.stop();
-    }
-
-
-    public double prevTime=0;
-
-    public double requiredPWR1=0.8;
-    public double requiredPWR2=0.8;
-
-    public void EncoderShooter(double speed)
+    public void EncoderShooter(EncoderTeleopWithSound.shooterSettings settings)
     {
-        if(speed!=0) {
-
-            double Kp = 0.001;
-            double Ki = 0.00001;
-            double Kd = 0.00001;
+        if(settings.requestedRPM!=0) {
 
 
-            if (getRuntime() - prevTime > 0.25) {//only update every 10ms
-                current_position1 = shooter1.getCurrentPosition();
-                current_position2 = shooter2.getCurrentPosition();
-                current_rpm1 = (current_position1 - previous_position1) / (getRuntime() - prevTime);
-                current_rpm2 = (current_position2 - previous_position2) / (getRuntime() - prevTime);
+            if(startShootingtime==-999) {//only update on first run
+                startShootingtime = getRuntime();
+            }
+
+            settings.dt=getRuntime()-prevTime;
+            if (settings.dt> 0.01) {//only update every 10ms
+                settings.current_position1 = shooter1.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
+                settings.current_position2 = shooter2.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
+                prevTime = getRuntime();//MUST BE FIRST - time sensitive measurement
+
+                updateRPM1and2(settings);
+
+                if(getRuntime()-startShootingtime>settings.rampUpTime) {//only update Kalmin and PID after ramp up
+                    timeUpdate(settings);
+                    measurementUpdate(settings);
 
 
-                if(current_rpm1<RequestedRPM)
-                {//we need to speed up
-                    requiredPWR1+=Kp;
+                    //DbgLog.msg("Time: "+getRuntime()+"RPM1: " + current_rpm1+"RPM2: " + current_rpm2);
+
+                    PID1Update(settings);
+                    PID2Update(settings);
+
+                    applyAdjustment1(settings);
+                    applyAdjustment2(settings);
                 }
-                else if(current_rpm1>RequestedRPM)
-                {//we need to slow down
-                    requiredPWR1-=Kp;
-                }
-                if(current_rpm2<RequestedRPM)
-                {//we need to speed up
-                    requiredPWR2+=Kp;
-                }
-                else if(current_rpm2>RequestedRPM)
-                {//we need to slow down
-                    requiredPWR2-=Kp;
-                }
+                clipPower1(settings);
+                clipPower2(settings);
+
+                previous1Update(settings);
+                previous2Update(settings);
 
 
-                previous_position1 = current_position1;
-                previous_rpm1 = current_rpm1;
-                previous_position2 = current_position2;
-                previous_rpm2 = current_rpm2;
-                prevTime = getRuntime();
+            }
+
+            checkIfReadyToShoot(settings);
+            if(USE_TELEMETRY) {
+                outputTelemetry(settings);
             }
 
 
-            telemetry.addData("requiredPWR1: ", String.format("%.4f", requiredPWR1));
-            telemetry.addData("requiredPWR2: ", String.format("%.4f", requiredPWR2));
-            telemetry.addData("curr1", current_rpm1);
-            telemetry.addData("curr2", current_rpm2);
-            telemetry.addData("Time: ", "" + getRuntime());
+            shooter1.setPower(settings.requiredPWR1);
+            shooter2.setPower(settings.requiredPWR2);
 
-
-
-            shooter1.setPower(requiredPWR1);
-            shooter2.setPower(requiredPWR2);
-            //shooter2.setPower(speed);
 
         }
         else
         {
             shooter1.setPower(0);
             shooter2.setPower(0);
+            startShootingtime=-999;
+            resetKalmin(settings);
+            resetPID(settings);
         }
 
     }
-    public double scaleShooterPower(double intialPower)
-    {
-        double MAX_VOLTAGE=13.7;
 
-        double currentVoltage= hardwareMap.voltageSensor.get("drive").getVoltage();
 
-        double scaledPower=MAX_VOLTAGE*intialPower/currentVoltage;
+    public void updateRPM1and2(EncoderTeleopWithSound.shooterSettings settings){
+        settings.current_rpm1 = (settings.current_position1 - settings.previous_position1) / (settings.dt);
+        settings.current_rpm2 = (settings.current_position2 - settings.previous_position2) / (settings.dt);
+    }
 
-        telemetry.addData("Scaled power: ", scaledPower);
+    public void PID1Update(EncoderTeleopWithSound.shooterSettings settings){
+        settings.error1=-(settings.Xk1- settings.requestedEncoderTicksPerSecond);
+        settings.integral1 = settings.integral1 + settings.error1 * settings.dt;//calculate integral of error
+        settings.derivative1 = (settings.error1 - settings.previous_error1) / settings.dt;//calculate derivative of data
 
-        return scaledPower;
+        if(Math.abs(settings.error1)<settings.deadband)
+        {
+            settings.integral1=0;
+            settings.derivative1=0;
+        }
+
+        settings.adjustment1 = settings.Kp * settings.error1 + settings.Kd*settings.derivative1 + settings.Ki*settings.integral1;// + Ki * integral1 + Kd * derivative1;//summation of PID
 
 
 
     }
+
+    public void PID2Update(EncoderTeleopWithSound.shooterSettings settings){
+
+        settings.error2=-(settings.Xk2- settings.requestedEncoderTicksPerSecond);
+        settings.integral2 = settings.integral2 + settings.error2 * settings.dt;//calculate integral of error
+        settings.derivative2 = (settings.error2 - settings.previous_error2) / settings.dt;//calculate derivative of data
+
+        if(Math.abs(settings.error2)<settings.deadband)
+        {
+            settings.integral2=0;
+            settings.derivative2=0;
+        }
+
+        settings.adjustment2 = settings.Kp * settings.error2 + settings.Kd*settings.derivative2 + settings.Ki*settings.integral2;// + Ki * integral1 + Kd * derivative1;//summation of PID
+
+
+    }
+
+    public void previous1Update(EncoderTeleopWithSound.shooterSettings settings){
+        settings.previous_error1=settings.error1;
+        settings.previous_position1 = settings.current_position1;
+        settings.previous_rpm1 = settings.current_rpm1;
+    }
+
+    public void previous2Update(EncoderTeleopWithSound.shooterSettings settings){
+        settings.previous_error2=settings.error2;
+        settings.previous_position2 = settings.current_position2;
+        settings.previous_rpm2 = settings.current_rpm2;
+    }
+
+    public void applyAdjustment1(EncoderTeleopWithSound.shooterSettings settings) {
+        settings.requiredPWR1+=settings.adjustment1;
+    }
+
+    public void applyAdjustment2(EncoderTeleopWithSound.shooterSettings settings) {
+        settings.requiredPWR2+=settings.adjustment2;
+    }
+
+    public void clipPower1(EncoderTeleopWithSound.shooterSettings settings){
+        if(settings.requiredPWR1<settings.originalPWR1-settings.allowedPowerDifference)
+        {
+            settings.requiredPWR1=settings.originalPWR1-settings.allowedPowerDifference;
+        }
+        else if(settings.requiredPWR1>settings.originalPWR1+settings.allowedPowerDifference)
+        {
+            settings.requiredPWR1=settings.originalPWR1+settings.allowedPowerDifference;
+        }
+
+    }
+
+    public void clipPower2(EncoderTeleopWithSound.shooterSettings settings){
+        if(settings.requiredPWR2<settings.originalPWR2-settings.allowedPowerDifference)
+        {
+            settings.requiredPWR2=settings.originalPWR2-settings.allowedPowerDifference;
+        }
+        else if(settings.requiredPWR2>settings.originalPWR2+settings.allowedPowerDifference)
+        {
+            settings.requiredPWR2=settings.originalPWR2+settings.allowedPowerDifference;
+        }
+
+    }
+
+
+    public boolean checkIfReadyToShoot(EncoderTeleopWithSound.shooterSettings settings) {
+        if(Math.abs(settings.error1)<settings.deadband && Math.abs(settings.error2)<settings.deadband && getRuntime()-startShootingtime>settings.rampUpTime)
+        {
+            telemetry.addData("READY TO SHOOT", "");
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+
+    public void outputTelemetry(EncoderTeleopWithSound.shooterSettings settings) {
+        telemetry.addData("requiredPWR1: ", String.format("%.4f", settings.requiredPWR1));
+        telemetry.addData("requiredPWR2: ", String.format("%.4f", settings.requiredPWR2));
+        telemetry.addData("adjustment1: ", settings.adjustment1);
+        telemetry.addData("P1: ", settings.Kp*settings.error1);
+        telemetry.addData("I1: ", settings.Ki*settings.integral1);
+        telemetry.addData("D1: ", settings.Kd*settings.derivative1);
+        telemetry.addData("adjustment2: ", settings.adjustment2);
+        telemetry.addData("P2: ", settings.Kp*settings.error2);
+        telemetry.addData("I2: ", settings.Ki*settings.integral2);
+        telemetry.addData("D2: ", settings.Kd*settings.derivative2);
+        telemetry.addData("curr1", settings.current_rpm1);
+        telemetry.addData("curr2", settings.current_rpm2);
+        telemetry.addData("Kalmin1", settings.Xk1);
+        telemetry.addData("Kalmin2", settings.Xk2);
+        telemetry.addData("K1", settings.Kk1);
+        telemetry.addData("K2", settings.Kk2);
+        telemetry.addData("Time: ", "" + getRuntime());
+        telemetry.addData("ReqestedETPS", settings.requestedEncoderTicksPerSecond);
+
+    }
+
+    //Kalmin phase 1
+    public void timeUpdate(EncoderTeleopWithSound.shooterSettings settings){
+        settings.input1=settings.current_rpm1;
+        settings.prevXk1=settings.Xk1;
+        settings.prevPk1=settings.Pk1;
+
+        settings.input2=settings.current_rpm2;
+        settings.prevXk2=settings.Xk2;
+        settings.prevPk2=settings.Pk2;
+    }
+
+    //Kalmin phase 2
+    public void measurementUpdate(EncoderTeleopWithSound.shooterSettings settings){
+        //RPM1 calculations
+        settings.Kk1=settings.prevPk1/(settings.prevPk1+settings.R1);
+        settings.Xk1=settings.prevXk1+settings.Kk1*(settings.input1-settings.prevXk1);
+        settings.Pk1=(1-settings.Kk1)*settings.prevPk1;
+
+        //RPM2 calculations
+        settings.Kk2=settings.prevPk2/(settings.prevPk2+settings.R2);
+        settings.Xk2=settings.prevXk2+settings.Kk2*(settings.input2-settings.prevXk2);
+        settings.Pk2=(1-settings.Kk2)*settings.prevPk2;
+
+
+    }
+
+    public void resetKalmin(EncoderTeleopWithSound.shooterSettings settings){
+        settings.input1=0;
+        settings.prevXk1=0;
+        settings.prevPk1=1;
+        settings.Xk1=0;
+        settings.Pk1=1;
+        // Kk1=0;
+
+
+        settings.input2=0;
+        settings.prevXk2=0;
+        settings.prevPk2=1;
+        settings.Xk2=0;
+        settings.Pk2=1;
+        // Kk2=0;
+
+
+
+    }
+
+    public void resetPID(EncoderTeleopWithSound.shooterSettings settings){
+        settings.previous_position1=0;
+        settings.current_position1=0;
+        settings.current_rpm1=0;
+        settings.previous_rpm1=0;
+        settings.error1=0;
+        settings.previous_error1=0;
+        settings.integral1=0;
+        settings.derivative1=0;
+        settings.adjustment1=0;
+        settings.previous_position2=0;
+        settings.current_position2=0;
+        settings.current_rpm2=0;
+        settings.previous_rpm2=0;
+        settings.error2=0;
+        settings.previous_error2=0;
+        settings.integral2=0;
+        settings.derivative2=0;
+        settings.adjustment2=0;
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /*
@@ -463,6 +584,7 @@ public class EncoderTeleopWithSound extends OpMode {
         // return scaled value.
         return dScale;
     }
+
 
 }
 
