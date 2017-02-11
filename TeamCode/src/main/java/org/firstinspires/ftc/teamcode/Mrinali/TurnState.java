@@ -39,12 +39,9 @@ public class TurnState extends BasicAbstractState {
 
     Orientation angles;
     double angleZ;
-    int turnAngle;
+    private int turnAngle;
     TurnDirection direction;
-    double angDiff;
-    int leftPos;
-    int rightPos;
-    double startAngle;
+    private double angDiff;
 
     double TURN_POWER_1 = .2;
     double TURN_POWER_2 = .05;
@@ -69,10 +66,6 @@ public class TurnState extends BasicAbstractState {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        leftPos = leftMotor.getCurrentPosition();
-        rightPos = rightMotor.getCurrentPosition();
-
-        startAngle = getIMUheading();
         angleZ = getIMUheading();
 
         angDiff = turnAngle-angleZ; //positive: turn left
