@@ -30,14 +30,10 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.Mrinali;
+package org.firstinspires.ftc.teamcode.Saransh;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerImpl;
-import com.qualcomm.robotcore.util.ThreadPool;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -59,15 +55,14 @@ import java.util.concurrent.TimeUnit;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Autonomous Blue", group="Pushbot")
+@Autonomous(name="Beacons Autonomous Red Turn Fix", group="Pushbot")
 //@Disabled
-public class DriveToBeaconsBlue extends LinearOpMode {
+public class DriveToBeaconsRed extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
-    AutonomousActions auto = new AutonomousActions(this);
-    double FASTER_SPEED = .7;
+    org.firstinspires.ftc.teamcode.Saransh.AutonomousActions auto = new AutonomousActions(this);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -76,9 +71,8 @@ public class DriveToBeaconsBlue extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         auto.init(hardwareMap, telemetry);
-        auto.runOpMode();
 
-        telemetry.addData("verifyBlue", auto.verifyBlue()); //checks color sensors
+        telemetry.addData("verify", auto.verifyRed()); //checks color sensors
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to runIMU");    //
@@ -90,6 +84,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
             // Display the light level while we are waiting to start
             telemetry.addData("Light Level", auto.lightSensor.getLightDetected());
             telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
+            auto.angleInit = auto.IMUheading();
             auto.angleZ = auto.IMUheading();
             telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
             telemetry.addData("Angle", auto.angleZ);
@@ -101,31 +96,31 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         }
 
         auto.encoderDrive(auto.APPROACH_SPEED, 3, 3, 3);
-        auto.turn(-40); //The robot uses the IMU to turn to 40 degrees
+        auto.turn(40);
         auto.encoderDrive(auto.APPROACH_SPEED, 17, 17, 7);
-        auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
+        auto.toWhiteLine(false);
         sleep(100);
-        auto.followLineBlueSide();
-        auto.pushBlueButton(); //The robot then uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
-        auto.turn(0); //and turns parallel to the beacon using the IMU
-        auto.encoderDrive(auto.APPROACH_SPEED, 6, 6, 5);
+        auto.followLineRedSide();
+        auto.pushRedButton();
+        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3);
+        auto.turn(0);
+        auto.encoderDrive(auto.APPROACH_SPEED, 7, 7, 5);
 
         sleep(1000);
         auto.turn(0);
         auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
-        auto.toWhiteLine(true); //It advances to the next white line
+        auto.toWhiteLine(true);
         sleep(100);
-        auto.followLineBlueSide();
-        auto.pushBlueButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //Then it will back up
+        auto.followLineRedSide();
+        auto.pushRedButton();
+        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3);
 
-        auto.leftMotor.setPower(auto.APPROACH_SPEED); //and turns until it is facing the cap ball
-        auto.rightMotor.setPower(-auto.APPROACH_SPEED);
-        while (opModeIsActive() && auto.angleZ > -180 && auto.angleZ < 0 || auto.angleZ > 155) {
+        auto.leftMotor.setPower(-auto.APPROACH_SPEED);
+        auto.rightMotor.setPower(auto.APPROACH_SPEED);
+        while (opModeIsActive() && auto.angleZ < 180 && auto.angleZ > 0 || auto.angleZ < -155) {
             auto.angleZ = auto.IMUheading();
-            telemetry.log().add("Angle " + auto.angleZ);
+            telemetry.addData("Angle", auto.angleZ);
             telemetry.update();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
@@ -133,4 +128,3 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         auto.encoderDrive(auto.APPROACH_SPEED, 22, 22, 5);
     }
 }
-

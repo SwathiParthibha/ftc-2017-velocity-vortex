@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 
 @TeleOp(name = "Two Controller Teleop V3", group = "Teleop")
