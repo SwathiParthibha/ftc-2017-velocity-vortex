@@ -100,6 +100,8 @@ public class AutonomousActions extends LinearOpMode {
 
     static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
     static final double APPROACH_SPEED = 0.5;
+    double TURN_POWER_1 = .1;
+    double TURN_POWER_2 = .03;
     double WHEEL_SIZE_IN = 4;
     public int ROTATION = 1220; // # of ticks for 40-1 gear ratio
     static final double     DRIVE_GEAR_REDUCTION    = 1.5 ;     // This is < 1.0 if geared UP
@@ -149,16 +151,7 @@ public class AutonomousActions extends LinearOpMode {
         // Set all motors to zero power
         leftMotor.setPower(0);
         rightMotor.setPower(0);
-        //armMotor.setPower(0);
 
-        // Set all motors to runIMU without encoders.
-        // May want to use RUN_USING_ENCODERS if encoders are installed.
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        /* Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -177,9 +170,6 @@ public class AutonomousActions extends LinearOpMode {
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         telemetry = telem;
-        // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
-        // leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        // rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // get a reference to our Light Sensor object.
         lightSensor = hardwareMap.lightSensor.get("light sensor");
@@ -256,8 +246,6 @@ public class AutonomousActions extends LinearOpMode {
     }
 
     void turn (int turnAngle) throws InterruptedException{
-        //leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         int leftPos = leftMotor.getCurrentPosition();
         int rightPos = rightMotor.getCurrentPosition();
@@ -266,7 +254,10 @@ public class AutonomousActions extends LinearOpMode {
         angleZ = IMUheading();
 
         double angDiff = turnAngle-angleZ; //positive: turn left
-        //if (Math.abs(angDiff) > 180) angDiff = angDiff % 180;
+        angDiff = (angDiff + 180) % 360 - 180;
+        telemetry.log().add("Angle Difference: " + angDiff);
+        telemetry.update();
+        sleep(2000);
 
         if (angDiff < 0) { //turns right
             leftMotor.setPower(APPROACH_SPEED * .6 );
@@ -276,21 +267,22 @@ public class AutonomousActions extends LinearOpMode {
 
                 angleZ = IMUheading();
                 angDiff = turnAngle-angleZ;
+                angDiff = (angDiff + 180) % 360 - 180;
 
                 if (Math.abs(angDiff) < 90) {
-                    leftMotor.setPower(APPROACH_SPEED * .2);
-                    rightMotor.setPower(-APPROACH_SPEED * .2);
+                    leftMotor.setPower(TURN_POWER_1);
+                    rightMotor.setPower(-TURN_POWER_1);
                 }
                 else if (Math.abs(angDiff) < 45) {
-                    leftMotor.setPower(APPROACH_SPEED * .05);
-                    rightMotor.setPower(-APPROACH_SPEED * .05);
+                    leftMotor.setPower(TURN_POWER_2);
+                    rightMotor.setPower(-TURN_POWER_2);
                 }
 
                 telemetry.addData("Angle", angleZ);
                 telemetry.update();
 
-                if (leftMotor.getCurrentPosition() > leftPos
-                        && rightMotor.getCurrentPosition() < rightPos
+                if (leftMotor.getCurrentPosition() - 100 > leftPos
+                        && rightMotor.getCurrentPosition() + 100 < rightPos
                         && IMUheading() == startAngle) {
                     resetIMuandPos(leftPos, rightPos);
                 }
@@ -309,21 +301,22 @@ public class AutonomousActions extends LinearOpMode {
 
                 angleZ = IMUheading();
                 angDiff = turnAngle-angleZ;
+                angDiff = (angDiff + 180) % 360 - 180;
 
                 if (Math.abs(angDiff) < 90) {
-                    leftMotor.setPower(-APPROACH_SPEED * .2);
-                    rightMotor.setPower(APPROACH_SPEED * .2);
+                    leftMotor.setPower(-TURN_POWER_1);
+                    rightMotor.setPower(TURN_POWER_1);
                 }
                 else if (Math.abs(angDiff) < 45) {
-                    leftMotor.setPower(-APPROACH_SPEED * .05);
-                    rightMotor.setPower(APPROACH_SPEED * .05);
+                    leftMotor.setPower(-TURN_POWER_2);
+                    rightMotor.setPower(TURN_POWER_2);
                 }
 
                 telemetry.addData("Angle", angleZ);
                 telemetry.update();
 
-                if (leftMotor.getCurrentPosition() < leftPos
-                        && rightMotor.getCurrentPosition() > rightPos
+                if (leftMotor.getCurrentPosition() + 100 < leftPos
+                        && rightMotor.getCurrentPosition() - 100 > rightPos
                         && IMUheading() == startAngle) {
                     resetIMuandPos(leftPos, rightPos);
                 }
@@ -333,8 +326,6 @@ public class AutonomousActions extends LinearOpMode {
             leftMotor.setPower(0);
             rightMotor.setPower(0);
         }
-        //leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     void resetIMuandPos(int left, int right) { //resets IMU to 0 at starting position of turn
@@ -509,12 +500,20 @@ public class AutonomousActions extends LinearOpMode {
         int leftBlue = leftColorSensor.blue();
         int rightBlue = rightColorSensor.blue();
 
+        ElapsedTime time = new ElapsedTime();
+        time.reset();
+
+        boolean wrongColor;
+
         do{
+            telemetry.addData("Time", time.seconds());
             telemetry.log().add("in the push button method while loop");
             telemetry.addData("Left blue: ", leftColorSensor.blue());
             telemetry.addData("Right blue: ", rightColorSensor.blue());
 
             telemetry.update();
+
+            wrongColor = false;
 
             if(leftColorSensor.blue() > rightColorSensor.blue()){// && !verifyBlue()){
                 //write the code here to press the left button
@@ -539,6 +538,8 @@ public class AutonomousActions extends LinearOpMode {
                 //sleep(4000); // wait 5 seconds total
                 leftMotor.setPower(APPROACH_SPEED);
                 rightMotor.setPower(APPROACH_SPEED);
+
+                wrongColor = true;
 
             } else if(getcmUltrasonic(rangeSensor) > 8) {
                 encoderDrive(APPROACH_SPEED, 1, 1, 1);
@@ -569,7 +570,8 @@ public class AutonomousActions extends LinearOpMode {
 
             //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        } while (opMode.opModeIsActive() && !verifyBlue());
+        } while (opMode.opModeIsActive() && !verifyBlue()
+                && (time.seconds() < 8 || wrongColor));
 
         telemetry.log().add("end of the push button method");
 
@@ -589,12 +591,19 @@ public class AutonomousActions extends LinearOpMode {
         int leftBlue = leftColorSensor.blue();
         int rightBlue = rightColorSensor.blue();
 
+        ElapsedTime time = new ElapsedTime();
+        time.reset();
+
+        boolean wrongColor;
+
         do{
             telemetry.log().add("in the push button method while loop");
             telemetry.addData("Left red: ", leftColorSensor.red());
             telemetry.addData("Right red: ", rightColorSensor.red());
 
             telemetry.update();
+
+            wrongColor = false;
 
             if(leftColorSensor.red() > rightColorSensor.red()){// && !verifyBlue()){
                 //write the code here to press the left button
@@ -618,6 +627,9 @@ public class AutonomousActions extends LinearOpMode {
                 //sleep(4000); // wait 5 seconds total
                 leftMotor.setPower(APPROACH_SPEED);
                 rightMotor.setPower(APPROACH_SPEED);
+
+                wrongColor = true;
+
             } else if(getcmUltrasonic(rangeSensor) > 8) {
                 encoderDrive(APPROACH_SPEED, 1, 1, 1);
             } else{
@@ -647,7 +659,8 @@ public class AutonomousActions extends LinearOpMode {
             telemetry.addData("Left red: ", leftColorSensor.red());
             telemetry.addData("Right red: ", rightColorSensor.red());
             telemetry.update();
-        } while  (opMode.opModeIsActive() && !verifyRed());
+        } while  (opMode.opModeIsActive() && !verifyBlue()
+                && (time.seconds() < 8 || wrongColor));
 
         telemetry.log().add("end of the push button method");
 
