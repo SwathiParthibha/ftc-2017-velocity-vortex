@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Sam;
 
 import com.qualcomm.ftccommon.DbgLog;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,7 +13,7 @@ import static java.lang.Thread.sleep;
 
 
 @TeleOp(name = "Encoder Test", group = "Teleop")
-//@Disabled
+@Disabled
 public class EncoderTest extends OpMode {
 
 

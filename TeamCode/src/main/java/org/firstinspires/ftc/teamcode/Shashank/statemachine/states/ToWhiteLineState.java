@@ -51,8 +51,8 @@ public class ToWhiteLineState extends BasicAbstractState {
         }
 
         if (!isDone()){
-            leftMotor.setPower(0.2);
-            rightMotor.setPower(0.2);
+            leftMotor.setPower(0.4);
+            rightMotor.setPower(0.4);
             return stateName;
         } else {
             leftMotor.setPower(0);

@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.LineFollowState;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PivotToWhiteLineState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PressBeaconState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.ToWhiteLineState;
 import org.firstinspires.ftc.teamcode.Shashank.testcode.TestMoveState;
@@ -31,16 +32,23 @@ public class AutoStates extends States {
         return new TestMoveState(stateName, nextStateName, 1, leftMotor, rightMotor);
     }
 
-    public static State lineFollow(Telemetry telemetry, StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, I2cDeviceSynchImpl rangeSensor, BeaconColor color){
+    public static State lineFollow(Telemetry telemetry, StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, I2cDeviceSynchImpl rangeSensor, AllianceColor color){
         return new LineFollowState(telemetry, stateName, nextStateName, leftMotor, rightMotor, lightSensor,  rangeSensor, color);
     }
 
-    public static State pressBeacon(Telemetry telemetry, StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, ColorSensor leftColorSensor, ColorSensor rightColorSensor, BeaconColor color){
+    public static State pressBeacon(Telemetry telemetry, StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, ColorSensor leftColorSensor, ColorSensor rightColorSensor, AllianceColor color){
+        telemetry.log().add("in autostates pressBeacon method");
+        telemetry.log().add("left motor name: " + leftColorSensor.getConnectionInfo() + " right motor name: "+ rightColorSensor.getConnectionInfo());
+        telemetry.update();
         return new PressBeaconState(stateName, nextStateName, leftMotor, rightMotor, leftColorSensor, rightColorSensor, telemetry, 100, color);
     }
 
     public static State toWhiteLine(StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor){
         return new ToWhiteLineState(leftMotor, rightMotor, lightSensor, stateName, nextStateName);
+    }
+
+    public static State pivotToWhiteLineState(DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, StateName stateName, StateName nextStateName, AllianceColor beaconColor){
+        return new PivotToWhiteLineState(leftMotor, rightMotor, lightSensor, stateName, nextStateName, beaconColor);
     }
 
 }

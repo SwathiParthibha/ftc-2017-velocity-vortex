@@ -3,17 +3,20 @@ package org.firstinspires.ftc.teamcode.Sam;
 import android.media.MediaPlayer;
 
 import com.qualcomm.ftccommon.DbgLog;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import java.lang.*;
 
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.BeaconColor;
 
 
 @TeleOp(name = "Two Controller Teleop V2", group = "Teleop")
+@Disabled
 public class twoControllerTeleopv2 extends OpMode {
     private DcMotor leftMotor;
     private DcMotor rightMotor;
@@ -115,12 +118,15 @@ public class twoControllerTeleopv2 extends OpMode {
 
     public double startShootingtime=0;
     public double prevTime=0;
+    public double currTime=0;
 
     private MediaPlayer wrongBallSound = null, correctBallSound = null;
     private ColorSensor sweeperColorSensor;
     private BeaconColor beaconColor = null;
 
     private boolean ballSensed = false;
+
+
 
     @Override
     public void init() {
@@ -278,6 +284,7 @@ public class twoControllerTeleopv2 extends OpMode {
     @Override
     public void stop() {
         super.stop();
+        //ShooterPowerCont=false;
     }
 
     private boolean isWrongBall() {
@@ -305,11 +312,14 @@ public class twoControllerTeleopv2 extends OpMode {
                 startShootingtime = getRuntime();
             }
 
-            settings.dt=getRuntime()-prevTime;
-            if (settings.dt> 0.05) {//only update every 50ms
+            currTime=System.nanoTime();
+            settings.dt=currTime-prevTime;
+            if (settings.dt> 5000000) {//only update every 50ms
+                currTime=System.nanoTime();
+                settings.dt=currTime-prevTime;
                 settings.current_position1 = shooter1.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
                 settings.current_position2 = shooter2.getCurrentPosition();//MUST BE FIRST - time sensitive measurement
-                prevTime = getRuntime();//MUST BE FIRST - time sensitive measurement
+                prevTime = currTime;//MUST BE FIRST - time sensitive measurement
 
                 updateRPM1and2(settings);
 
@@ -319,7 +329,7 @@ public class twoControllerTeleopv2 extends OpMode {
 
 
                     //DbgLog.msg("Time: "+getRuntime()+"RPM1: " + settings.current_rpm1+"RPM2: " + settings.current_rpm2+"Kalmin1: " + settings.Xk1+"Kalmin2: " + settings.Xk2);
-                    DbgLog.msg("Time: "+getRuntime()+"Encoder: " + settings.current_position2+"Encoder2: " + settings.current_position2);
+                    DbgLog.msg("Time: "+System.nanoTime()+"Encoder: " + settings.current_position2+"Encoder2: " + settings.current_position2);
 
                     PID1Update(settings);
                     PID2Update(settings);
