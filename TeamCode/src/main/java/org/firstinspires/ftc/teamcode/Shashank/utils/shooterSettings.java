@@ -38,7 +38,7 @@ public class ShooterSettings {//data members can be replaced, but default values
 
         //PID Constants
         public double Kp = 0.00000001;
-        public double Ki = 0.0000000000000001;//0.00000001
+        public double Ki = 0.0000001;//0.00000001
         public double Kd = 0.0000001;
 
         //Timing variables
