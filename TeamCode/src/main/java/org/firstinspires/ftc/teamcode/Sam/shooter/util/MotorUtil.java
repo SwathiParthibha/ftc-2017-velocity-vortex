@@ -6,7 +6,7 @@ public final class MotorUtil {
     }
 
     public static double getCurrentRPM(long deltaTime, int currentPosition, int prevPosition) {
-        return (1000000000) * ((double) (currentPosition - prevPosition) / (double) deltaTime);
+        return ((double) (currentPosition - prevPosition) / (double) deltaTime);
     }
 
 

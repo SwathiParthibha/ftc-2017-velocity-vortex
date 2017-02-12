@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Sam.shooter;
 
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
@@ -23,6 +24,7 @@ public class RPMThread implements Runnable {
     @Override
     public void run() {
         ShooterMotor shooterMotor = MotorFactory.getInstance().getMotor(motorName);
+        //DbgLog.msg("dt: " + (System.nanoTime() - previousTime));
         //deltaTime should be the same as in PowerManager
 //        long deltaTime = System.nanoTime() - previousTime;
         double rpm = MotorUtil.getCurrentRPM(Constants.DELTA_TIME, shooter.getCurrentPosition(), previousPosition);

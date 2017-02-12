@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Sam.shooter.beans;
 
+import com.qualcomm.ftccommon.DbgLog;
+
 public class ShooterMotor {
     private Enum name;
     private double rpm = 0D;
@@ -13,6 +15,7 @@ public class ShooterMotor {
     }
 
     public double getRpm() {
+        //DbgLog.msg("rpm: "+rpm);
         return rpm;
     }
 
