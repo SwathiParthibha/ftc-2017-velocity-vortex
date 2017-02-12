@@ -34,10 +34,7 @@ package org.firstinspires.ftc.teamcode.Mrinali;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerImpl;
-import com.qualcomm.robotcore.util.ThreadPool;
-
-import java.util.concurrent.TimeUnit;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -59,15 +56,14 @@ import java.util.concurrent.TimeUnit;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Autonomous Blue", group="Pushbot")
+@Autonomous(name="Shooting Position", group="Pushbot")
 //@Disabled
-public class DriveToBeaconsBlue extends LinearOpMode {
+public class DriveToBeaconsBlue1 extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
     AutonomousActions auto = new AutonomousActions(this);
-    double FASTER_SPEED = .7;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -78,7 +74,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         auto.init(hardwareMap, telemetry);
         auto.runOpMode();
 
-        telemetry.addData("verifyBlue", auto.verifyBlue()); //checks color sensors
+        //telemetry.addData("verifyBlue", auto.verifyBlue()); //checks color sensors
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to runIMU");    //
@@ -100,37 +96,106 @@ public class DriveToBeaconsBlue extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDrive(auto.APPROACH_SPEED, 3, 3, 3);
-        auto.turn(-40); //The robot uses the IMU to turn to 40 degrees
-        auto.encoderDrive(auto.APPROACH_SPEED, 17, 17, 7);
-        auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
-        sleep(100);
-        auto.followLineBlueSide();
-        auto.pushBlueButton(); //The robot then uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
-        auto.turn(0); //and turns parallel to the beacon using the IMU
-        auto.encoderDrive(auto.APPROACH_SPEED, 6, 6, 5);
-
-        sleep(1000);
-        auto.turn(0);
-        auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
-        auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
-        auto.toWhiteLine(true); //It advances to the next white line
-        sleep(100);
-        auto.followLineBlueSide();
-        auto.pushBlueButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //Then it will back up
-
-        auto.leftMotor.setPower(auto.APPROACH_SPEED); //and turns until it is facing the cap ball
-        auto.rightMotor.setPower(-auto.APPROACH_SPEED);
-        while (opModeIsActive() && auto.angleZ > -180 && auto.angleZ < 0 || auto.angleZ > 155) {
-            auto.angleZ = auto.IMUheading();
-            telemetry.log().add("Angle " + auto.angleZ);
-            telemetry.update();
-            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+        auto.turn(135);
+        auto.encoderDrive(auto.APPROACH_SPEED, 10, 10, 5);
+        ElapsedTime time = new ElapsedTime();
+        while (opModeIsActive() && time.seconds() < 5) {
+            auto.leftMotor.setPower(0);
+            auto.rightMotor.setPower(0);
         }
+        auto.turn(130);
+        auto.encoderDrive(auto.APPROACH_SPEED, 12, 12, 5);
+    }
 
-        auto.encoderDrive(auto.APPROACH_SPEED, 22, 22, 5);
+    void pushBlueButton() throws InterruptedException {
+
+        telemetry.log().add("in the push button method");
+
+        telemetry.update();
+        auto.leftColorSensor.enableLed(true);
+        auto.rightColorSensor.enableLed(true);
+
+        telemetry.update();
+        int leftBlue = auto.leftColorSensor.blue();
+        int rightBlue = auto.rightColorSensor.blue();
+
+        ElapsedTime time = new ElapsedTime();
+        time.reset();
+
+        boolean wrongColor;
+
+        do{
+            telemetry.addData("Time", time.seconds());
+            telemetry.log().add("in the push button method while loop");
+            telemetry.addData("Left blue: ", auto.leftColorSensor.blue());
+            telemetry.addData("Right blue: ", auto.rightColorSensor.blue());
+
+            telemetry.update();
+
+            wrongColor = false;
+
+            if(auto.leftColorSensor.blue() > auto.rightColorSensor.blue()){// && !verifyBlue()){
+                //write the code here to press the left button
+                telemetry.log().add("left is blue");
+                telemetry.update();
+
+                auto.leftMotor.setPower(auto.APPROACH_SPEED); //motors seem to work in reverse
+                auto.rightMotor.setPower(0);
+            } else if(auto.rightColorSensor.blue() > auto.leftColorSensor.blue()) {// && !verifyBlue()){
+                //write the code here to press the right button
+                telemetry.log().add("right is blue");
+                telemetry.update();
+
+                auto.rightMotor.setPower(auto.APPROACH_SPEED); //motors seem to work in reverse
+                auto.leftMotor.setPower(0);
+            } else if(auto.leftColorSensor.red() > auto.leftColorSensor.blue() &&
+                    auto.rightColorSensor.red() > auto.rightColorSensor.blue()){
+                //red button has been pressed
+                telemetry.log().add("beacon is red");
+                telemetry.update();
+
+                //sleep(4000); // wait 5 seconds total
+                auto.leftMotor.setPower(auto.APPROACH_SPEED);
+                auto.rightMotor.setPower(auto.APPROACH_SPEED);
+
+                wrongColor = true;
+
+            } else if(auto.getcmUltrasonic(auto.rangeSensor) > 8) {
+                auto.encoderDrive(auto.APPROACH_SPEED, 1, 1, 1);
+            } else{
+                auto.leftMotor.setPower(0);
+                auto.rightMotor.setPower(0);
+                telemetry.log().add("blue is not detected");
+                telemetry.update();
+                break;
+            }
+            telemetry.update();
+            sleep(1500);
+            auto.leftMotor.setPower(0);
+            auto.rightMotor.setPower(0);
+
+            //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            auto.leftMotor.setPower(-auto.APPROACH_SPEED * .8);
+            auto.rightMotor.setPower(-auto.APPROACH_SPEED * .8);
+            sleep(100);
+            auto.leftMotor.setPower(0);
+            auto.rightMotor.setPower(0);
+
+            telemetry.addData("Left blue: ", auto.leftColorSensor.blue());
+            telemetry.addData("Right blue: ", auto.rightColorSensor.blue());
+            telemetry.update();
+
+            //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        } while (opModeIsActive() && !auto.verifyBlue()
+                && (time.seconds() < 8 || wrongColor));
+
+        telemetry.log().add("end of the push button method");
+
+        auto.leftMotor.setPower(0);
+        auto.rightMotor.setPower(0);
     }
 }
-

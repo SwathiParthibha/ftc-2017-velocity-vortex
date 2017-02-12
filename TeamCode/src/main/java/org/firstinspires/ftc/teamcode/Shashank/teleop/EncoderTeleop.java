@@ -165,22 +165,22 @@ public class EncoderTeleop extends OpMode {
         }
 
 
-
+        if(beaconColor == null) {
+            if ((sweeperColorSensor.red()-sweeperColorSensor.blue()) > 15) {
+                beaconColor = AllianceColor.RED;
+                telemetry.log().add("Beacon Color Set");
+            } else if((sweeperColorSensor.blue()-sweeperColorSensor.red()) > 15){
+                beaconColor = AllianceColor.BLUE;
+                telemetry.log().add("Beacon Color Set");
+            } else {
+                beaconColor = null;
+                telemetry.log().add("Beacon Color Not Set");
+            }
+        }
 
         if(gamepad2.right_bumper){
             sweeper.setPower(0.7);
 
-            if(beaconColor == null) {
-                if (sweeperColorSensor.red() > 15) {
-                    if (sweeperColorSensor.red() > sweeperColorSensor.blue())
-                        beaconColor = AllianceColor.RED;
-                } else if(sweeperColorSensor.blue() > 15){
-                    if (sweeperColorSensor.red() < sweeperColorSensor.blue())
-                        beaconColor = AllianceColor.BLUE;
-                } else
-                    beaconColor = AllianceColor.BLUE;
-                telemetry.log().add("Beacon Color Set");
-            }
         } else if(gamepad2.right_trigger > 0){
             sweeper.setPower(-0.7);
         } else {
@@ -215,6 +215,11 @@ public class EncoderTeleop extends OpMode {
 
         telemetry.addData("left joystick",  "%.2f", left);
         telemetry.addData("right joystick", "%.2f", right);
+        telemetry.addData("Beacon Color", beaconColor);
+        telemetry.addData("lego color sensor red:", sweeperColorSensor.red());
+        telemetry.addData("lego color sensor blue:", sweeperColorSensor.blue());
+        telemetry.addData("lego color sensor green:", sweeperColorSensor.green());
+        telemetry.addData("lego color sensor argb:", sweeperColorSensor.argb());
         telemetry.update();
     }
 
