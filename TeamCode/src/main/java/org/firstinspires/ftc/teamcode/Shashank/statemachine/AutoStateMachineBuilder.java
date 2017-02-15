@@ -47,4 +47,8 @@ public class AutoStateMachineBuilder extends StateMachineBuilder {
         add(stateName, AutoStates.pivotToWhiteLineState(leftMotor, rightMotor, lightSensor, stateName, nextStateName, beaconColor));
     }
 
+    public void addEncoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, int distance){
+        add(stateName, AutoStates.encoderDrive(leftMotor, rightMotor, stateName, nextStateName, distance));
+    }
+
 }
