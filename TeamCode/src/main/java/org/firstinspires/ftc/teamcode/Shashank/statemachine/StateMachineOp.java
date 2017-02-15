@@ -40,12 +40,14 @@ public class StateMachineOp extends OpMode {
 
     enum S implements StateName {
         TO_WHITE_LINE,
+        DRIVE,
         WHITE_LINE_PIVOT_WAIT,
         PIVOT_TO_LINE,
         FOLLOW_lINE,
         PRESS_BEACON,
         WAIT,
         _2ND_TO_WHITE_LINE,
+        _2ND_DRIVE,
         _2ND_WHITE_LINE_PIVOT_WAIT,
         _2ND_PIVOT_TO_LINE,
         _2ND_FOLLOW_lINE,
@@ -126,18 +128,35 @@ public class StateMachineOp extends OpMode {
 
         AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.TO_WHITE_LINE);
 
-        autoStateMachineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.PIVOT_TO_LINE, leftMotor, rightMotor, lightSensor);
-        //autoStateMachineBuilder.addWait(S.WHITE_LINE_PIVOT_WAIT, S.PIVOT_TO_LINE, 300);
+        //go to the white line
+        autoStateMachineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.DRIVE, leftMotor, rightMotor, lightSensor);
+
+        //overshoot by a little bit
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.DRIVE, S.WHITE_LINE_PIVOT_WAIT, 5);
+
+        //wait for a little bit
+        autoStateMachineBuilder.addWait(S.WHITE_LINE_PIVOT_WAIT, S.PIVOT_TO_LINE, 300);
+
+        //pivot to the line
         autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.PIVOT_TO_LINE, S.FOLLOW_lINE, beaconColor);
+
+        //line follow to the beacon
         autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
+
+        //press the beacon
         autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.WAIT, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+
+        //wait for person to adjust the robot, as we have no turn state right now
         autoStateMachineBuilder.addWait(S.WAIT, S._2ND_TO_WHITE_LINE, 7000);
-        autoStateMachineBuilder.addToWhiteLine(S._2ND_TO_WHITE_LINE, S._2ND_PIVOT_TO_LINE, leftMotor, rightMotor, lightSensor);
-        //autoStateMachineBuilder.addWait(S._2ND_WHITE_LINE_PIVOT_WAIT, S._2ND_PIVOT_TO_LINE, 300);
+
+        //repeat
+        autoStateMachineBuilder.addToWhiteLine(S._2ND_TO_WHITE_LINE, S._2ND_DRIVE, leftMotor, rightMotor, lightSensor);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S._2ND_DRIVE, S._2ND_WHITE_LINE_PIVOT_WAIT, 5);
+        autoStateMachineBuilder.addWait(S._2ND_WHITE_LINE_PIVOT_WAIT, S._2ND_PIVOT_TO_LINE, 300);
         autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S._2ND_PIVOT_TO_LINE, S._2ND_FOLLOW_lINE, beaconColor);
         autoStateMachineBuilder.addLineFollow(telemetry, S._2ND_FOLLOW_lINE, S._2ND_PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
         autoStateMachineBuilder.addPressBeacon(telemetry, S._2ND_PRESS_BEACON, S.STOP, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
-        //autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.PIVOT_TO_LINE, S.STOP, beaconColor);
+        autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.PIVOT_TO_LINE, S.STOP, beaconColor);
         autoStateMachineBuilder.addStop(S.STOP);
 
         stateMachine = autoStateMachineBuilder.build();
