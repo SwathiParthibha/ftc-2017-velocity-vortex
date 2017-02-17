@@ -7,6 +7,16 @@ public class KalminFilter {
     
     private double prevValue=0D;
     private double prevError = 1D;
+    private double trustVal;
+
+
+    public double getTrustVal() {
+        return trustVal;
+    }
+
+    public double getPrevError() {
+        return prevError;
+    }
 
     public double applyFilter(double rpm){
         double trustVal = prevError / (prevError + STD_DEVIATION);

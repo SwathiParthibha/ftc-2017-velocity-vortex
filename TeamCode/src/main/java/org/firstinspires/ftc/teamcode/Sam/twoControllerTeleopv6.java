@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.R;
@@ -22,8 +23,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
-@TeleOp(name = "twoControllerTeleop5", group = "Teleop")
-public class twoControllerTeleopv5 extends OpMode {
+@TeleOp(name = "Two Controller Teleopv6", group = "Teleop")
+public class twoControllerTeleopv6 extends OpMode {
     private final double SWEEPER_IN_POWER = -0.7;
     private final double SWEEPER_OUT_POWER = 0.7;
     private final double MAX_POWER = 1.0;
@@ -37,8 +38,12 @@ public class twoControllerTeleopv5 extends OpMode {
     private DcMotor shooter1;
     private DcMotor shooter2;
     private DcMotor sweeper;
+    private Servo leftArm;
+    private Servo rightArm;
     private PowerManager leftShooterPowerMgr;
     private PowerManager rightShooterPowerMgr;
+
+
 
     private boolean swap = false;
     private MediaPlayer wrongBallSound = null, correctBallSound = null;
@@ -60,6 +65,8 @@ public class twoControllerTeleopv5 extends OpMode {
         shooter1 = this.hardwareMap.dcMotor.get("shooter1");
         shooter2 = this.hardwareMap.dcMotor.get("shooter2");
         sweeper = this.hardwareMap.dcMotor.get("sweeper");
+        leftArm=this.hardwareMap.servo.get("leftarm");
+        rightArm=this.hardwareMap.servo.get("rightarm");
         sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
 
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -153,6 +160,11 @@ public class twoControllerTeleopv5 extends OpMode {
             sweeper.setPower(SWEEPER_OUT_POWER);
         } else {
             sweeper.setPower(ZERO_POWER);
+
+        }
+
+        if(gamepad2.x)
+        {
 
         }
 
