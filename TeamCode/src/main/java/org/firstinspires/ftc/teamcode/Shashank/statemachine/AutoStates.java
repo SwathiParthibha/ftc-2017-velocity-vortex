@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.EncoderDriveState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.LineFollowState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PivotToWhiteLineState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PressBeaconState;
@@ -49,6 +50,10 @@ public class AutoStates extends States {
 
     public static State pivotToWhiteLineState(DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, StateName stateName, StateName nextStateName, AllianceColor beaconColor){
         return new PivotToWhiteLineState(leftMotor, rightMotor, lightSensor, stateName, nextStateName, beaconColor);
+    }
+
+    public static State encoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, int distance){
+        return new EncoderDriveState(distance, leftMotor, rightMotor, stateName, nextStateName);
     }
 
 }
