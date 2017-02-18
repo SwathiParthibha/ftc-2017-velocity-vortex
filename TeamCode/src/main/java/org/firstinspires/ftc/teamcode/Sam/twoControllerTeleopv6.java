@@ -32,8 +32,8 @@ public class twoControllerTeleopv6 extends OpMode {
     private final double MIN_POWER = -1.0;
     private final double ZERO_POWER = 0.0;
     private final double SERVO_ADJUSTMENT_VAL=0.04;
-    double leftServoPos = 0.5;
-    double rightServoPos = 0.4;
+    double leftServoPos = 0;
+    double rightServoPos = 1.0;
 
 
     private DcMotor leftMotor;
