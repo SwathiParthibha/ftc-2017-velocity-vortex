@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.Shashank.statemachine;
 
+import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnState;
 import org.firstinspires.ftc.teamcode.Shashank.testcode.TestStates;
 
 import ftc.electronvolts.statemachine.StateMachineBuilder;
@@ -47,8 +49,12 @@ public class AutoStateMachineBuilder extends StateMachineBuilder {
         add(stateName, AutoStates.pivotToWhiteLineState(leftMotor, rightMotor, lightSensor, stateName, nextStateName, beaconColor));
     }
 
-    public void addEncoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, int distance){
+    public void addEncoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, double distance){
         add(stateName, AutoStates.encoderDrive(leftMotor, rightMotor, stateName, nextStateName, distance));
+    }
+
+    public void addTurn(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, BNO055IMU imu, int turnAngle, TurnState.TurnDirection turnDirection){
+        add(stateName, AutoStates.turn(leftMotor, rightMotor, stateName, nextStateName, imu, turnAngle, turnDirection));
     }
 
 }

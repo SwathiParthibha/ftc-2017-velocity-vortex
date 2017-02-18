@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Created by Saransh on 11/5/2016.
  */
-@Autonomous(name="CustomVuforiaNavigationTest", group ="Tests")
+@Autonomous(name="MecanumVuforiaNavigation", group ="Tests")
 //@Disabled
 public class MecanumVuforia extends LinearOpMode {
 

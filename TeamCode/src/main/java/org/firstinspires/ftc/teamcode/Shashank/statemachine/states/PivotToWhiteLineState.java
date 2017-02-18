@@ -47,11 +47,11 @@ public class PivotToWhiteLineState extends BasicAbstractState {
             return getNextStateName();
         } else {
             if(beaconColor == AllianceColor.BLUE){
-                leftMotor.setPower(0.4);
-                rightMotor.setPower(-0.4);
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(-0.2);
             } else {
-                leftMotor.setPower(-0.4);
-                rightMotor.setPower(0.4);
+                leftMotor.setPower(-0.2);
+                rightMotor.setPower(0.2);
             }
 
             return stateName;

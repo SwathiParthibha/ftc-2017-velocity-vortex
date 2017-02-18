@@ -76,7 +76,7 @@ public class LineFollowState extends BasicAbstractState {
         telemetry.update();
 
         if(!isDone()) {
-            if(color == AllianceColor.BLUE){
+            if(color == AllianceColor.RED){
                 if (lightSensor.getLightDetected() > 0.3) {
                     leftMotor.setPower(0);
                     rightMotor.setPower(0.2);
@@ -85,7 +85,7 @@ public class LineFollowState extends BasicAbstractState {
                     rightMotor.setPower(0);
                 }
                 return stateName;
-            } else if(color == AllianceColor.RED){
+            } else if(color == AllianceColor.BLUE){
                 if (lightSensor.getLightDetected() > 0.3) {
                     leftMotor.setPower(0.2);
                     rightMotor.setPower(0);

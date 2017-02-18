@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
+import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -14,7 +16,10 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.R;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnState;
 
 import ftc.electronvolts.statemachine.StateMachine;
 import ftc.electronvolts.statemachine.StateName;
@@ -28,24 +33,24 @@ public class StateMachineOp extends OpMode {
     private DcMotor rightMotor = null;
 
     private I2cDeviceSynchImpl rangeSensor = null;
-    private byte[] rangeSensorCache;
     private I2cDevice rangeA;
 
     ElapsedTime runtime = new ElapsedTime();
     private LightSensor lightSensor;
 
-    private Thread testThread = null;
-
     private ColorSensor leftColorSensor, rightColorSensor = null;
 
     enum S implements StateName {
+        GO_FORWARD,
+        TURN_40,
         TO_WHITE_LINE,
         DRIVE,
         WHITE_LINE_PIVOT_WAIT,
         PIVOT_TO_LINE,
         FOLLOW_lINE,
         PRESS_BEACON,
-        WAIT,
+        GO_BACKWARD,
+        TURN_0,
         _2ND_TO_WHITE_LINE,
         _2ND_DRIVE,
         _2ND_WHITE_LINE_PIVOT_WAIT,
@@ -58,6 +63,8 @@ public class StateMachineOp extends OpMode {
     private StateMachine stateMachine;
 
     private AllianceColor beaconColor = null;
+
+    private BNO055IMU imu;
 
     @Override
     public void init() {
@@ -83,8 +90,18 @@ public class StateMachineOp extends OpMode {
         rightColorSensor = hardwareMap.colorSensor.get("rcs");
         rightColorSensor.setI2cAddress(i2cAddr);
 
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu.initialize(parameters);
 
         Activity activity = (Activity) hardwareMap.appContext;
         activity.runOnUiThread(new Runnable() {
@@ -126,13 +143,19 @@ public class StateMachineOp extends OpMode {
         else if(beaconColor == null)
             telemetry.log().add("Beacon color is: NULL");
 
-        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.TO_WHITE_LINE);
+        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.GO_FORWARD);
+
+        //go forward a little
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_FORWARD, S.TURN_40, 2);
+
+        //turn to 40 degrees
+        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.TURN_40, S.TO_WHITE_LINE, imu, 120, TurnState.TurnDirection.RIGHT);
 
         //go to the white line
         autoStateMachineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.DRIVE, leftMotor, rightMotor, lightSensor);
 
         //overshoot by a little bit
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.DRIVE, S.WHITE_LINE_PIVOT_WAIT, 5);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.DRIVE, S.WHITE_LINE_PIVOT_WAIT, 0.5);
 
         //wait for a little bit
         autoStateMachineBuilder.addWait(S.WHITE_LINE_PIVOT_WAIT, S.PIVOT_TO_LINE, 300);
@@ -144,19 +167,21 @@ public class StateMachineOp extends OpMode {
         autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
 
         //press the beacon
-        autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.WAIT, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+        autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.GO_BACKWARD, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
 
-        //wait for person to adjust the robot, as we have no turn state right now
-        autoStateMachineBuilder.addWait(S.WAIT, S._2ND_TO_WHITE_LINE, 7000);
+        //go backward
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_BACKWARD, S.TURN_0, -5);
+
+        //turn to 0 degrees
+        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.TURN_0, S._2ND_TO_WHITE_LINE, imu, 0, TurnState.TurnDirection.LEFT);
 
         //repeat
         autoStateMachineBuilder.addToWhiteLine(S._2ND_TO_WHITE_LINE, S._2ND_DRIVE, leftMotor, rightMotor, lightSensor);
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S._2ND_DRIVE, S._2ND_WHITE_LINE_PIVOT_WAIT, 5);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S._2ND_DRIVE, S._2ND_WHITE_LINE_PIVOT_WAIT, 0.5);
         autoStateMachineBuilder.addWait(S._2ND_WHITE_LINE_PIVOT_WAIT, S._2ND_PIVOT_TO_LINE, 300);
         autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S._2ND_PIVOT_TO_LINE, S._2ND_FOLLOW_lINE, beaconColor);
         autoStateMachineBuilder.addLineFollow(telemetry, S._2ND_FOLLOW_lINE, S._2ND_PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
         autoStateMachineBuilder.addPressBeacon(telemetry, S._2ND_PRESS_BEACON, S.STOP, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
-        autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.PIVOT_TO_LINE, S.STOP, beaconColor);
         autoStateMachineBuilder.addStop(S.STOP);
 
         stateMachine = autoStateMachineBuilder.build();
@@ -193,6 +218,7 @@ public class StateMachineOp extends OpMode {
         telemetry.addData("right blue", String.format("b=%d", rightColorSensor.blue()));
         telemetry.addData("left connec", leftColorSensor.getConnectionInfo());
         telemetry.addData("right connec", rightColorSensor.getConnectionInfo());
+        telemetry.addData("IMU", imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX).firstAngle);
         telemetry.update();
 
         stateMachine.act();
