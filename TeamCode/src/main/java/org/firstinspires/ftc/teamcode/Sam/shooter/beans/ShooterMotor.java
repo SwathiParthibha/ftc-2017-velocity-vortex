@@ -2,15 +2,17 @@ package org.firstinspires.ftc.teamcode.Sam.shooter.beans;
 
 import com.qualcomm.ftccommon.DbgLog;
 
+import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
+
 public class ShooterMotor {
-    private Enum name;
+    private Constants.MOTORNAME name;
     private double rpm = 0D;
 
-    public Enum getName() {
+    public Constants.MOTORNAME getName() {
         return name;
     }
 
-    public void setName(Enum name) {
+    public void setName(Constants.MOTORNAME name) {
         this.name = name;
     }
 

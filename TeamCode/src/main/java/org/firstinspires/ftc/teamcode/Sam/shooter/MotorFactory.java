@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Sam.shooter;
 import com.qualcomm.ftccommon.DbgLog;
 
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
+import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class MotorFactory {
     }
 
     private static Semaphore mutex = new Semaphore(1);
-    private Map<Enum, ShooterMotor> motors = new HashMap<Enum, ShooterMotor>();
+    private Map<Constants.MOTORNAME, ShooterMotor> motors = new HashMap<Constants.MOTORNAME, ShooterMotor>();
 
     public static MotorFactory getInstance() {
         if (null == factory) {
@@ -39,12 +40,13 @@ public class MotorFactory {
     }
 
 
-    public ShooterMotor getMotor(Enum name) {
+    public ShooterMotor getMotor(Constants.MOTORNAME name) {
         return motors.get(name);
     }
 
     public void addMotor(ShooterMotor shooterMotor) {
         motors.put(shooterMotor.getName(), shooterMotor);
     }
+
 
 }

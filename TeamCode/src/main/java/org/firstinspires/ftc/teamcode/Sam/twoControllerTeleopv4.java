@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Sam;
 import android.media.MediaPlayer;
 
 import com.qualcomm.ftccommon.DbgLog;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -17,6 +18,7 @@ import java.util.TimerTask;
 
 
 @TeleOp(name = "Two Controller Teleop V4", group = "Teleop")
+@Disabled
 public class twoControllerTeleopv4 extends OpMode {
     private DcMotor leftMotor;
     private DcMotor rightMotor;

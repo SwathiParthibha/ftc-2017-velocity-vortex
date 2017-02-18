@@ -95,7 +95,7 @@ public class TurnState extends BasicAbstractState {
 
         if(!isDone()) {
             if(direction == LEFT){
-                if (Math.abs(angDiff) < 90) {
+                if (Math.abs(angDiff) < 90 && Math.abs(angDiff) >= 45) {
                     leftMotor.setPower(TURN_POWER_1);
                     rightMotor.setPower(-TURN_POWER_1);
                 } else if (Math.abs(angDiff) < 45) {
@@ -105,7 +105,7 @@ public class TurnState extends BasicAbstractState {
 
                 return stateName;
             } else if(direction == RIGHT){
-                if (Math.abs(angDiff) < 90) {
+                if (Math.abs(angDiff) < 90 && Math.abs(angDiff) >= 45) {
                     leftMotor.setPower(-TURN_POWER_1);
                     rightMotor.setPower(TURN_POWER_1);
                 } else if (Math.abs(angDiff) < 45) {
