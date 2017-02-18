@@ -136,7 +136,7 @@ public class AutonomousActions extends LinearOpMode {
     public double startShootingtime=0;
     public double prevTime=0;
 
-    public void init(HardwareMap hardwareMap, Telemetry telem) {
+    public void init(HardwareMap hardwareMap, Telemetry telem) throws InterruptedException  {
 
         // Define and Initialize Motors
         leftMotor   = hardwareMap.dcMotor.get("l");
@@ -267,14 +267,17 @@ public class AutonomousActions extends LinearOpMode {
                 angleZ = IMUheading();
                 angDiff = turnAngle-angleZ;
                 angDiff = (angDiff + 180) % 360 - 180;
+                telemetry.log().add("Difference: " + angDiff);
 
-                if (Math.abs(angDiff) < 90) {
+                if (Math.abs(angDiff) < 90 && Math.abs(angDiff) >= 45) {
                     leftMotor.setPower(TURN_POWER_1);
                     rightMotor.setPower(-TURN_POWER_1);
+                    telemetry.log().add("TURN_POWER_1");
                 }
                 else if (Math.abs(angDiff) < 45) {
                     leftMotor.setPower(TURN_POWER_2);
                     rightMotor.setPower(-TURN_POWER_2);
+                    telemetry.log().add("TURN_POWER_2");
                 }
 
                 telemetry.addData("Angle", angleZ);
@@ -296,19 +299,21 @@ public class AutonomousActions extends LinearOpMode {
             leftMotor.setPower(-APPROACH_SPEED);
             rightMotor.setPower(APPROACH_SPEED);
 
-            while (angDiff > 0) {
+            while (opMode.opModeIsActive() && angDiff > 0) {
 
                 angleZ = IMUheading();
                 angDiff = turnAngle-angleZ;
                 angDiff = (angDiff + 180) % 360 - 180;
 
-                if (Math.abs(angDiff) < 90) {
+                if (Math.abs(angDiff) < 90  && Math.abs(angDiff) >= 45) {
                     leftMotor.setPower(-TURN_POWER_1);
                     rightMotor.setPower(TURN_POWER_1);
+                    telemetry.log().add("TURN_POWER_1");
                 }
                 else if (Math.abs(angDiff) < 45) {
                     leftMotor.setPower(-TURN_POWER_2);
                     rightMotor.setPower(TURN_POWER_2);
+                    telemetry.log().add("TURN_POWER_2");
                 }
 
                 telemetry.addData("Angle", angleZ);
@@ -327,7 +332,7 @@ public class AutonomousActions extends LinearOpMode {
         }
     }
 
-    void resetIMuandPos(int left, int right) { //resets IMU to 0 at starting position of turn
+    void resetIMuandPos(int left, int right) throws InterruptedException { //resets IMU to 0 at starting position of turn
 
         telemetry.addLine("IMU Problem");
         telemetry.update();
@@ -344,7 +349,7 @@ public class AutonomousActions extends LinearOpMode {
         rightMotor.setPower(.2);
         leftMotor.setPower(.2);
 
-        while (opModeIsActive() &&
+        while (opMode.opModeIsActive() &&
                 (leftMotor.isBusy() && rightMotor.isBusy())) {
 
             // Display it for the driver.
@@ -353,6 +358,8 @@ public class AutonomousActions extends LinearOpMode {
                     leftMotor.getCurrentPosition(),
                     rightMotor.getCurrentPosition());
             telemetry.update();
+
+            idle();
         }
 
         rightMotor.setPower(0);
@@ -433,6 +440,7 @@ public class AutonomousActions extends LinearOpMode {
         rightMotor.setPower(-.2);
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
             telemetry.addData("Light", lightSensor.getLightDetected());
+            idle();
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
@@ -449,6 +457,8 @@ public class AutonomousActions extends LinearOpMode {
                 rightMotor.setPower(0.2);
             }
             telemetry.update();
+
+            idle();
         }
         stopRobot();
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -465,6 +475,7 @@ public class AutonomousActions extends LinearOpMode {
         rightMotor.setPower(.2);
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
             telemetry.addData("Light", lightSensor.getLightDetected());
+            idle();
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
@@ -481,6 +492,8 @@ public class AutonomousActions extends LinearOpMode {
                 rightMotor.setPower(0);
             }
             telemetry.update();
+
+            idle();
         }
         stopRobot();
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -567,6 +580,7 @@ public class AutonomousActions extends LinearOpMode {
             telemetry.addData("Right blue: ", rightColorSensor.blue());
             telemetry.update();
 
+            idle();
             //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         } while (opMode.opModeIsActive() && !verifyBlue()
@@ -658,6 +672,8 @@ public class AutonomousActions extends LinearOpMode {
             telemetry.addData("Left red: ", leftColorSensor.red());
             telemetry.addData("Right red: ", rightColorSensor.red());
             telemetry.update();
+
+            idle();
         } while  (opMode.opModeIsActive() && !verifyBlue()
                 && (time.seconds() < 8 || wrongColor));
 
@@ -767,6 +783,8 @@ public class AutonomousActions extends LinearOpMode {
             telemetry.addData("Left motor busy", leftMotor.isBusy());
             telemetry.addData("Right motor busy", rightMotor.isBusy());
             telemetry.update();
+
+            idle();
         }
         // Stop all motion;
         leftMotor.setPower(0);
