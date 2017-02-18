@@ -86,7 +86,7 @@ import java.util.List;
  * is explained below.
  */
 
-@Autonomous(name="CustomVuforiaNavigationTest", group ="Tests")
+//@Autonomous(name="CustomVuforiaNavigationTest", group ="Tests")
 //@Disabled
 public class CustomVuforiaNavigationTest extends LinearOpMode {
 

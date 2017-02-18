@@ -226,7 +226,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorController.html" title="interface in com.qualcomm.robotcore.hardware">DcMotorController</a></code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#getController()">getController</a></strong>()</code>
-<div class="block">Get DC motor controller</div>
+<div class="block">Get DC shooterMotor controller</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -256,7 +256,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <tr class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#getMaxSpeed()">getMaxSpeed</a></strong>()</code>
-<div class="block">Returns the current maximum targetable speed for this motor when the motor is
+<div class="block">Returns the current maximum targetable speed for this shooterMotor when the shooterMotor is
  running in one of the PID modes.</div>
 </td>
 </tr>
@@ -275,19 +275,19 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <tr class="altColor">
 <td class="colFirst"><code>double</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#getPower()">getPower</a></strong>()</code>
-<div class="block">Get the current motor power</div>
+<div class="block">Get the current shooterMotor power</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#getPowerFloat()">getPowerFloat</a></strong>()</code>
-<div class="block">Is motor power set to float?</div>
+<div class="block">Is shooterMotor power set to float?</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#getTargetPosition()">getTargetPosition</a></strong>()</code>
-<div class="block">Get the current motor target position.</div>
+<div class="block">Get the current shooterMotor target position.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -299,7 +299,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.ZeroPowerBehavior</a></code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#getZeroPowerBehavior()">getZeroPowerBehavior</a></strong>()</code>
-<div class="block">Returns the current behavior of the motor were a power level of zero to be applied.</div>
+<div class="block">Returns the current behavior of the shooterMotor were a power level of zero to be applied.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -317,7 +317,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#isBusy()">isBusy</a></strong>()</code>
-<div class="block">Is the motor busy?</div>
+<div class="block">Is the shooterMotor busy?</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -335,9 +335,9 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#setMaxSpeed(int)">setMaxSpeed</a></strong>(int&nbsp;encoderTicksPerSecond)</code>
-<div class="block">When the motor is running in one of the <a href="https://en.wikipedia.org/wiki/PID_controller">PID modes</a>
+<div class="block">When the shooterMotor is running in one of the <a href="https://en.wikipedia.org/wiki/PID_controller">PID modes</a>
  the value set using the <a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)"><code>setPower()</code></a> method is indicative of a
- desired motor <em>velocity</em> rather than a raw <em>power</em> level.</div>
+ desired shooterMotor <em>velocity</em> rather than a raw <em>power</em> level.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -349,7 +349,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#setPower(double)">setPower</a></strong>(double&nbsp;power)</code>
-<div class="block">Set the current motor power</div>
+<div class="block">Set the current shooterMotor power</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -361,13 +361,13 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#setTargetPosition(int)">setTargetPosition</a></strong>(int&nbsp;position)</code>
-<div class="block">Set the motor target position, using an integer.</div>
+<div class="block">Set the shooterMotor target position, using an integer.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorImpl.html#setZeroPowerBehavior(com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior)">setZeroPowerBehavior</a></strong>(<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.ZeroPowerBehavior</a>&nbsp;zeroPowerBehavior)</code>
-<div class="block">Sets the behavior of the motor when a power level of zero is applied.</div>
+<div class="block">Sets the behavior of the shooterMotor when a power level of zero is applied.</div>
 </td>
 </tr>
 </table>
@@ -445,7 +445,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <pre>public&nbsp;DcMotorImpl(<a href="../../../../com/qualcomm/robotcore/hardware/DcMotorController.html" title="interface in com.qualcomm.robotcore.hardware">DcMotorController</a>&nbsp;controller,
            int&nbsp;portNumber)</pre>
 <div class="block">Constructor</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>controller</code> - DC motor controller this motor is attached to</dd><dd><code>portNumber</code> - portNumber position on the controller</dd></dl>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>controller</code> - DC shooterMotor controller this shooterMotor is attached to</dd><dd><code>portNumber</code> - portNumber position on the controller</dd></dl>
 </li>
 </ul>
 <a name="DcMotorImpl(com.qualcomm.robotcore.hardware.DcMotorController, int, com.qualcomm.robotcore.hardware.DcMotorSimple.Direction)">
@@ -458,7 +458,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
            int&nbsp;portNumber,
            <a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.Direction.html" title="enum in com.qualcomm.robotcore.hardware">DcMotorSimple.Direction</a>&nbsp;direction)</pre>
 <div class="block">Constructor</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>controller</code> - DC motor controller this motor is attached to</dd><dd><code>portNumber</code> - portNumber port number on the controller</dd><dd><code>direction</code> - direction this motor should spin</dd></dl>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>controller</code> - DC shooterMotor controller this shooterMotor is attached to</dd><dd><code>portNumber</code> - portNumber port number on the controller</dd><dd><code>direction</code> - direction this shooterMotor should spin</dd></dl>
 </li>
 </ul>
 </li>
@@ -567,7 +567,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <li class="blockList">
 <h4>getController</h4>
 <pre>public&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotorController.html" title="interface in com.qualcomm.robotcore.hardware">DcMotorController</a>&nbsp;getController()</pre>
-<div class="block">Get DC motor controller</div>
+<div class="block">Get DC shooterMotor controller</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#getController()">getController</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" title="interface in com.qualcomm.robotcore.hardware">DcMotor</a></code></dd>
@@ -623,7 +623,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <li class="blockList">
 <h4>setPower</h4>
 <pre>public&nbsp;void&nbsp;setPower(double&nbsp;power)</pre>
-<div class="block">Set the current motor power</div>
+<div class="block">Set the current shooterMotor power</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)">setPower</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html" title="interface in com.qualcomm.robotcore.hardware">DcMotorSimple</a></code></dd>
@@ -649,15 +649,15 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <h4>setMaxSpeed</h4>
 <pre>public&nbsp;void&nbsp;setMaxSpeed(int&nbsp;encoderTicksPerSecond)</pre>
 <div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setMaxSpeed(int)">DcMotor</a></code></strong></div>
-<div class="block">When the motor is running in one of the <a href="https://en.wikipedia.org/wiki/PID_controller">PID modes</a>
+<div class="block">When the shooterMotor is running in one of the <a href="https://en.wikipedia.org/wiki/PID_controller">PID modes</a>
  the value set using the <a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)"><code>setPower()</code></a> method is indicative of a
- desired motor <em>velocity</em> rather than a raw <em>power</em> level. In those modes, the
+ desired shooterMotor <em>velocity</em> rather than a raw <em>power</em> level. In those modes, the
  <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setMaxSpeed(int)"><code>setMaxSpeed()</code></a> method provides the interpretation of the speed to which
  a value of 1.0 passed to <a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)"><code>setPower()</code></a> should correspond.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setMaxSpeed(int)">setMaxSpeed</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" title="interface in com.qualcomm.robotcore.hardware">DcMotor</a></code></dd>
-<dt><span class="strong">Parameters:</span></dt><dd><code>encoderTicksPerSecond</code> - the maximum targetable speed for this motor when the motor is
+<dt><span class="strong">Parameters:</span></dt><dd><code>encoderTicksPerSecond</code> - the maximum targetable speed for this shooterMotor when the shooterMotor is
                               in one of the PID modes, in units of encoder ticks per second.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html#RUN_USING_ENCODER"><code>DcMotor.RunMode.RUN_USING_ENCODER</code></a>, 
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.RunMode.html#RUN_TO_POSITION"><code>DcMotor.RunMode.RUN_TO_POSITION</code></a>, 
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#getMaxSpeed()"><code>DcMotor.getMaxSpeed()</code></a></dd></dl>
@@ -671,12 +671,12 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <h4>getMaxSpeed</h4>
 <pre>public&nbsp;int&nbsp;getMaxSpeed()</pre>
 <div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#getMaxSpeed()">DcMotor</a></code></strong></div>
-<div class="block">Returns the current maximum targetable speed for this motor when the motor is
+<div class="block">Returns the current maximum targetable speed for this shooterMotor when the shooterMotor is
  running in one of the PID modes.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#getMaxSpeed()">getMaxSpeed</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" title="interface in com.qualcomm.robotcore.hardware">DcMotor</a></code></dd>
-<dt><span class="strong">Returns:</span></dt><dd>the current maximum targetable speed for this motor, in units of encoder
+<dt><span class="strong">Returns:</span></dt><dd>the current maximum targetable speed for this shooterMotor, in units of encoder
          ticks per second</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setMaxSpeed(int)"><code>DcMotor.setMaxSpeed(int)</code></a></dd></dl>
 </li>
 </ul>
@@ -687,7 +687,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <li class="blockList">
 <h4>getPower</h4>
 <pre>public&nbsp;double&nbsp;getPower()</pre>
-<div class="block">Get the current motor power</div>
+<div class="block">Get the current shooterMotor power</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#getPower()">getPower</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html" title="interface in com.qualcomm.robotcore.hardware">DcMotorSimple</a></code></dd>
@@ -701,11 +701,11 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <li class="blockList">
 <h4>isBusy</h4>
 <pre>public&nbsp;boolean&nbsp;isBusy()</pre>
-<div class="block">Is the motor busy?</div>
+<div class="block">Is the shooterMotor busy?</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#isBusy()">isBusy</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" title="interface in com.qualcomm.robotcore.hardware">DcMotor</a></code></dd>
-<dt><span class="strong">Returns:</span></dt><dd>true if the motor is busy</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setTargetPosition(int)"><code>DcMotor.setTargetPosition(int)</code></a></dd></dl>
+<dt><span class="strong">Returns:</span></dt><dd>true if the shooterMotor is busy</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setTargetPosition(int)"><code>DcMotor.setTargetPosition(int)</code></a></dd></dl>
 </li>
 </ul>
 <a name="setZeroPowerBehavior(com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior)">
@@ -716,11 +716,11 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <h4>setZeroPowerBehavior</h4>
 <pre>public&nbsp;void&nbsp;setZeroPowerBehavior(<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.ZeroPowerBehavior</a>&nbsp;zeroPowerBehavior)</pre>
 <div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setZeroPowerBehavior(com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior)">DcMotor</a></code></strong></div>
-<div class="block">Sets the behavior of the motor when a power level of zero is applied.</div>
+<div class="block">Sets the behavior of the shooterMotor when a power level of zero is applied.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setZeroPowerBehavior(com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior)">setZeroPowerBehavior</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" title="interface in com.qualcomm.robotcore.hardware">DcMotor</a></code></dd>
-<dt><span class="strong">Parameters:</span></dt><dd><code>zeroPowerBehavior</code> - the new behavior of the motor when a power level of zero is applied.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware"><code>DcMotor.ZeroPowerBehavior</code></a>, 
+<dt><span class="strong">Parameters:</span></dt><dd><code>zeroPowerBehavior</code> - the new behavior of the shooterMotor when a power level of zero is applied.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware"><code>DcMotor.ZeroPowerBehavior</code></a>,
 <a href="../../../../com/qualcomm/robotcore/hardware/DcMotorSimple.html#setPower(double)"><code>DcMotorSimple.setPower(double)</code></a></dd></dl>
 </li>
 </ul>
@@ -732,11 +732,11 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <h4>getZeroPowerBehavior</h4>
 <pre>public&nbsp;<a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html" title="enum in com.qualcomm.robotcore.hardware">DcMotor.ZeroPowerBehavior</a>&nbsp;getZeroPowerBehavior()</pre>
 <div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#getZeroPowerBehavior()">DcMotor</a></code></strong></div>
-<div class="block">Returns the current behavior of the motor were a power level of zero to be applied.</div>
+<div class="block">Returns the current behavior of the shooterMotor were a power level of zero to be applied.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#getZeroPowerBehavior()">getZeroPowerBehavior</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" title="interface in com.qualcomm.robotcore.hardware">DcMotor</a></code></dd>
-<dt><span class="strong">Returns:</span></dt><dd>the current behavior of the motor were a power level of zero to be applied.</dd></dl>
+<dt><span class="strong">Returns:</span></dt><dd>the current behavior of the shooterMotor were a power level of zero to be applied.</dd></dl>
 </li>
 </ul>
 <a name="setPowerFloat()">
@@ -748,7 +748,7 @@ implements <a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" ti
 <pre>@Deprecated
 public&nbsp;void&nbsp;setPowerFloat()</pre>
 <div class="block"><span class="strong">Deprecated.</span>&nbsp;</div>
-<div class="block">Allow motor to float</div>
+<div class="block">Allow shooterMotor to float</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setPowerFloat()">setPowerFloat</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" title="interface in com.qualcomm.robotcore.hardware">DcMotor</a></code></dd>
@@ -764,11 +764,11 @@ public&nbsp;void&nbsp;setPowerFloat()</pre>
 <li class="blockList">
 <h4>getPowerFloat</h4>
 <pre>public&nbsp;boolean&nbsp;getPowerFloat()</pre>
-<div class="block">Is motor power set to float?</div>
+<div class="block">Is shooterMotor power set to float?</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#getPowerFloat()">getPowerFloat</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html" title="interface in com.qualcomm.robotcore.hardware">DcMotor</a></code></dd>
-<dt><span class="strong">Returns:</span></dt><dd>true of motor is set to float</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setPowerFloat()"><code>DcMotor.setPowerFloat()</code></a></dd></dl>
+<dt><span class="strong">Returns:</span></dt><dd>true of shooterMotor is set to float</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../com/qualcomm/robotcore/hardware/DcMotor.html#setPowerFloat()"><code>DcMotor.setPowerFloat()</code></a></dd></dl>
 </li>
 </ul>
 <a name="setTargetPosition(int)">
@@ -778,7 +778,7 @@ public&nbsp;void&nbsp;setPowerFloat()</pre>
 <li class="blockList">
 <h4>setTargetPosition</h4>
 <pre>public&nbsp;void&nbsp;setTargetPosition(int&nbsp;position)</pre>
-<div class="block">Set the motor target position, using an integer. If this motor has been set to REVERSE,
+<div class="block">Set the shooterMotor target position, using an integer. If this shooterMotor has been set to REVERSE,
  the passed-in "position" value will be multiplied by -1.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
@@ -806,7 +806,7 @@ public&nbsp;void&nbsp;setPowerFloat()</pre>
 <li class="blockList">
 <h4>getTargetPosition</h4>
 <pre>public&nbsp;int&nbsp;getTargetPosition()</pre>
-<div class="block">Get the current motor target position. If this motor has been set to REVERSE, the returned
+<div class="block">Get the current shooterMotor target position. If this shooterMotor has been set to REVERSE, the returned
  "position" will be multiplied by -1.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
@@ -821,7 +821,7 @@ public&nbsp;void&nbsp;setPowerFloat()</pre>
 <li class="blockList">
 <h4>getCurrentPosition</h4>
 <pre>public&nbsp;int&nbsp;getCurrentPosition()</pre>
-<div class="block">Get the current encoder value. If this motor has been set to REVERSE, the returned "position"
+<div class="block">Get the current encoder value. If this shooterMotor has been set to REVERSE, the returned "position"
  will be multiplied by -1.</div>
 <dl>
 <dt><strong>Specified by:</strong></dt>
