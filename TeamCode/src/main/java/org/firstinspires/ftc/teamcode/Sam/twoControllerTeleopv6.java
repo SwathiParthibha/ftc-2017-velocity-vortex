@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
@@ -30,6 +31,9 @@ public class twoControllerTeleopv6 extends OpMode {
     private final double MAX_POWER = 1.0;
     private final double MIN_POWER = -1.0;
     private final double ZERO_POWER = 0.0;
+    private final double SERVO_ADJUSTMENT_VAL=0.04;
+    double leftServoPos = 0.5;
+    double rightServoPos = 0.4;
 
 
     private DcMotor leftMotor;
@@ -65,8 +69,8 @@ public class twoControllerTeleopv6 extends OpMode {
         shooter1 = this.hardwareMap.dcMotor.get("shooter1");
         shooter2 = this.hardwareMap.dcMotor.get("shooter2");
         sweeper = this.hardwareMap.dcMotor.get("sweeper");
-        leftArm=this.hardwareMap.servo.get("leftarm");
-        rightArm=this.hardwareMap.servo.get("rightarm");
+        leftArm=this.hardwareMap.servo.get("leftservo");
+        rightArm=this.hardwareMap.servo.get("rightservo");
         sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
 
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -163,10 +167,6 @@ public class twoControllerTeleopv6 extends OpMode {
 
         }
 
-        if(gamepad2.x)
-        {
-
-        }
 
         if (isWrongBall()) {
             if (!wrongBallSound.isPlaying()) {
@@ -187,6 +187,29 @@ public class twoControllerTeleopv6 extends OpMode {
             wrongBallSound.stop();
             //sweeper.setPower(0);
         }
+
+
+
+
+        if (gamepad2.dpad_left) {
+            leftServoPos -= SERVO_ADJUSTMENT_VAL;
+            rightServoPos += SERVO_ADJUSTMENT_VAL;
+            leftServoPos=Range.clip(leftServoPos, 0, 1);//clip the range so it won't go over 1 or under 0
+            rightServoPos=Range.clip(rightServoPos, 0, 1);//clip the range so it won't go over 1 or under 0
+            leftArm.setPosition(leftServoPos);
+            rightArm.setPosition(rightServoPos);
+
+        } else if (gamepad2.dpad_right) {
+            leftServoPos += SERVO_ADJUSTMENT_VAL;
+            rightServoPos -= SERVO_ADJUSTMENT_VAL;
+            leftServoPos=Range.clip(leftServoPos, 0, 1);//clip the range so it won't go over 1 or under 0
+            rightServoPos=Range.clip(rightServoPos, 0, 1);//clip the range so it won't go over 1 or under 0
+            leftArm.setPosition(leftServoPos);
+            rightArm.setPosition(rightServoPos);
+        }
+
+
+
 
         printTelemetry();
         telemetry.addData("", "");//need to output something or else the telemetry won't update
@@ -214,6 +237,7 @@ public class twoControllerTeleopv6 extends OpMode {
         } else {
             allianceColor = allianceColor.BLUE;
         }
+
         telemetry.log().add("Beacon Color Set");
     }
 
