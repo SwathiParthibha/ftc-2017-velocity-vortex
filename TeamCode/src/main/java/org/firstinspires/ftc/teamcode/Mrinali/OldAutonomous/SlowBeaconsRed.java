@@ -30,10 +30,13 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.Mrinali;
+package org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -55,9 +58,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Autonomous Red Shoot", group="Pushbot")
-//@Disabled
-public class DriveToBeaconsRedRPMShoot extends LinearOpMode {
+@Autonomous(name="Slow Red", group="Pushbot")
+@Disabled
+public class SlowBeaconsRed extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
@@ -103,9 +106,9 @@ public class DriveToBeaconsRedRPMShoot extends LinearOpMode {
         auto.pushRedButton();
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3);
         auto.turn(0);
-        auto.EncoderShooter(auto.RPM955);
-        auto.encoderDrive(auto.APPROACH_SPEED, 10, 10, 5);
+        auto.encoderDrive(auto.APPROACH_SPEED, 7, 7, 5);
 
+        sleep(1000);
         auto.turn(0);
         auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
@@ -124,10 +127,6 @@ public class DriveToBeaconsRedRPMShoot extends LinearOpMode {
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
 
-        auto.encoderDrive(auto.APPROACH_SPEED, 7, 7, 5); //The robot then advances forward, using encoders, and hits the cap ball off the centerpiece and parks on it
-        auto.scooper.setPower(1);
-        while (opModeIsActive()) {
-            auto.EncoderShooter(auto.RPM955);
-        }
+        auto.encoderDrive(auto.APPROACH_SPEED, 22, 22, 5);
     }
 }

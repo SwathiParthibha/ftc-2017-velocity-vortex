@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.Mrinali;
+package org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous;
 
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
@@ -70,15 +71,19 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Autonomous Red", group="Pushbot")
+@Autonomous(name="Beacons Autonomous Red Shooter", group="Pushbot")
 @Disabled
-public class DriveToBeaconsRedPushbot extends LinearOpMode {
+public class SlowRedBeaconsShooter extends LinearOpMode {
 
     //To change blue to red: negative angles, color sensors sense red, left side range sensor
 
     /* Declare OpMode members. */
     HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
     // could also use HardwarePushbotMatrix class.
+    private DcMotor shooter1;
+    private DcMotor shooter2;
+    private boolean state;
+    private DcMotor scooper;
     LightSensor lightSensor;      // Primary LEGO Light sensor,
     I2cDeviceSynchImpl rangeSensor;
     I2cDeviceSynchImpl sideRangeSensor;
@@ -129,6 +134,20 @@ public class DriveToBeaconsRedPushbot extends LinearOpMode {
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        shooter1 = this.hardwareMap.dcMotor.get("shooter1");
+        shooter2 = this.hardwareMap.dcMotor.get("shooter2");
+        scooper = this.hardwareMap.dcMotor.get("scooper");
+
+        state = false;
+
+        shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         // get a reference to our Light Sensor object.
         lightSensor = hardwareMap.lightSensor.get("light sensor");
         rangeA = hardwareMap.i2cDevice.get("range sensor");// Primary LEGO Light Sensor
@@ -175,9 +194,11 @@ public class DriveToBeaconsRedPushbot extends LinearOpMode {
             idle();
         }
 
-        encoderDrive(APPROACH_SPEED, 3, 3, 3);
-        turn(40);
-        encoderDrive(APPROACH_SPEED, 17, 17, 7);
+        encoderDrive(APPROACH_SPEED, 8/2, 8/2, 3);
+        shoot();
+        encoderDrive(APPROACH_SPEED, -8/2, -8/2, 3);
+        turn(45);
+        encoderDrive(APPROACH_SPEED * .8, 35/2, 35/2, 8);
         toWhiteLine(false);
         turn(90);
         sleep(100);
@@ -185,7 +206,7 @@ public class DriveToBeaconsRedPushbot extends LinearOpMode {
         pushButton();
         encoderDrive(APPROACH_SPEED, backup, backup, 3);
         turn(0);
-        encoderDrive(APPROACH_SPEED, 8, 8, 5);
+        encoderDrive(APPROACH_SPEED, 8/2, 8/2, 5);
         //maintainDist();
 
         turn(0);
@@ -207,7 +228,7 @@ public class DriveToBeaconsRedPushbot extends LinearOpMode {
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
 
-        encoderDrive(APPROACH_SPEED, 24, 24, 5);
+        encoderDrive(APPROACH_SPEED, 56/2, 56/2, 5);
     }
 
     double IMUheading() {
@@ -375,30 +396,6 @@ public class DriveToBeaconsRedPushbot extends LinearOpMode {
         robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
-    void followLine() {
-        robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        telemetry.addLine("Following Line");
-        while (getcmUltrasonic(rangeSensor) > 11){
-            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
-            telemetry.addData("Light", lightSensor.getLightDetected());
-            if(lightSensor.getLightDetected() > WHITE_THRESHOLD){
-                telemetry.addLine("Moving right");
-                robot.leftMotor.setPower(0.2);
-                robot.rightMotor.setPower(0);
-            } else {
-                telemetry.addLine("Moving left");
-                robot.leftMotor.setPower(0);
-                robot.rightMotor.setPower(0.2);
-            }
-        }
-        stopRobot();
-        robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-    }
-
     void pushButton() {
 
         telemetry.log().add("in the push button method");
@@ -457,11 +454,11 @@ public class DriveToBeaconsRedPushbot extends LinearOpMode {
             //robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             //robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            robot.rightMotor.setPower(-APPROACH_SPEED * .8);
             robot.leftMotor.setPower(-APPROACH_SPEED * .8);
-            sleep(80);
-            robot.rightMotor.setPower(0);
+            robot.rightMotor.setPower(-APPROACH_SPEED * .8);
+            sleep(40);
             robot.leftMotor.setPower(0);
+            robot.rightMotor.setPower(0);
 
             //robot.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             //robot.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -569,4 +566,36 @@ public class DriveToBeaconsRedPushbot extends LinearOpMode {
             //  sleep(250);   // optional pause after each move
         }
     }
+
+    public void shoot() {
+        EncoderShooter(scaleShooterPower(0.9));//0.6//0.7
+        sleep(2000);
+        scooper.setPower(1);
+        sleep(2500);
+        EncoderShooter(0);
+        scooper.setPower(0);
+    }
+
+    public void EncoderShooter(double speed)
+    {
+
+        shooter1.setPower(speed);
+        shooter2.setPower(speed);
+
+
+    }
+
+    public double scaleShooterPower(double intialPower)
+    {
+        double MAX_VOLTAGE=13.7;
+
+        double currentVoltage= hardwareMap.voltageSensor.get("drive").getVoltage();
+
+        double scaledPower=MAX_VOLTAGE*intialPower/currentVoltage;
+
+        telemetry.addData("Scaled power: ", scaledPower);
+
+        return scaledPower;
+    }
+
 }
