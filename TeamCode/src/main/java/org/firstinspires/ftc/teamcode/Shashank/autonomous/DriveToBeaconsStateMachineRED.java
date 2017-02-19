@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.Shashank.autonomous;
 
 import com.qualcomm.hardware.adafruit.BNO055IMU;
-import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -21,7 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.Mrinali.HardwarePushbot;
+import org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous.HardwarePushbot;
 import org.firstinspires.ftc.teamcode.Shashank.utils.IMUInitialization;
 
 import java.util.Locale;
@@ -46,7 +44,7 @@ public class DriveToBeaconsStateMachineRED extends OpMode {
     // OpticalDistanceSensor
 
     /* Declare OpMode members. */
-    org.firstinspires.ftc.teamcode.Mrinali.HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
+    HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
     // could also use HardwarePushbotMatrix class.
     LightSensor lightSensor;      // Primary LEGO Light sensor,
     //lightSensor;   // Alternative MR ODS sensor

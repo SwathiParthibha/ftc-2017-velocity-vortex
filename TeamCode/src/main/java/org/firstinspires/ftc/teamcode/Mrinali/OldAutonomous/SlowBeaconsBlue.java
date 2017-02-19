@@ -30,10 +30,17 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.Mrinali;
+package org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerImpl;
+import com.qualcomm.robotcore.util.ThreadPool;
+
+import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -55,14 +62,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Autonomous Blue Shoot", group="Pushbot")
-//@Disabled
-public class DriveToBeaconsBlueRPMShoot extends LinearOpMode {
+@Autonomous(name="Slow Blue", group="Pushbot")
+@Disabled
+public class SlowBeaconsBlue extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
     AutonomousActions auto = new AutonomousActions(this);
+    double FASTER_SPEED = .7;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -104,8 +112,9 @@ public class DriveToBeaconsBlueRPMShoot extends LinearOpMode {
         auto.pushBlueButton(); //The robot then uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         auto.turn(0); //and turns parallel to the beacon using the IMU
-        auto.encoderDrive(auto.APPROACH_SPEED, 8, 8, 5);
+        auto.encoderDrive(auto.APPROACH_SPEED, 6, 6, 5);
 
+        sleep(1000);
         auto.turn(0);
         auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
@@ -113,7 +122,6 @@ public class DriveToBeaconsBlueRPMShoot extends LinearOpMode {
         sleep(100);
         auto.followLineBlueSide();
         auto.pushBlueButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
-        auto.EncoderShooter(auto.RPM955);
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //Then it will back up
 
         auto.leftMotor.setPower(auto.APPROACH_SPEED); //and turns until it is facing the cap ball
@@ -125,16 +133,7 @@ public class DriveToBeaconsBlueRPMShoot extends LinearOpMode {
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
 
-        auto.encoderDrive(auto.APPROACH_SPEED, 7, 7, 5); //The robot then advances forward, using encoders, and hits the cap ball off the centerpiece and parks on it
-        auto.scooper.setPower(1);
-        while (opModeIsActive()) {
-            auto.EncoderShooter(auto.RPM955);
-        }
-    }
-
-    @Override
-    protected void postLoop() {
-        super.postLoop();
+        auto.encoderDrive(auto.APPROACH_SPEED, 22, 22, 5);
     }
 }
 
