@@ -328,11 +328,11 @@ public class AutonomousActions extends LinearOpMode {
 
     double turnPower(double difference) {
         if (Math.abs(difference) < 20) {
-            return 0.05;
-        } else if (Math.abs(difference) < 45) {
             return 0.1;
-        } else if (Math.abs(difference) < 90) {
+        } else if (Math.abs(difference) < 45) {
             return 0.2;
+        } else if (Math.abs(difference) < 90) {
+            return 0.3;
         } else return 0.5;
     }
 
