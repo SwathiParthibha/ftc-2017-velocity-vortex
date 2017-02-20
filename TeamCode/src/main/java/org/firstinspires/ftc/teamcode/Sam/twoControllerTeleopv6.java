@@ -37,8 +37,10 @@ public class twoControllerTeleopv6 extends OpMode {
     private final double RIGHT_OUT_VAL=0.76;
     private final double SERVO_ADJUSTMENT_VAL_LEFT=(Math.abs(LEFT_IN_VAL-LEFT_OUT_VAL)/14);
     private final double SERVO_ADJUSTMENT_VAL_RIGHT=(Math.abs(RIGHT_IN_VAL-RIGHT_OUT_VAL)/14);
+    private final double SERVO_ADJUSTMENT_VAL_CAP=0.02;
     double leftServoPos = 0;
     double rightServoPos = 1.0;
+    double capServoPos = 0.38;
 
 
     private DcMotor leftMotor;
@@ -49,6 +51,7 @@ public class twoControllerTeleopv6 extends OpMode {
     private DcMotor sweeper;
     private Servo leftArm;
     private Servo rightArm;
+    private Servo capArm;
     private PowerManager leftShooterPowerMgr;
     private PowerManager rightShooterPowerMgr;
 
@@ -76,6 +79,7 @@ public class twoControllerTeleopv6 extends OpMode {
         sweeper = this.hardwareMap.dcMotor.get("sweeper");
         leftArm=this.hardwareMap.servo.get("leftservo");
         rightArm=this.hardwareMap.servo.get("rightservo");
+        capArm=this.hardwareMap.servo.get("capArm");
         sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
 
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -87,6 +91,7 @@ public class twoControllerTeleopv6 extends OpMode {
 
         leftArm.setPosition(leftServoPos);
         rightArm.setPosition(rightServoPos);
+        capArm.setPosition(capServoPos);
 
 
 
@@ -164,10 +169,20 @@ public class twoControllerTeleopv6 extends OpMode {
         if (gamepad2.a) {
             leftShooterPowerMgr.regulatePower();
             rightShooterPowerMgr.regulatePower();
-        } else {
+        } else if(gamepad2.b){
+
+            shooter1.setPower(1.0);
+            shooter2.setPower(1.0);
+        }else {
             shooter1.setPower(0);
             shooter2.setPower(0);
         }
+
+        if (gamepad2.start) {
+            shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
 
 
         if (gamepad2.right_bumper) {
@@ -226,21 +241,36 @@ public class twoControllerTeleopv6 extends OpMode {
             rightServoPos=RIGHT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
             leftArm.setPosition(leftServoPos);
             rightArm.setPosition(rightServoPos);
+        }else if(gamepad2.dpad_right)
+        {
+            leftServoPos=LEFT_IN_VAL;
+            rightServoPos=RIGHT_IN_VAL;
+            leftArm.setPosition(leftServoPos);
+            rightArm.setPosition(rightServoPos);
+        }
+
+        if (gamepad1.a) {
+            capServoPos+=SERVO_ADJUSTMENT_VAL_CAP;
+            capServoPos=Range.clip(capServoPos, 0.04, 0.96);//clip the range so it won't go over 1 or under 0
+            capArm.setPosition(capServoPos);
+
+        } else if (gamepad1.y) {
+            capServoPos-=SERVO_ADJUSTMENT_VAL_CAP;
+            capServoPos=Range.clip(capServoPos, 0.04, 0.96);//clip the range so it won't go over 1 or under 0
+            capArm.setPosition(capServoPos);
         }
 
 
 
 
         printTelemetry();
-        telemetry.addData("left",leftServoPos);
-        telemetry.addData("right",rightServoPos);
+        telemetry.addData("cap",capServoPos);
         telemetry.addData("", "");//need to output something or else the telemetry won't update
         telemetry.update();
     }
 
     private void printTelemetry() {
         if (Constants.USE_TELEMETRY) {
-            telemetry.addData("Hello", "Here");
             telemetry.addData("", leftShooterPowerMgr.getMotorTelemetry().toString());
             telemetry.addData("", rightShooterPowerMgr.getMotorTelemetry().toString());
         }
