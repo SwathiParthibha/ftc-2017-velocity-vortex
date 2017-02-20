@@ -86,6 +86,9 @@ public class twoControllerTeleopv6 extends OpMode {
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         swap = true;
 
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
         correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
 
@@ -106,6 +109,9 @@ public class twoControllerTeleopv6 extends OpMode {
         ShooterMotor rightShooter = new ShooterMotor();
         rightShooter.setName(Constants.MOTORNAME.RIGHT_SHOOTER);
         motorFactory.addMotor(rightShooter);
+
+
+
 
         leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
         rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
@@ -167,12 +173,12 @@ public class twoControllerTeleopv6 extends OpMode {
         }
 
         if (gamepad2.a) {
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+           leftShooterPowerMgr.regulatePower();
+           rightShooterPowerMgr.regulatePower();
         } else if(gamepad2.b){
 
-            shooter1.setPower(1.0);
-            shooter2.setPower(1.0);
+            shooter1.setPower(0.5);
+            shooter2.setPower(0.5);
         }else {
             shooter1.setPower(0);
             shooter2.setPower(0);
@@ -189,7 +195,7 @@ public class twoControllerTeleopv6 extends OpMode {
             sweeper.setPower(SWEEPER_OUT_POWER);
 
             setAllianceColor();
-        } else if (gamepad2.right_trigger > 0) {
+        } else if (gamepad2.right_trigger > 0.5) {
             sweeper.setPower(SWEEPER_IN_POWER);
         } else {
             sweeper.setPower(ZERO_POWER);
