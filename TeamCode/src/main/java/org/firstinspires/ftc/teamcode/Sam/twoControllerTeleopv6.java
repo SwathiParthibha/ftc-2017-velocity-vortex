@@ -172,6 +172,7 @@ public class twoControllerTeleopv6 extends OpMode {
             leftShooterPowerMgr.regulatePower();
             rightShooterPowerMgr.regulatePower();
         } else if (gamepad2.b) {
+            
 
             shooter1.setPower(0.5);
             shooter2.setPower(0.5);
