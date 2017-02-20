@@ -27,44 +27,47 @@ public class TurnStateEncoderDrive extends BasicAbstractState {
 
     private boolean stopThread = false;
 
+    static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 1.5 ;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 5.0 ;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * Math.PI);
+    static final double     DRIVE_SPEED             = 0.3;
+    static final double     Circumference           = 18 * Math.PI;
+    static final double     Inches_PER_DEGREE       = Circumference / 360;
+
     Orientation angles;
-    double angleZ;
     private int turnAngle;
-    TurnDirection direction;
-    private double angDiff;
+    private TurnDirection direction;
 
-        double TURN_POWER_1 = .2;
-        double TURN_POWER_2 = .05;
+    double TURN_POWER_1 = .2;
+    double TURN_POWER_2 = .05;
 
-        public TurnStateEncoderDrive(StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, BNO055IMU imu, int turnAngle) {
-            this.stateName = stateName;
-            this.nextStateName = nextStateName;
-            this.leftMotor = leftMotor;
-            this.rightMotor = rightMotor;
-            this.imu = imu;
-            this.turnAngle = turnAngle;
+    public TurnStateEncoderDrive(StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, int turnAngle, TurnDirection turnDirection) {
+        this.stateName = stateName;
+        this.nextStateName = nextStateName;
+        this.leftMotor = leftMotor;
+        this.rightMotor = rightMotor;
+        this.turnAngle = turnAngle;
+        this.direction = turnDirection;
     }
-
     @Override
     public void init() {
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
-        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        angleZ = getIMUheading();
+        int targetPos = (int) (COUNTS_PER_INCH*Inches_PER_DEGREE*turnAngle);
 
-        angDiff = turnAngle-angleZ; //positive: turn left
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                while (!stopThread){
-                    angleZ = getIMUheading();
-                }
-            }
-        });
+        if(direction == TurnDirection.LEFT){
+            leftMotor.setTargetPosition(leftMotor.getCurrentPosition()-targetPos);
+            rightMotor.setTargetPosition(leftMotor.getCurrentPosition()+targetPos);
+        } else {
+            leftMotor.setTargetPosition(leftMotor.getCurrentPosition()+targetPos);
+            rightMotor.setTargetPosition(leftMotor.getCurrentPosition()-targetPos);
+        }
 
         DbgLog.msg("FNINSHED INIT");
     }
@@ -76,20 +79,15 @@ public class TurnStateEncoderDrive extends BasicAbstractState {
             hasInitialized = true;
         }
 
-        DbgLog.msg("angDiff is " + angDiff);
         DbgLog.msg("turn angle is " + turnAngle);
-        DbgLog.msg("angleZ angle is " + angleZ);
-
-        //angleZ = getIMUheading();
-        angDiff = turnAngle-angleZ;
 
         if(!isDone()) {
-            if(angDiff < 0){
+            if(direction == TurnDirection.LEFT){
                 leftMotor.setPower(TURN_POWER_1);
-                rightMotor.setPower(-TURN_POWER_1);
+                rightMotor.setPower(TURN_POWER_1);
                 return stateName;
-            } else if(angDiff > 0){
-                leftMotor.setPower(-TURN_POWER_1);
+            } else if(direction == TurnDirection.RIGHT){
+                leftMotor.setPower(TURN_POWER_1);
                 rightMotor.setPower(TURN_POWER_1);
                 return stateName;
             } else {
@@ -103,13 +101,10 @@ public class TurnStateEncoderDrive extends BasicAbstractState {
         }
     }
 
-    double getIMUheading() {
-        return Math.abs(imu.getAngularOrientation().firstAngle);
-    }
-
     @Override
     public boolean isDone() {
-        return Math.abs(angDiff) < 3;
+        return leftMotor.getCurrentPosition() > leftMotor.getTargetPosition()
+        && rightMotor.getCurrentPosition() > rightMotor.getTargetPosition();
     }
 
     public enum TurnDirection {

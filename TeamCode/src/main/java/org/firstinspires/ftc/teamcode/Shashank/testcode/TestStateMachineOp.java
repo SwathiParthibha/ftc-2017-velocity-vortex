@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -41,7 +42,14 @@ public class TestStateMachineOp extends OpMode {
     private ColorSensor leftColorSensor, rightColorSensor = null;
 
     enum S implements StateName {
-        TURN,
+        STATE,
+        WAIT,
+        STATE_2,
+        WAIT_2,
+        STATE_3,
+        WAIT_3,
+        STATE_4,
+        WAIT_4,
         STOP
     };
 
@@ -88,9 +96,16 @@ public class TestStateMachineOp extends OpMode {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
 
-        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.TURN);
+        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.STATE);
 
-        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.TURN, S.STOP, imu, 90, TurnState.TurnDirection.LEFT);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.STATE, S.WAIT, 7);
+        autoStateMachineBuilder.addWait(S.WAIT, S.STATE_2, 3000);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.STATE_2, S.WAIT_2, -7);
+        autoStateMachineBuilder.addWait(S.WAIT_2, S.STATE_3, 3000);
+        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_3, S.WAIT_3, imu, 150);
+        autoStateMachineBuilder.addWait(S.WAIT_3, S.STATE_4, 3000);
+        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_4, S.WAIT_4, imu, 0);
+        autoStateMachineBuilder.addWait(S.WAIT_4, S.STOP, 3000);
         autoStateMachineBuilder.addStop(S.STOP);
 
         stateMachine = autoStateMachineBuilder.build();
@@ -127,7 +142,10 @@ public class TestStateMachineOp extends OpMode {
         telemetry.addData("right blue", String.format("b=%d", rightColorSensor.blue()));
         telemetry.addData("left connec", leftColorSensor.getConnectionInfo());
         telemetry.addData("right connec", rightColorSensor.getConnectionInfo());
+        telemetry.addData("imu ", imu.getAngularOrientation().firstAngle);
         telemetry.update();
+
+        DbgLog.msg("CURRENT STATE " + stateMachine.getCurrentStateName());
 
         stateMachine.act();
     }

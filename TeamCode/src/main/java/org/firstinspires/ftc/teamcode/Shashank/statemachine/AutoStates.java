@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PivotToWhiteL
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PressBeaconState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.ToWhiteLineState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnState;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnStateEncoderDrive;
 import org.firstinspires.ftc.teamcode.Shashank.testcode.TestMoveState;
 import org.firstinspires.ftc.teamcode.Shashank.testcode.TestState;
 
@@ -58,8 +59,12 @@ public class AutoStates extends States {
         return new EncoderDriveState(distance, leftMotor, rightMotor, stateName, nextStateName);
     }
 
-    public static State turn(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, BNO055IMU imu, int turnAngle, TurnState.TurnDirection turnDirection){
-        return new TurnState(stateName, nextStateName, leftMotor, rightMotor, imu, turnAngle, turnDirection);
+    public static State turn(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, BNO055IMU imu, int turnAngle){
+        return new TurnState(stateName, nextStateName, leftMotor, rightMotor, imu, turnAngle);
+    }
+
+    public static State turnEncoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, int turnAngle, TurnStateEncoderDrive.TurnDirection turnDirection){
+        return new TurnStateEncoderDrive(stateName, nextStateName, leftMotor, rightMotor, turnAngle, turnDirection);
     }
 
 }

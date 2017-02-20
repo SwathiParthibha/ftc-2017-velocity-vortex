@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnState;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnStateEncoderDrive;
 import org.firstinspires.ftc.teamcode.Shashank.testcode.TestStates;
 
 import ftc.electronvolts.statemachine.StateMachineBuilder;
@@ -53,8 +54,12 @@ public class AutoStateMachineBuilder extends StateMachineBuilder {
         add(stateName, AutoStates.encoderDrive(leftMotor, rightMotor, stateName, nextStateName, distance));
     }
 
-    public void addTurn(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, BNO055IMU imu, int turnAngle, TurnState.TurnDirection turnDirection){
-        add(stateName, AutoStates.turn(leftMotor, rightMotor, stateName, nextStateName, imu, turnAngle, turnDirection));
+    public void addTurn(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, BNO055IMU imu, int turnAngle){
+        add(stateName, AutoStates.turn(leftMotor, rightMotor, stateName, nextStateName, imu, turnAngle));
+    }
+
+    public void addTurnEncoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, int turnAngle, TurnStateEncoderDrive.TurnDirection turnDirection){
+        add(stateName, AutoStates.turnEncoderDrive(leftMotor, rightMotor, stateName, nextStateName, turnAngle, turnDirection));
     }
 
 }

@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.Shashank.statemachine.states;
 
+import android.os.AsyncTask;
+
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -33,17 +34,19 @@ public class TurnState extends BasicAbstractState {
     TurnDirection direction;
     private double angDiff;
 
+    double TURN_POWER_0 = .3;
     double TURN_POWER_1 = .2;
-    double TURN_POWER_2 = .05;
+    double TURN_POWER_2 = .1;
 
-    public TurnState(StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, BNO055IMU imu, int turnAngle, TurnDirection turnDirection) {
+    ElapsedTime runtime = new ElapsedTime();
+
+    public TurnState(StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, BNO055IMU imu, int turnAngle) {
         this.stateName = stateName;
         this.nextStateName = nextStateName;
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
         this.imu = imu;
         this.turnAngle = turnAngle;
-        this.direction = turnDirection;
     }
 
     @Override
@@ -56,13 +59,22 @@ public class TurnState extends BasicAbstractState {
 
         angleZ = getIMUheading();
 
-        angDiff = turnAngle-angleZ; //positive: turn left
-        angDiff = (angDiff + 180) % 360 - 180; //changes to number between -180 and 180
+        angDiff = turnAngle-angleZ; //negative: turn left
+        //angDiff = (angDiff + 180) % 360 - 180; //changes to number between -180 and 180
 
-        if (angDiff > 0)
+        log("angDiff in init is " + angDiff);
+        log("turnAngle in init is " + turnAngle);
+        log("angleZ in init is " + angleZ);
+        log("\n\n");
+
+        if (angDiff < 0)
             direction = TurnDirection.LEFT;
-        else if (angDiff < 0)
+        else if (angDiff > 0)
             direction = TurnDirection.RIGHT;
+
+        log("direction in init is " + direction);
+        log("FINISHED INIT");
+        log("\n\n");
     }
 
     @Override
@@ -70,32 +82,52 @@ public class TurnState extends BasicAbstractState {
         if(!hasInitialized) {
             init();
             hasInitialized = true;
+
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (!isDone()){
+                        angleZ = getIMUheading();
+                    }
+                }
+            });
         }
 
-        angleZ = getIMUheading();
+        //angleZ = getIMUheading();
         angDiff = turnAngle-angleZ;
-        angDiff = (angDiff + 180) % 360 - 180;
+
+        log("angDiff in is " + angDiff);
+        log("turnAngle in is " + turnAngle);
+        log("angleZ in is " + angleZ);
+        log("direction in init is " + direction);
+        log("right motor power is " + rightMotor.getPower());
+        log("left motor power is " + leftMotor.getPower());
+        log("\n\n");
 
         if(!isDone()) {
             if(direction == TurnDirection.LEFT){
-                if (Math.abs(angDiff) < 90) {
-                    leftMotor.setPower(TURN_POWER_1);
-                    rightMotor.setPower(-TURN_POWER_1);
-                } else if (Math.abs(angDiff) < 45) {
-                    leftMotor.setPower(TURN_POWER_2);
-                    rightMotor.setPower(-TURN_POWER_2);
-                }
-
-                return stateName;
-            } else if(direction == TurnDirection.RIGHT){
-                if (Math.abs(angDiff) < 90) {
+                if (Math.abs(angDiff) >= 90) {
+                    leftMotor.setPower(-TURN_POWER_0);
+                    rightMotor.setPower(TURN_POWER_0);
+                } else if (Math.abs(angDiff) >= 45) {
                     leftMotor.setPower(-TURN_POWER_1);
                     rightMotor.setPower(TURN_POWER_1);
                 } else if (Math.abs(angDiff) < 45) {
                     leftMotor.setPower(-TURN_POWER_2);
                     rightMotor.setPower(TURN_POWER_2);
                 }
-
+                return stateName;
+            } else if(direction == TurnDirection.RIGHT){
+                if (Math.abs(angDiff) >= 90) {
+                    leftMotor.setPower(TURN_POWER_0);
+                    rightMotor.setPower(-TURN_POWER_0);
+                } else if (Math.abs(angDiff) >= 45) {
+                    leftMotor.setPower(TURN_POWER_1);
+                    rightMotor.setPower(-TURN_POWER_1);
+                } else if (Math.abs(angDiff) < 45) {
+                    leftMotor.setPower(TURN_POWER_2);
+                    rightMotor.setPower(-TURN_POWER_2);
+                }
                 return stateName;
             } else {
                 return stateName;
@@ -103,27 +135,29 @@ public class TurnState extends BasicAbstractState {
         } else {
             leftMotor.setPower(0);
             rightMotor.setPower(0);
+            log("FINISHED STATE");
             return nextStateName;
         }
     }
 
     double getIMUheading() {
-        angles = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
-        return AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
+        return Math.abs(imu.getAngularOrientation().firstAngle);
     }
 
     @Override
     public boolean isDone() {
-        if (direction == TurnDirection.LEFT)
-            return angDiff < 0;
-        else if (direction == TurnDirection.RIGHT)
-            return angDiff > 0;
-        else return true;
+        if(Math.abs(angDiff) < 3)
+            return true;
+        else return false;
     }
 
-    public enum TurnDirection {
+    enum TurnDirection {
         LEFT,
         RIGHT
+    }
+
+    private void log(String str){
+        DbgLog.msg("TURN STATE > " + str);
     }
 
     @Override

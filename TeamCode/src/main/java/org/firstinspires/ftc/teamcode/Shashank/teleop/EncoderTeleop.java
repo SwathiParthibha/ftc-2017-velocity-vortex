@@ -136,6 +136,9 @@ public class EncoderTeleop extends OpMode {
             rightServoPos -= 0.04;
         }
 
+        leftServoPos = Range.clip(leftServoPos, 0, 1);
+        rightServoPos = Range.clip(rightServoPos, 0, 1);
+
         leftServo.setPosition(Range.clip(leftServoPos, 0, 1));
         rightServo.setPosition(Range.clip(rightServoPos, 0, 1));
 

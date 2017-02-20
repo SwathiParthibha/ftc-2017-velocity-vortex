@@ -25,6 +25,8 @@ public class PivotToWhiteLineState extends BasicAbstractState {
 
     private boolean hasInitialized = false;
 
+    private static final double MOTOR_POWER = 0.4;
+
     public PivotToWhiteLineState(DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, StateName stateName, StateName nextStateName, AllianceColor beaconColor) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
@@ -47,11 +49,11 @@ public class PivotToWhiteLineState extends BasicAbstractState {
             return getNextStateName();
         } else {
             if(beaconColor == AllianceColor.BLUE){
-                leftMotor.setPower(0.2);
-                rightMotor.setPower(-0.2);
+                leftMotor.setPower(MOTOR_POWER);
+                rightMotor.setPower(-MOTOR_POWER);
             } else {
-                leftMotor.setPower(-0.2);
-                rightMotor.setPower(0.2);
+                leftMotor.setPower(-MOTOR_POWER);
+                rightMotor.setPower(MOTOR_POWER);
             }
 
             return stateName;
