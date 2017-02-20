@@ -31,9 +31,16 @@ public class twoControllerTeleopv6 extends OpMode {
     private final double MAX_POWER = 1.0;
     private final double MIN_POWER = -1.0;
     private final double ZERO_POWER = 0.0;
-    private final double SERVO_ADJUSTMENT_VAL=0.04;
+    private final double LEFT_IN_VAL=0.56;
+    private final double RIGHT_IN_VAL=0.34;
+    private final double LEFT_OUT_VAL=0.12;
+    private final double RIGHT_OUT_VAL=0.76;
+    private final double SERVO_ADJUSTMENT_VAL_LEFT=(Math.abs(LEFT_IN_VAL-LEFT_OUT_VAL)/14);
+    private final double SERVO_ADJUSTMENT_VAL_RIGHT=(Math.abs(RIGHT_IN_VAL-RIGHT_OUT_VAL)/14);
+    private final double SERVO_ADJUSTMENT_VAL_CAP=0.02;
     double leftServoPos = 0;
     double rightServoPos = 1.0;
+    double capServoPos = 0.38;
 
 
     private DcMotor leftMotor;
@@ -44,6 +51,7 @@ public class twoControllerTeleopv6 extends OpMode {
     private DcMotor sweeper;
     private Servo leftArm;
     private Servo rightArm;
+    private Servo capArm;
     private PowerManager leftShooterPowerMgr;
     private PowerManager rightShooterPowerMgr;
 
@@ -71,6 +79,7 @@ public class twoControllerTeleopv6 extends OpMode {
         sweeper = this.hardwareMap.dcMotor.get("sweeper");
         leftArm=this.hardwareMap.servo.get("leftservo");
         rightArm=this.hardwareMap.servo.get("rightservo");
+        capArm=this.hardwareMap.servo.get("capArm");
         sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
 
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -79,6 +88,11 @@ public class twoControllerTeleopv6 extends OpMode {
 
         wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
         correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
+
+        leftArm.setPosition(leftServoPos);
+        rightArm.setPosition(rightServoPos);
+        capArm.setPosition(capServoPos);
+
 
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -139,9 +153,14 @@ public class twoControllerTeleopv6 extends OpMode {
 
 
         if (gamepad2.left_trigger > 0) {
-            scooper.setPower(SWEEPER_IN_POWER);
-        } else if (gamepad2.left_bumper) {
             scooper.setPower(MAX_POWER);
+
+            leftServoPos=LEFT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+            rightServoPos=RIGHT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+            leftArm.setPosition(leftServoPos);
+            rightArm.setPosition(rightServoPos);
+        } else if (gamepad2.left_bumper) {
+            scooper.setPower(MIN_POWER);
         } else {
             scooper.setPower(ZERO_POWER);
 
@@ -150,10 +169,20 @@ public class twoControllerTeleopv6 extends OpMode {
         if (gamepad2.a) {
             leftShooterPowerMgr.regulatePower();
             rightShooterPowerMgr.regulatePower();
-        } else {
+        } else if(gamepad2.b){
+
+            shooter1.setPower(1.0);
+            shooter2.setPower(1.0);
+        }else {
             shooter1.setPower(0);
             shooter2.setPower(0);
         }
+
+        if (gamepad2.start) {
+            shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
 
 
         if (gamepad2.right_bumper) {
@@ -161,7 +190,7 @@ public class twoControllerTeleopv6 extends OpMode {
 
             setAllianceColor();
         } else if (gamepad2.right_trigger > 0) {
-            sweeper.setPower(SWEEPER_OUT_POWER);
+            sweeper.setPower(SWEEPER_IN_POWER);
         } else {
             sweeper.setPower(ZERO_POWER);
 
@@ -191,34 +220,57 @@ public class twoControllerTeleopv6 extends OpMode {
 
 
 
-        if (gamepad2.dpad_left) {
-            leftServoPos -= SERVO_ADJUSTMENT_VAL;
-            rightServoPos += SERVO_ADJUSTMENT_VAL;
-            leftServoPos=Range.clip(leftServoPos, 0, 1);//clip the range so it won't go over 1 or under 0
-            rightServoPos=Range.clip(rightServoPos, 0, 1);//clip the range so it won't go over 1 or under 0
+        if (gamepad2.dpad_down) {
+            leftServoPos -= SERVO_ADJUSTMENT_VAL_LEFT;
+            rightServoPos += SERVO_ADJUSTMENT_VAL_RIGHT;
+            leftServoPos=Range.clip(leftServoPos, LEFT_OUT_VAL, LEFT_IN_VAL);//clip the range so it won't go over 1 or under 0
+            rightServoPos=Range.clip(rightServoPos, RIGHT_IN_VAL, RIGHT_OUT_VAL);//clip the range so it won't go over 1 or under 0
             leftArm.setPosition(leftServoPos);
             rightArm.setPosition(rightServoPos);
 
-        } else if (gamepad2.dpad_right) {
-            leftServoPos += SERVO_ADJUSTMENT_VAL;
-            rightServoPos -= SERVO_ADJUSTMENT_VAL;
-            leftServoPos=Range.clip(leftServoPos, 0, 1);//clip the range so it won't go over 1 or under 0
-            rightServoPos=Range.clip(rightServoPos, 0, 1);//clip the range so it won't go over 1 or under 0
+        } else if (gamepad2.dpad_up) {
+            leftServoPos += SERVO_ADJUSTMENT_VAL_LEFT;
+            rightServoPos -= SERVO_ADJUSTMENT_VAL_RIGHT;
+            leftServoPos=Range.clip(leftServoPos, LEFT_OUT_VAL, LEFT_IN_VAL);//clip the range so it won't go over 1 or under 0
+            rightServoPos=Range.clip(rightServoPos, RIGHT_IN_VAL, RIGHT_OUT_VAL);//clip the range so it won't go over 1 or under 0
             leftArm.setPosition(leftServoPos);
             rightArm.setPosition(rightServoPos);
+        }else if(gamepad2.dpad_left)
+        {
+            leftServoPos=LEFT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+            rightServoPos=RIGHT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+            leftArm.setPosition(leftServoPos);
+            rightArm.setPosition(rightServoPos);
+        }else if(gamepad2.dpad_right)
+        {
+            leftServoPos=LEFT_IN_VAL;
+            rightServoPos=RIGHT_IN_VAL;
+            leftArm.setPosition(leftServoPos);
+            rightArm.setPosition(rightServoPos);
+        }
+
+        if (gamepad1.a) {
+            capServoPos+=SERVO_ADJUSTMENT_VAL_CAP;
+            capServoPos=Range.clip(capServoPos, 0.04, 0.96);//clip the range so it won't go over 1 or under 0
+            capArm.setPosition(capServoPos);
+
+        } else if (gamepad1.y) {
+            capServoPos-=SERVO_ADJUSTMENT_VAL_CAP;
+            capServoPos=Range.clip(capServoPos, 0.04, 0.96);//clip the range so it won't go over 1 or under 0
+            capArm.setPosition(capServoPos);
         }
 
 
 
 
         printTelemetry();
+        telemetry.addData("cap",capServoPos);
         telemetry.addData("", "");//need to output something or else the telemetry won't update
         telemetry.update();
     }
 
     private void printTelemetry() {
         if (Constants.USE_TELEMETRY) {
-            telemetry.addData("Hello", "Here");
             telemetry.addData("", leftShooterPowerMgr.getMotorTelemetry().toString());
             telemetry.addData("", rightShooterPowerMgr.getMotorTelemetry().toString());
         }
