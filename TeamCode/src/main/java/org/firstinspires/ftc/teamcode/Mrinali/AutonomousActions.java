@@ -222,10 +222,12 @@ public class AutonomousActions extends LinearOpMode {
 
     public void toWhiteLine(boolean wall) throws InterruptedException {
         // Start the robot moving forward, and then begin looking for a white line.
+        /*
         if (!wall) {
             leftMotor.setPower(APPROACH_SPEED * .4);
             rightMotor.setPower(APPROACH_SPEED * .4);
         }
+        */
 
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
 
