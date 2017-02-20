@@ -115,7 +115,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         auto.encoderDrive(FASTER_SPEED, 8, 8, 1);
         coastTime.reset();
         while (opModeIsActive() && coastTime.seconds() < .4); //waits 1 second before powering motors again
-        //auto.turn(0);
+        auto.turn(0);
         auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
