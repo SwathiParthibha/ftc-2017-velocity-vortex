@@ -12,7 +12,7 @@ public final class Constants {
     public static final int REQUESTED_ETPS = 1450;//1750
     public static final int DELTA_TIME = 50;
 
-    public static final double DEFAULT_POWER = 0.40;//0.42
+    public static final double DEFAULT_POWER = 0.42;//0.42
     public static final double ALLOWED_POWER_DIFF = 0.03;
 
     public static final boolean USE_TELEMETRY=true;
