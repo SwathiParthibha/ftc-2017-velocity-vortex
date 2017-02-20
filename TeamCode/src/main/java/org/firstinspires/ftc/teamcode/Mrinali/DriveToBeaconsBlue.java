@@ -64,7 +64,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
 
     /* Declare OpMode members. */
     AutonomousActions auto = new AutonomousActions(this);
-    double FASTER_SPEED = .8;
+    double FASTER_SPEED = .7;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -101,7 +101,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         auto.turn(-45); //The robot uses the IMU to turn to 40 degrees
         auto.encoderDrive(FASTER_SPEED, 12, 12, 7);
         ElapsedTime coastTime = new ElapsedTime();
-        while (opModeIsActive() && coastTime.seconds() < .35); //waits .5 seconds before powering motors again
+        while (opModeIsActive() && coastTime.seconds() < .4); //waits .5 seconds before powering motors again
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
 
         sleep(100);
@@ -114,7 +114,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         // auto.encoderDrive(FASTER_SPEED, 4, 4, 1);
         auto.encoderDrive(FASTER_SPEED, 8, 8, 1);
         coastTime.reset();
-        while (opModeIsActive() && coastTime.seconds() < .35); //waits 1 second before powering motors again
+        while (opModeIsActive() && coastTime.seconds() < .4); //waits 1 second before powering motors again
         //auto.turn(0);
         auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);

@@ -255,10 +255,9 @@ public class AutonomousActions extends LinearOpMode {
         double startAngle = IMUheading();
         angleZ = IMUheading();
 
-        double angDiff = turnAngle-angleZ; //positive: turn left
-        angDiff = angDiff % 180; //changes to number between -180 and 180
-        if (Math.abs(angDiff) - 180 < Math.abs(angDiff))
-            angDiff = angDiff - Math.signum(angDiff) * 180;
+        double angDiff = (turnAngle-angleZ) % 360;
+        if (360 - Math.abs(angDiff) < Math.abs(angDiff))
+            angDiff = -(360 * Math.signum(angDiff) - angDiff);
 
         telemetry.log().add("Angle Difference: " + angDiff);
         telemetry.update();
@@ -270,10 +269,9 @@ public class AutonomousActions extends LinearOpMode {
             while (opMode.opModeIsActive() && angDiff < 0) {
 
                 angleZ = IMUheading();
-                angDiff = turnAngle-angleZ;
-                angDiff = angDiff % 180; //changes to number between -180 and 180
-                if (Math.abs(angDiff) - 180 < Math.abs(angDiff))
-                    angDiff = angDiff - Math.signum(angDiff) * 180;
+                angDiff = (turnAngle-angleZ) % 360;
+                if (360 - Math.abs(angDiff) < Math.abs(angDiff))
+                    angDiff = -(360 * Math.signum(angDiff) - angDiff);
 
                 telemetry.addData("Angle", angleZ);
                 telemetry.addData("Difference", angDiff);
@@ -301,10 +299,9 @@ public class AutonomousActions extends LinearOpMode {
             while (opMode.opModeIsActive() && angDiff > 0) {
 
                 angleZ = IMUheading();
-                angDiff = turnAngle-angleZ;
-                angDiff = angDiff % 180; //changes to number between -180 and 180
-                if (Math.abs(angDiff) - 180 < Math.abs(angDiff))
-                    angDiff = angDiff - Math.signum(angDiff) * 180;
+                angDiff = (turnAngle-angleZ) % 360;
+                if (360 - Math.abs(angDiff) < Math.abs(angDiff))
+                    angDiff = -(360 * Math.signum(angDiff) - angDiff);
 
                 telemetry.addData("Angle", angleZ);
                 telemetry.addData("Difference", angDiff);
@@ -331,11 +328,11 @@ public class AutonomousActions extends LinearOpMode {
 
     double turnPower(double difference) {
         if (Math.abs(difference) < 20) {
-            return 0.05;
-        } else if (Math.abs(difference) < 45) {
             return 0.1;
-        } else if (Math.abs(difference) < 90) {
+        } else if (Math.abs(difference) < 45) {
             return 0.2;
+        } else if (Math.abs(difference) < 90) {
+            return 0.3;
         } else return 0.5;
     }
 
