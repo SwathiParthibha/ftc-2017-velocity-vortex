@@ -132,7 +132,7 @@ public class TurnState extends BasicAbstractState {
     @Override
     public boolean isDone() {
         if (direction == LEFT)
-            return angDiff < 0;
+            return angDiff > 0;
         else if (direction == RIGHT)
             return angDiff < 0;
         else return true;

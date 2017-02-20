@@ -9,7 +9,7 @@ public final class Constants {
         LEFT_SHOOTER, RIGHT_SHOOTER
     }
 
-    public static final int REQUESTED_ETPS = 1750;//1750
+    public static final int REQUESTED_ETPS = 1450;//1750
     public static final int DELTA_TIME = 50;
 
     public static final double DEFAULT_POWER = 0.42;//0.42
