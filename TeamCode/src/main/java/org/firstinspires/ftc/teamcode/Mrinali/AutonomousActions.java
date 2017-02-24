@@ -239,7 +239,7 @@ public class AutonomousActions extends LinearOpMode {
             telemetry.update();
             idle();
 
-            if (imu.getLinearAcceleration().zAccel < 0.5) {
+            if (imu.getLinearAcceleration().zAccel < 0.2) {
                 leftMotor.setPower(APPROACH_SPEED * .4);
                 rightMotor.setPower(APPROACH_SPEED * .4);
             }
