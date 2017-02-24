@@ -46,6 +46,7 @@ public class StateMachineOp extends OpMode {
 
     enum S implements StateName {
         GO_FORWARD,
+        WAIT_BEFORE_TURN,
         FIRST_TURN,
         TO_WHITE_LINE,
         DRIVE,
@@ -134,7 +135,7 @@ public class StateMachineOp extends OpMode {
 
         DbgLog.msg("SYSTEM STATUS OF IMU BEFORE INIT " + imu.getSystemStatus().toString());
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        final BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
@@ -142,7 +143,12 @@ public class StateMachineOp extends OpMode {
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-        imu.initialize(parameters);
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                imu.initialize(parameters);
+            }
+        });
 
         DbgLog.msg("SYSTEM STATUS OF IMU after INIT " + imu.getSystemStatus().toString());
 
@@ -167,12 +173,12 @@ public class StateMachineOp extends OpMode {
         telemetry.log().add("Starting start method");
         telemetry.update();
 
-        while (beaconColor  == null){
+        while (beaconColor  == null || imu.getSystemStatus().toString().equals("UNKNOWN")){
             Util.waitUntil(50);
         }
 
-        int firstTurnAngle = 37;
-        int thirdTurnAngle = 127;
+        int firstTurnAngle = 34;
+        int thirdTurnAngle = 121;
 
         if(beaconColor == AllianceColor.RED){
             firstTurnAngle = 360 - firstTurnAngle;
@@ -182,7 +188,7 @@ public class StateMachineOp extends OpMode {
         AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.GO_FORWARD);
 
         //go forward a little
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_FORWARD, S.FIRST_TURN, 3);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_FORWARD, S.WAIT_BEFORE_TURN, 3);
 
         //turn to designated degree
         autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.FIRST_TURN, S.TO_WHITE_LINE, imu, firstTurnAngle);

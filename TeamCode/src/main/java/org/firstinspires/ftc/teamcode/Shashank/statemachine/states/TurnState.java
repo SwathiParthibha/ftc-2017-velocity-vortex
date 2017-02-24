@@ -58,8 +58,8 @@ public class TurnState extends BasicAbstractState {
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         angleZ = getIMUheading();
-
         angDiff = turnAngle-angleZ; //negative: turn left
+
         //angDiff = (angDiff + 180) % 360 - 180; //changes to number between -180 and 180
 
         log("angDiff in init is " + angDiff);
@@ -88,13 +88,11 @@ public class TurnState extends BasicAbstractState {
                 public void run() {
                     while (!isDone()){
                         angleZ = getIMUheading();
+                        angDiff = turnAngle-angleZ;
                     }
                 }
             });
         }
-
-        //angleZ = getIMUheading();
-        angDiff = turnAngle-angleZ;
 
         log("angDiff in is " + angDiff);
         log("turnAngle in is " + turnAngle);
@@ -146,7 +144,7 @@ public class TurnState extends BasicAbstractState {
 
     @Override
     public boolean isDone() {
-        if(Math.abs(angDiff) < 3)
+        if(Math.abs(angDiff) < 1.7)
             return true;
         else return false;
     }
