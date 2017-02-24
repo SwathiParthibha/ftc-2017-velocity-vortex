@@ -111,8 +111,8 @@ public class AutonomousActions extends LinearOpMode {
     double DIST = 18;
     double SIDE_DIST = 30;
     public double backup = -2;
-    double overBeacon1 = 2;
-    double overBeacon2 = 2;
+    double overLine1 = 2;
+    double overLine2 = 2;
     byte[] rangeSensorCache;
     byte[] sideRangeSensorCache;
     I2cDevice rangeA;
@@ -141,6 +141,9 @@ public class AutonomousActions extends LinearOpMode {
         // Define and Initialize Motors
         leftMotor   = hardwareMap.dcMotor.get("l");
         rightMotor  = hardwareMap.dcMotor.get("r");
+
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
@@ -235,16 +238,21 @@ public class AutonomousActions extends LinearOpMode {
             telemetry.addData("Light Level", lightSensor.getLightDetected());
             telemetry.update();
             idle();
+
+            if (imu.getLinearAcceleration().zAccel < 0.5) {
+                leftMotor.setPower(APPROACH_SPEED * .4);
+                rightMotor.setPower(APPROACH_SPEED * .4);
+            }
         }
 
         // Stop all motors
         stopRobot();
 
         if (!wall) {
-            encoderDrive(APPROACH_SPEED * .4, 1.25, 1.25, 1);
+            encoderDrive(APPROACH_SPEED * .4, .75, .75, 1);
         }
         else
-            encoderDrive(APPROACH_SPEED * .4, 2.25, 2.25, 2);
+            encoderDrive(APPROACH_SPEED * .4, 1, 1, 2);
     }
 
     public void turn(int turnAngle) throws InterruptedException{
@@ -758,6 +766,9 @@ public class AutonomousActions extends LinearOpMode {
         ElapsedTime runtime = new ElapsedTime();
         int newLeftTarget;
         int newRightTarget;
+
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Ensure that the opmode is still active
 
