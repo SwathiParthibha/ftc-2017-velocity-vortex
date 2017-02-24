@@ -34,7 +34,6 @@ package org.firstinspires.ftc.teamcode.Mrinali;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -56,9 +55,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Blue", group="Pushbot")
+@Autonomous(name="Beacons Blue Shoot", group="Pushbot")
 //@Disabled
-public class DriveToBeaconsBlue extends LinearOpMode {
+public class DriveToBeaconsBlueShoot extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
@@ -97,7 +96,9 @@ public class DriveToBeaconsBlue extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDrive(auto.APPROACH_SPEED, 3, 3, 3);
+        auto.encoderDriveSpinup(auto.APPROACH_SPEED, 6, 6, 3);
+        auto.shoot();
+        auto.encoderDrive(auto.APPROACH_SPEED, -4, -4, 3);
         auto.turn(-45); //The robot uses the IMU to turn to 40 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         //ElapsedTime coastTime = new ElapsedTime();

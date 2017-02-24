@@ -23,8 +23,9 @@ public class PowerManager {
         this.dcMotor = dcMotor;
 
         this.dcMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        this.dcMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.dcMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.dcMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //this.dcMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //this.dcMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorTelemetry.setMotorName(motorName);
     }
 
