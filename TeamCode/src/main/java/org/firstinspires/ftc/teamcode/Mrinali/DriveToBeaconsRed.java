@@ -56,7 +56,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Faster Red", group="Pushbot")
+@Autonomous(name="Beacons Red", group="Pushbot")
 //@Disabled
 public class DriveToBeaconsRed extends LinearOpMode {
 
@@ -102,7 +102,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         //ElapsedTime coastTime = new ElapsedTime();
         //while (opModeIsActive() && coastTime.seconds() < .5); //waits .5 seconds before powering motors again
-        auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
+        auto.toWhiteLine(false, "red"); //and then proceeds to the white line using encoders and a NXT light sensor
 
         sleep(100);
         auto.followLineRedSide();
@@ -110,12 +110,12 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         auto.turn(0); //and turns parallel to the beacon using the IMU
         auto.turn(0);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
+        auto.encoderDriveCheckTilt(FASTER_SPEED, 10, 10, 4, "red");
         //coastTime.reset();
         //while (opModeIsActive() && coastTime.seconds() < .5); //waits 1 second before powering motors again
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
-        auto.toWhiteLine(true); //It advances to the next white line
+        auto.toWhiteLine(true, "red"); //It advances to the next white line
         sleep(100);
         auto.followLineRedSide();
         auto.pushRedButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
