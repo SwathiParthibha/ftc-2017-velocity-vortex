@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Shashank.statemachine;
 
+import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
@@ -11,6 +12,8 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.LineFollowSta
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PivotToWhiteLineState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PressBeaconState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.ToWhiteLineState;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnState;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnStateEncoderDrive;
 import org.firstinspires.ftc.teamcode.Shashank.testcode.TestMoveState;
 import org.firstinspires.ftc.teamcode.Shashank.testcode.TestState;
 
@@ -52,8 +55,16 @@ public class AutoStates extends States {
         return new PivotToWhiteLineState(leftMotor, rightMotor, lightSensor, stateName, nextStateName, beaconColor);
     }
 
-    public static State encoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, int distance){
+    public static State encoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, double distance){
         return new EncoderDriveState(distance, leftMotor, rightMotor, stateName, nextStateName);
+    }
+
+    public static State turn(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, BNO055IMU imu, int turnAngle){
+        return new TurnState(stateName, nextStateName, leftMotor, rightMotor, imu, turnAngle);
+    }
+
+    public static State turnEncoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, int turnAngle, TurnStateEncoderDrive.TurnDirection turnDirection){
+        return new TurnStateEncoderDrive(stateName, nextStateName, leftMotor, rightMotor, turnAngle, turnDirection);
     }
 
 }

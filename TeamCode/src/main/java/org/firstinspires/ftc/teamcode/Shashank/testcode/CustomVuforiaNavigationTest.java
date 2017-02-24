@@ -86,7 +86,7 @@ import java.util.List;
  * is explained below.
  */
 
-//@Autonomous(name="CustomVuforiaNavigationTest", group ="Tests")
+@Autonomous(name="CustomVuforiaNavigationTest", group ="Tests")
 //@Disabled
 public class CustomVuforiaNavigationTest extends LinearOpMode {
 
@@ -370,6 +370,6 @@ public class CustomVuforiaNavigationTest extends LinearOpMode {
      * and formats it in a form palatable to a human being.
      */
     String format(OpenGLMatrix transformationMatrix) {
-        return transformationMatrix.formatAsTransform(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES);
+        return transformationMatrix.formatAsTransform(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
     }
 }

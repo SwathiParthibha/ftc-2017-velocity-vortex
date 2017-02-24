@@ -12,7 +12,7 @@ import ftc.electronvolts.statemachine.StateName;
 public class EncoderDriveState extends BasicAbstractState {
 
     private boolean hasInitialized = false;
-    private int distanceInch = 0;
+    private double distanceInch = 0;
 
     private DcMotor leftMotor, rightMotor;
 
@@ -22,10 +22,10 @@ public class EncoderDriveState extends BasicAbstractState {
     static final double     DRIVE_GEAR_REDUCTION    = 1.5 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 5.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.6;
+            (WHEEL_DIAMETER_INCHES * Math.PI);
+    static final double     DRIVE_SPEED             = 0.3;
 
-    public EncoderDriveState(int distanceInch, DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName) {
+    public EncoderDriveState(double distanceInch, DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName) {
         this.distanceInch = distanceInch;
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
@@ -57,7 +57,7 @@ public class EncoderDriveState extends BasicAbstractState {
             hasInitialized = true;
         }
 
-        if(leftMotor.getCurrentPosition() < leftMotor.getTargetPosition() && rightMotor.getCurrentPosition() < rightMotor.getTargetPosition()){
+        if(!isDone()){
             return stateName;
         } else {
             leftMotor.setPower(0);
@@ -71,7 +71,9 @@ public class EncoderDriveState extends BasicAbstractState {
 
     @Override
     public boolean isDone() {
-        return false;
+        int leftDiff = Math.abs(leftMotor.getTargetPosition() - leftMotor.getCurrentPosition());
+        int rightDiff = Math.abs(rightMotor.getTargetPosition() - rightMotor.getCurrentPosition());
+        return leftDiff < 3 && rightDiff < 3;
     }
 
     @Override
