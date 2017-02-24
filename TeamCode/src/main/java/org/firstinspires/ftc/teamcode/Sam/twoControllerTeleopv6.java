@@ -172,19 +172,16 @@ public class twoControllerTeleopv6 extends OpMode {
             leftShooterPowerMgr.regulatePower();
             rightShooterPowerMgr.regulatePower();
         } else if (gamepad2.b) {
-            
 
-            shooter1.setPower(0.5);
-            shooter2.setPower(0.5);
+
+            shooter1.setPower(1.0);
+            shooter2.setPower(1.0);
         } else {
             shooter1.setPower(0);
             shooter2.setPower(0);
         }
 
-        if (gamepad2.start) {
-            shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
+
 
 
         if (gamepad2.right_bumper) {
