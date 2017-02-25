@@ -68,6 +68,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
 
     private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(2);
+    private ShooterMotor leftShooter, rightShooter;
 
     @Override
     public void init() {
@@ -94,21 +95,21 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
         leftArm.setPosition(leftServoPos);
         rightArm.setPosition(rightServoPos);
-        capArm.setPosition(capServoPos);
 
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         MotorFactory motorFactory = MotorFactory.getInstance();
-        ShooterMotor leftShooter = new ShooterMotor();
+        leftShooter = new ShooterMotor();
         leftShooter.setName(Constants.MOTORNAME.LEFT_SHOOTER);
         motorFactory.addMotor(leftShooter);
 
-        ShooterMotor rightShooter = new ShooterMotor();
+        rightShooter = new ShooterMotor();
         rightShooter.setName(Constants.MOTORNAME.RIGHT_SHOOTER);
         motorFactory.addMotor(rightShooter);
 
+        capArm.setPosition(1);
 
         leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
         rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
@@ -126,7 +127,6 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
     @Override
     public void loop() {
-
 
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
@@ -152,6 +152,10 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
             swap = true;
+        }
+
+        if(gamepad1.x){
+            capArm.setPosition(0.70);
         }
 
 
@@ -254,21 +258,15 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             rightArm.setPosition(rightServoPos);
         }
 
-        if (gamepad1.a) {
-            capServoPos += SERVO_ADJUSTMENT_VAL_CAP;
-            capServoPos = Range.clip(capServoPos, 0.04, 0.96);//clip the range so it won't go over 1 or under 0
-            capArm.setPosition(capServoPos);
-
-        } else if (gamepad1.y) {
-            capServoPos -= SERVO_ADJUSTMENT_VAL_CAP;
-            capServoPos = Range.clip(capServoPos, 0.04, 0.96);//clip the range so it won't go over 1 or under 0
-            capArm.setPosition(capServoPos);
-        }
-
 
         printTelemetry();
         telemetry.addData("cap", capServoPos);
         telemetry.addData("", "");//need to output something or else the telemetry won't update
+        telemetry.addData("Current Power left", leftMotor.getPower());
+        telemetry.addData("Current Power right", rightMotor.getPower());
+        telemetry.addData("Current left RPM", leftShooter.getRpm());
+        telemetry.addData("Current right RPM", rightShooter.getRpm());
+        telemetry.addData("gamepad1.x", gamepad1.x);
         telemetry.update();
     }
 
@@ -276,8 +274,6 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         if (Constants.USE_TELEMETRY) {
             telemetry.addData("", leftShooterPowerMgr.getMotorTelemetry().toString());
             telemetry.addData("", rightShooterPowerMgr.getMotorTelemetry().toString());
-            telemetry.addData("Current Power left", leftMotor.getPower());
-            telemetry.addData("Current Power right", rightMotor.getPower());
         }
     }
 
