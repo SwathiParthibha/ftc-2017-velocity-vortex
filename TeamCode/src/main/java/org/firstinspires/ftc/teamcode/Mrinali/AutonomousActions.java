@@ -94,6 +94,7 @@ public class AutonomousActions extends LinearOpMode {
     private PowerManager rightShooterPowerMgr;
     private Servo leftArm;
     private Servo rightArm;
+    private Servo capArm;
     private boolean state;
     public DcMotor scooper;
     public LightSensor lightSensor;      // Primary LEGO Light sensor,
@@ -130,8 +131,11 @@ public class AutonomousActions extends LinearOpMode {
     private final double RIGHT_OUT_VAL = 0.76;
     private final double SERVO_ADJUSTMENT_VAL_LEFT = (Math.abs(LEFT_IN_VAL - LEFT_OUT_VAL) / 14);
     private final double SERVO_ADJUSTMENT_VAL_RIGHT = (Math.abs(RIGHT_IN_VAL - RIGHT_OUT_VAL) / 14);
+    private final double LEFT_START_VAL = (LEFT_IN_VAL + 2*LEFT_OUT_VAL) /3;
+    private final double RIGHT_START_VAL = (RIGHT_IN_VAL + 2*RIGHT_OUT_VAL) /3;
     double leftServoPos = 0;
     double rightServoPos = 1.0;
+    double capServoPos = 1.0;
     byte[] rangeSensorCache;
     byte[] sideRangeSensorCache;
     I2cDevice rangeA;
@@ -193,11 +197,13 @@ public class AutonomousActions extends LinearOpMode {
 
         leftArm = hardwareMap.servo.get("leftservo");
         rightArm = hardwareMap.servo.get("rightservo");
-        leftServoPos = LEFT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
-        rightServoPos = RIGHT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+        leftServoPos = LEFT_START_VAL;
+        rightServoPos = RIGHT_START_VAL;
         leftArm.setPosition(leftServoPos);
         rightArm.setPosition(rightServoPos);
 
+        capArm = this.hardwareMap.servo.get("capArm");
+        capArm.setPosition(capServoPos);
 
         state = false;
 
@@ -990,6 +996,9 @@ public class AutonomousActions extends LinearOpMode {
                              double leftInches, double rightInches,
                              double timeoutS) throws InterruptedException {
 
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         ElapsedTime runtime = new ElapsedTime();
         int newLeftTarget;
         int newRightTarget;
@@ -1041,6 +1050,8 @@ public class AutonomousActions extends LinearOpMode {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         //  sleep(250);   // optional pause after each move
     }
 
