@@ -102,7 +102,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         //ElapsedTime coastTime = new ElapsedTime();
         //while (opModeIsActive() && coastTime.seconds() < .4); //waits .5 seconds before powering motors again
-        auto.toWhiteLine(false, "blue"); //and then proceeds to the white line using encoders and a NXT light sensor
+        auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
 
         sleep(100);
         auto.followLineBlueSide();
@@ -112,18 +112,18 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         // auto.encoderDrive(.5, 3, 3, 5);
         auto.turn(0);
         // auto.encoderDrive(FASTER_SPEED, 4, 4, 1);
-        auto.encoderDriveCheckTilt(FASTER_SPEED, 10, 10, 4, "blue");
+        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
         //coastTime.reset();
         //while (opModeIsActive() && coastTime.seconds() < .4); //waits 1 second before powering motors again
         //auto.turn(0);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
-        auto.toWhiteLine(true, "blue"); //It advances to the next white line
+        auto.toWhiteLine(true); //It advances to the next white line
         sleep(100);
         auto.followLineBlueSide();
         auto.pushBlueButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 2, auto.backup - 2, 3); //Then it will back up
-        auto.turn(140);
+        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
+        auto.turn(145);
         auto.encoderDrive(FASTER_SPEED, 20, 20, 5);
     }
 }
