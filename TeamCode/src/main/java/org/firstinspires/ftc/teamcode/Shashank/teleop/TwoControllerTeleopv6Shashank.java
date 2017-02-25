@@ -38,8 +38,8 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private final double SERVO_ADJUSTMENT_VAL_LEFT = (Math.abs(LEFT_IN_VAL - LEFT_OUT_VAL) / 14);
     private final double SERVO_ADJUSTMENT_VAL_RIGHT = (Math.abs(RIGHT_IN_VAL - RIGHT_OUT_VAL) / 14);
     private final double SERVO_ADJUSTMENT_VAL_CAP = 0.02;
-    double leftServoPos = 0;
-    double rightServoPos = 1.0;
+    double leftServoPos = 0.12;
+    double rightServoPos = 0.76;
     double capServoPos = 0.38;
     private static double SHOOTER_POWER = 0.5;
 
@@ -179,10 +179,19 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         } else if (gamepad2.b) {
             shooter1.setPower(SHOOTER_POWER);
             shooter2.setPower(SHOOTER_POWER);
-        } else {
-            shooter1.setPower(0);
-            shooter2.setPower(0);
+        } else if(gamepad2.y) {
+            Constants.REQUESTED_ETPS=1900;
+            Constants.DEFAULT_POWER=0.52;
+        } else if(gamepad2.x){
+            Constants.REQUESTED_ETPS = 1800;//1590;//1750 good for close shots
+            Constants.DEFAULT_POWER = 0.49;//0.455;//0.42
+        }else{
+                shooter1.setPower(0);
+                shooter2.setPower(0);
+                leftShooterPowerMgr.reset();
+            rightShooterPowerMgr.reset();
         }
+
 
         if(gamepad2.left_stick_y > 0.3) {
             SHOOTER_POWER = SHOOTER_POWER + 0.03;
