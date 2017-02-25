@@ -38,6 +38,8 @@ public class LineFollowState extends BasicAbstractState {
 
     private AllianceColor color = null;
 
+    private static final int DISTANCE_FROM_BEACON = 11;
+
     public LineFollowState(Telemetry telemetry, StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, I2cDeviceSynchImpl rangeSensor, AllianceColor color) {
         this.stateName = stateName;
         this.nextStateName = nextStateName;
@@ -107,7 +109,7 @@ public class LineFollowState extends BasicAbstractState {
 
     @Override
     public boolean isDone() {
-        return threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) < 13 && threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) > 0;
+        return threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) < DISTANCE_FROM_BEACON && threadSharedObject.getInteger(rangeSensorRunnable.getULTRASONIC_KEY()) > 0;
     }
 
     @Override

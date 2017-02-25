@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Sahil;
+package org.firstinspires.ftc.teamcode.Shashank.autonomous;
 
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -9,11 +9,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous.HardwarePushbot;
 
@@ -21,7 +19,7 @@ import org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous.HardwarePushbot;
  * Created by SahilDoshi on 1/20/17.
  */
 
-@Autonomous(name="GoStraightShootToCenter", group="Pushbot")
+@Autonomous(name="GoStraightShootToCenterShashankv2", group="Pushbot")
 public class GoStraightShootToCenter extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
@@ -397,6 +395,14 @@ public class GoStraightShootToCenter extends LinearOpMode {
 
     }
 
+    private Servo leftArm;
+    private Servo rightArm;
+
+    private final double LEFT_IN_VAL = 0.56;
+    private final double RIGHT_IN_VAL = 0.34;
+    private final double LEFT_OUT_VAL = 0.12;
+    private final double RIGHT_OUT_VAL = 0.76;
+
     public void runOpMode() throws InterruptedException {
 
         /* Initialize the drive system variables.
@@ -417,6 +423,14 @@ public class GoStraightShootToCenter extends LinearOpMode {
         shooter2 = this.hardwareMap.dcMotor.get("shooter2");
         scooper = this.hardwareMap.dcMotor.get("scooper");
 
+        scooper.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftArm = this.hardwareMap.servo.get("leftservo");
+        rightArm = this.hardwareMap.servo.get("rightservo");
+
+        leftArm.setPosition(LEFT_OUT_VAL);
+        rightArm.setPosition(RIGHT_OUT_VAL);
+
         state = false;
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -435,7 +449,7 @@ public class GoStraightShootToCenter extends LinearOpMode {
         }
 
         // sleep(10000);
-        encoderDrive(APPROACH_SPEED, 20 / 2, 20 / 2, 3);
+        encoderDrive(APPROACH_SPEED, 24 / 2, 24 / 2, 3);
         shoot();
         encoderDrive(APPROACH_SPEED, 40 / 2, 40 / 2, 10);
     }
@@ -579,7 +593,16 @@ public class GoStraightShootToCenter extends LinearOpMode {
             EncoderShooter(RPM955);
             if(checkIfReadyToShoot(RPM955)){
                 scooper.setPower(1);
-                sleep(3000);
+                sleep(1500);
+                leftArm.setPosition(LEFT_IN_VAL);
+                rightArm.setPosition(RIGHT_IN_VAL);
+                sleep(500);
+                leftArm.setPosition(LEFT_OUT_VAL);
+                rightArm.setPosition(RIGHT_OUT_VAL);
+                sleep(1500);
+                leftArm.setPosition(LEFT_IN_VAL);
+                rightArm.setPosition(RIGHT_IN_VAL);
+                sleep(500);
                 break;
             }
         }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Sam;
+package org.firstinspires.ftc.teamcode.Shashank.teleop;
 
 import android.media.MediaPlayer;
 
@@ -24,8 +24,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
-@TeleOp(name = "Two Controller Teleopv6", group = "Teleop")
-public class twoControllerTeleopv6 extends OpMode {
+@TeleOp(name = "Two Controller Teleopv6 Shashank", group = "Teleop")
+public class TwoControllerTeleopv6Shashank extends OpMode {
     private final double SWEEPER_IN_POWER = -0.7;
     private final double SWEEPER_OUT_POWER = 0.7;
     private final double MAX_POWER = 1.0;
@@ -41,6 +41,7 @@ public class twoControllerTeleopv6 extends OpMode {
     double leftServoPos = 0;
     double rightServoPos = 1.0;
     double capServoPos = 0.38;
+    private static double SHOOTER_POWER = 0.5;
 
 
     private DcMotor leftMotor;
@@ -172,16 +173,25 @@ public class twoControllerTeleopv6 extends OpMode {
             leftShooterPowerMgr.regulatePower();
             rightShooterPowerMgr.regulatePower();
         } else if (gamepad2.b) {
-
-
-            shooter1.setPower(1.0);
-            shooter2.setPower(1.0);
+            shooter1.setPower(SHOOTER_POWER);
+            shooter2.setPower(SHOOTER_POWER);
         } else {
             shooter1.setPower(0);
             shooter2.setPower(0);
         }
 
+        if(gamepad2.left_stick_y > 0.3) {
+            SHOOTER_POWER = SHOOTER_POWER + 0.03;
+            SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
+        } else if (gamepad2.left_stick_y < -0.3){
+            SHOOTER_POWER = SHOOTER_POWER - 0.03;
+            SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
+        }
 
+        if (gamepad2.start) {
+            shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
 
 
         if (gamepad2.right_bumper) {
@@ -266,6 +276,8 @@ public class twoControllerTeleopv6 extends OpMode {
         if (Constants.USE_TELEMETRY) {
             telemetry.addData("", leftShooterPowerMgr.getMotorTelemetry().toString());
             telemetry.addData("", rightShooterPowerMgr.getMotorTelemetry().toString());
+            telemetry.addData("Current Power left", leftMotor.getPower());
+            telemetry.addData("Current Power right", rightMotor.getPower());
         }
     }
 
