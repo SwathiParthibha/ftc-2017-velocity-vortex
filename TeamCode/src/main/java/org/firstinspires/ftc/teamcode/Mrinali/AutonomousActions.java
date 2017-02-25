@@ -202,7 +202,7 @@ public class AutonomousActions extends LinearOpMode {
         leftArm.setPosition(leftServoPos);
         rightArm.setPosition(rightServoPos);
 
-        capArm = this.hardwareMap.servo.get("capArm");
+        capArm = hardwareMap.servo.get("capArm");
         capArm.setPosition(capServoPos);
 
         state = false;
