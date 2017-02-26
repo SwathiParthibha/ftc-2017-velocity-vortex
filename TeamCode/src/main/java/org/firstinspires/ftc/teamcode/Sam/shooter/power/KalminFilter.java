@@ -25,4 +25,11 @@ public class KalminFilter {
 
         return filteredData;
     }
+
+    public void reset()
+    {
+        prevValue=0D;
+        prevError = 1D;
+
+    }
 }

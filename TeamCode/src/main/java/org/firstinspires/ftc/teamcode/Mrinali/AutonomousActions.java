@@ -707,7 +707,7 @@ public class AutonomousActions extends LinearOpMode {
             //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         } while (opMode.opModeIsActive() && !verifyBlue()
-                && (time.seconds() < 8 || wrongColor));
+                && (time.seconds() < 4 || wrongColor));
 
         telemetry.log().add("end of the push button method");
 
@@ -798,7 +798,7 @@ public class AutonomousActions extends LinearOpMode {
 
             idle();
         } while (opMode.opModeIsActive() && !verifyRed()
-                && (time.seconds() < 8 || wrongColor));
+                && (time.seconds() < 4 || wrongColor));
 
         telemetry.log().add("end of the push button method");
 

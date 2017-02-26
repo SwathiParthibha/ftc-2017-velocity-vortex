@@ -106,7 +106,7 @@ public class SlowBeaconsBlue extends LinearOpMode {
         auto.encoderDrive(auto.APPROACH_SPEED, 3, 3, 3);
         auto.turn(-40); //The robot uses the IMU to turn to 40 degrees
         auto.encoderDrive(auto.APPROACH_SPEED, 17, 17, 7);
-        auto.toWhiteLine(false, null); //and then proceeds to the white line using encoders and a NXT light sensor
+        auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
         sleep(100);
         auto.followLineBlueSide();
         auto.pushBlueButton(); //The robot then uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
@@ -118,7 +118,7 @@ public class SlowBeaconsBlue extends LinearOpMode {
         auto.turn(0);
         auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
-        auto.toWhiteLine(true, null); //It advances to the next white line
+        auto.toWhiteLine(true); //It advances to the next white line
         sleep(100);
         auto.followLineBlueSide();
         auto.pushBlueButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again

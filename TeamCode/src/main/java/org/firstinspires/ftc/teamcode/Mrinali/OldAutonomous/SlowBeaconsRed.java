@@ -100,7 +100,7 @@ public class SlowBeaconsRed extends LinearOpMode {
         auto.encoderDrive(auto.APPROACH_SPEED, 3, 3, 3);
         auto.turn(40);
         auto.encoderDrive(auto.APPROACH_SPEED, 17, 17, 7);
-        auto.toWhiteLine(false, null);
+        auto.toWhiteLine(false);
         sleep(100);
         auto.followLineRedSide();
         auto.pushRedButton();
@@ -112,7 +112,7 @@ public class SlowBeaconsRed extends LinearOpMode {
         auto.turn(0);
         auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
-        auto.toWhiteLine(true, null);
+        auto.toWhiteLine(true);
         sleep(100);
         auto.followLineRedSide();
         auto.pushRedButton();
