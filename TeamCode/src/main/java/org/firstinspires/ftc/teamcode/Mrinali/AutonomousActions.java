@@ -623,6 +623,47 @@ public class AutonomousActions extends LinearOpMode {
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
+    public void followLineBlueSide1() throws InterruptedException {
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        telemetry.addLine("Following Line");
+        leftMotor.setPower(.2);
+        rightMotor.setPower(-.2);
+        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            idle();
+        }
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        ElapsedTime followTime = new ElapsedTime();
+        followTime.reset();
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
+            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            if (followTime.seconds() > 2
+                    && IMUheading() < -85 && IMUheading() > -95) {
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(0.2);
+            } else if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(0);
+            } else {
+                telemetry.addLine("Moving left");
+                leftMotor.setPower(0);
+                rightMotor.setPower(0.2);
+            }
+            telemetry.update();
+
+            idle();
+        }
+        stopRobot();
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
     public void pushBlueButton() throws InterruptedException {
 
         telemetry.log().add("in the push button method");
@@ -707,7 +748,7 @@ public class AutonomousActions extends LinearOpMode {
             //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         } while (opMode.opModeIsActive() && !verifyBlue()
-                && (time.seconds() < 8 || wrongColor));
+                && (time.seconds() < 4 || wrongColor));
 
         telemetry.log().add("end of the push button method");
 
@@ -798,7 +839,7 @@ public class AutonomousActions extends LinearOpMode {
 
             idle();
         } while (opMode.opModeIsActive() && !verifyRed()
-                && (time.seconds() < 8 || wrongColor));
+                && (time.seconds() < 4 || wrongColor));
 
         telemetry.log().add("end of the push button method");
 
@@ -1053,6 +1094,14 @@ public class AutonomousActions extends LinearOpMode {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         //  sleep(250);   // optional pause after each move
+    }
+
+    public void spinup(double seconds) {
+        ElapsedTime shootTime = new ElapsedTime();
+        while (opMode.opModeIsActive() && shootTime.seconds() < seconds) {
+            leftShooterPowerMgr.regulatePower();
+            rightShooterPowerMgr.regulatePower();
+        }
     }
 
     public void shoot() {

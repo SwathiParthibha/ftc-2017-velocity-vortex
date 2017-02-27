@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Sam;
 
 
 import com.qualcomm.ftccommon.DbgLog;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
+@Disabled
 @TeleOp(name = "Encoder Time Test", group = "Teleop")
 
 public class EncoderTimeTest extends OpMode {

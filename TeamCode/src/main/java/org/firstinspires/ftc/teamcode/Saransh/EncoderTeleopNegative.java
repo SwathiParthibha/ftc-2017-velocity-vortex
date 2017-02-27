@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Saransh;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -7,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import static java.lang.Thread.sleep;
 
-
+@Disabled
 @TeleOp(name = "Negative Teleop", group = "Teleop")
 public class EncoderTeleopNegative extends OpMode {
     private DcMotor leftMotor;
