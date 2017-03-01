@@ -97,8 +97,9 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
         }
 
         auto.encoderDriveSpinup(.3, 11, 11, 3);
+        auto.spinup(1);
         auto.shoot();
-        auto.encoderDrive(auto.APPROACH_SPEED, -5, -5, 3);
+        auto.encoderDrive(auto.APPROACH_SPEED, -4, -4, 3);
         auto.turn(-45); //The robot uses the IMU to turn to 40 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         //ElapsedTime coastTime = new ElapsedTime();
@@ -124,7 +125,7 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
         auto.followLineBlueSide();
         auto.pushBlueButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
-        auto.turn(145);
+        auto.turn(155);
         auto.encoderDrive(FASTER_SPEED, 20, 20, 5);
     }
 }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Mrinali;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -7,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
+@Disabled
 @TeleOp(name = "Two Controller Teleop V2 Blue", group = "Teleop")
 public class twoControllerTeleopv2Blue extends OpMode {
     private DcMotor leftMotor;

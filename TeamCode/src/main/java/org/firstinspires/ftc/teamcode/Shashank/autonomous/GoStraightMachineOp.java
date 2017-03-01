@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -39,6 +40,7 @@ public class GoStraightMachineOp extends OpMode {
     ElapsedTime runtime = new ElapsedTime();
 
     enum S implements StateName {
+        WAIT,
         GO_STRAIGHT,
         SHOOT,
         SECOND_GO_STRAIGHT,
@@ -47,10 +49,25 @@ public class GoStraightMachineOp extends OpMode {
 
     private StateMachine stateMachine;
 
+    private DcMotor scooper;
+    private DcMotor shooter1;
+    private DcMotor shooter2;
+    private DcMotor sweeper;
+    private Servo leftArm;
+    private Servo rightArm;
+    private Servo capArm;
+
     @Override
     public void init() {
         leftMotor = this.hardwareMap.dcMotor.get("l");
         rightMotor = this.hardwareMap.dcMotor.get("r");
+        scooper = this.hardwareMap.dcMotor.get("scooper");
+        shooter1 = this.hardwareMap.dcMotor.get("shooter1");
+        shooter2 = this.hardwareMap.dcMotor.get("shooter2");
+        sweeper = this.hardwareMap.dcMotor.get("sweeper");
+        leftArm = this.hardwareMap.servo.get("leftservo");
+        rightArm = this.hardwareMap.servo.get("rightservo");
+        capArm = this.hardwareMap.servo.get("capArm");
 
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
@@ -75,9 +92,10 @@ public class GoStraightMachineOp extends OpMode {
         AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.GO_STRAIGHT);
 
         //go forward a little
+        autoStateMachineBuilder.addWait(S.WAIT, S.GO_STRAIGHT, 20000);
         autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_STRAIGHT, S.SHOOT, 15);
-        autoStateMachineBuilder.addWait(S.SHOOT, S.SECOND_GO_STRAIGHT, 2000);
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.SECOND_GO_STRAIGHT, S.STOP, 15);
+        autoStateMachineBuilder.addShoot(S.SHOOT,  S.SECOND_GO_STRAIGHT, scooper, shooter1, shooter2, sweeper, leftArm, rightArm);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.SECOND_GO_STRAIGHT, S.STOP, 18);
         autoStateMachineBuilder.addStop(S.STOP);
 
         stateMachine = autoStateMachineBuilder.build();

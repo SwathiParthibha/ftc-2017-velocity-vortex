@@ -1055,6 +1055,14 @@ public class AutonomousActions extends LinearOpMode {
         //  sleep(250);   // optional pause after each move
     }
 
+    public void spinup(double seconds) {
+        ElapsedTime shootTime = new ElapsedTime();
+        while (opMode.opModeIsActive() && shootTime.seconds() < seconds) {
+            leftShooterPowerMgr.regulatePower();
+            rightShooterPowerMgr.regulatePower();
+        }
+    }
+
     public void shoot() {
         leftServoPos = LEFT_IN_VAL;
         rightServoPos = RIGHT_IN_VAL;

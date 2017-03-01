@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 import org.firstinspires.ftc.teamcode.Sam.util.Util;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,7 +61,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private boolean swap = false;
     private MediaPlayer wrongBallSound = null, correctBallSound = null;
     private ColorSensor sweeperColorSensor;
-    private org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor allianceColor = null;
+    private AllianceColor allianceColor = null;
 
     private boolean ballSensed = false;
 
@@ -183,8 +184,8 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             Constants.REQUESTED_ETPS=1900;
             Constants.DEFAULT_POWER=0.52;
         } else if(gamepad2.x){
-            Constants.REQUESTED_ETPS = 1800;//1590;//1750 good for close shots
-            Constants.DEFAULT_POWER = 0.49;//0.455;//0.42
+            Constants.REQUESTED_ETPS = 1650;//1590;//1750 good for close shots
+            Constants.DEFAULT_POWER = 0.45;//0.455;//0.42
         }else{
                 shooter1.setPower(0);
                 shooter2.setPower(0);
@@ -276,6 +277,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         telemetry.addData("Current left RPM", leftShooter.getRpm());
         telemetry.addData("Current right RPM", rightShooter.getRpm());
         telemetry.addData("gamepad1.x", gamepad1.x);
+        telemetry.addData("cap arm", capArm.getPosition());
         telemetry.update();
     }
 
