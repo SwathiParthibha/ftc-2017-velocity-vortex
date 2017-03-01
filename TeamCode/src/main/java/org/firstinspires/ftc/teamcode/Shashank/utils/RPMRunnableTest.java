@@ -21,7 +21,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Mrinali.Shoot;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Sam;
 
 import android.media.MediaPlayer;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -21,7 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
+@Disabled
 @TeleOp(name = "twoControllerTeleop5", group = "Teleop")
 public class twoControllerTeleopv5 extends OpMode {
     private final double SWEEPER_IN_POWER = -0.7;

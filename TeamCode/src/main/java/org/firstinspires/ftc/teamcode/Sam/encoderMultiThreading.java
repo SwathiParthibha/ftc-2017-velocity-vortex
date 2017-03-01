@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Sam;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,7 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
+@Disabled
 @TeleOp(name = "Encoder Multithreading", group = "Teleop")
 public class encoderMultiThreading extends OpMode {
     private DcMotor shooter1;
