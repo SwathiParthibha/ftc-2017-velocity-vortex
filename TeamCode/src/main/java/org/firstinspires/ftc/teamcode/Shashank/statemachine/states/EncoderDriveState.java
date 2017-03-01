@@ -23,7 +23,7 @@ public class EncoderDriveState extends BasicAbstractState {
     static final double     WHEEL_DIAMETER_INCHES   = 5.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
-    static final double     DRIVE_SPEED             = 0.3;
+    static final double     DRIVE_SPEED             = 0.5;
 
     public EncoderDriveState(double distanceInch, DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName) {
         this.distanceInch = distanceInch;

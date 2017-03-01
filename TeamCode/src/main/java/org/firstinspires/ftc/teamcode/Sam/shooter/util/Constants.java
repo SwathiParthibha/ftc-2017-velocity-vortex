@@ -9,10 +9,10 @@ public final class Constants {
         LEFT_SHOOTER, RIGHT_SHOOTER
     }
 
-    public static final int REQUESTED_ETPS = 1850;//1750
+    public static int REQUESTED_ETPS = 1800;//1590;//1750 good for close shots
     public static final int DELTA_TIME = 50;
 
-    public static final double DEFAULT_POWER = 0.70;//0.42
+    public static double DEFAULT_POWER = 0.51;//0.455;//0.42
     public static final double ALLOWED_POWER_DIFF = 0.03;
 
     public static final boolean USE_TELEMETRY=true;

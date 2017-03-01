@@ -18,15 +18,14 @@ import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 import org.firstinspires.ftc.teamcode.Sam.util.Util;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
-@TeleOp(name = "Two Controller Teleopv6 Shashank", group = "Teleop")
-public class TwoControllerTeleopv6Shashank extends OpMode {
+@TeleOp(name = "Two Controller Teleopv6 Shashank One Motor", group = "Teleop")
+public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
     private final double SWEEPER_IN_POWER = -0.7;
     private final double SWEEPER_OUT_POWER = 0.7;
     private final double MAX_POWER = 1.0;
@@ -55,13 +54,12 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private Servo rightArm;
     private Servo capArm;
     private PowerManager leftShooterPowerMgr;
-    private PowerManager rightShooterPowerMgr;
 
 
     private boolean swap = false;
     private MediaPlayer wrongBallSound = null, correctBallSound = null;
     private ColorSensor sweeperColorSensor;
-    private AllianceColor allianceColor = null;
+    private org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor allianceColor = null;
 
     private boolean ballSensed = false;
 
@@ -113,7 +111,6 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         capArm.setPosition(1);
 
         leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
-        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
 
         scheduledThreadPool.scheduleAtFixedRate(new RPMThread(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), 0L, Constants.DELTA_TIME, TimeUnit.MILLISECONDS);
         scheduledThreadPool.scheduleAtFixedRate(new RPMThread(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 0L, Constants.DELTA_TIME, TimeUnit.MILLISECONDS);
@@ -176,7 +173,6 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
         if (gamepad2.a) {
             leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
         } else if (gamepad2.b) {
             shooter1.setPower(SHOOTER_POWER);
             shooter2.setPower(SHOOTER_POWER);
@@ -184,19 +180,19 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             Constants.REQUESTED_ETPS=1900;
             Constants.DEFAULT_POWER=0.52;
         } else if(gamepad2.x){
-            Constants.REQUESTED_ETPS = 1650;//1590;//1750 good for close shots
-            Constants.DEFAULT_POWER = 0.45;//0.455;//0.42
+            Constants.REQUESTED_ETPS = 1800;//1590;//1750 good for close shots
+            Constants.DEFAULT_POWER = 0.49;//0.455;//0.42
         }else{
-                shooter1.setPower(0);
-                shooter2.setPower(0);
-                leftShooterPowerMgr.reset();
-            rightShooterPowerMgr.reset();
+            shooter1.setPower(0);
+            shooter2.setPower(0);
+            leftShooterPowerMgr.reset();
         }
 
 
         if(gamepad2.left_stick_y > 0.3) {
             SHOOTER_POWER = SHOOTER_POWER + 0.03;
             SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
+
         } else if (gamepad2.left_stick_y < -0.3){
             SHOOTER_POWER = SHOOTER_POWER - 0.03;
             SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
@@ -269,6 +265,8 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         }
 
 
+        shooter2.setPower(shooter1.getPower());
+
         printTelemetry();
         telemetry.addData("cap", capServoPos);
         telemetry.addData("", "");//need to output something or else the telemetry won't update
@@ -277,14 +275,12 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         telemetry.addData("Current left RPM", leftShooter.getRpm());
         telemetry.addData("Current right RPM", rightShooter.getRpm());
         telemetry.addData("gamepad1.x", gamepad1.x);
-        telemetry.addData("cap arm", capArm.getPosition());
         telemetry.update();
     }
 
     private void printTelemetry() {
         if (Constants.USE_TELEMETRY) {
             telemetry.addData("", leftShooterPowerMgr.getMotorTelemetry().toString());
-            telemetry.addData("", rightShooterPowerMgr.getMotorTelemetry().toString());
         }
     }
 

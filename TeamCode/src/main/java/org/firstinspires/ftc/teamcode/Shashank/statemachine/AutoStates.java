@@ -5,12 +5,14 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.EncoderDriveState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.LineFollowState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PivotToWhiteLineState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PressBeaconState;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.ShootState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.ToWhiteLineState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnStateEncoderDrive;
@@ -65,6 +67,10 @@ public class AutoStates extends States {
 
     public static State turnEncoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, int turnAngle, TurnStateEncoderDrive.TurnDirection turnDirection){
         return new TurnStateEncoderDrive(stateName, nextStateName, leftMotor, rightMotor, turnAngle, turnDirection);
+    }
+
+    public static State shootWithoutPID(StateName stateName, StateName nextStateName, DcMotor scooper, DcMotor shooter1, DcMotor shooter2, DcMotor sweeper, Servo leftArm, Servo rightArm){
+        return new ShootState(stateName, nextStateName, scooper, shooter1, shooter2, sweeper, leftArm, rightArm);
     }
 
 }
