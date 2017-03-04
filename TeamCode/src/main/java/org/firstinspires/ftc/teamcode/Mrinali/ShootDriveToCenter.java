@@ -96,7 +96,7 @@ public class ShootDriveToCenter extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDriveSpinup(.3, 20, 20, 3);
+        auto.encoderDriveSpinup(.3, 12, 12, 3);
         auto.shoot();
         auto.encoderDrive(auto.APPROACH_SPEED, 10, 10, 3);
     }

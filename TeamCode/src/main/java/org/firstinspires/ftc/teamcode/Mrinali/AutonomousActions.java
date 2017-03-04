@@ -639,13 +639,13 @@ public class AutonomousActions extends LinearOpMode {
         rightMotor.setPower(0);
         ElapsedTime followTime = new ElapsedTime();
         followTime.reset();
-        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 13) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
             telemetry.addData("Light", lightSensor.getLightDetected());
-            if (followTime.seconds() > 2
-                    && IMUheading() < -85 && IMUheading() > -95) {
-                leftMotor.setPower(0.2);
-                rightMotor.setPower(0.2);
+            if (lightSensor.getLightDetected() > WHITE_THRESHOLD
+                    && Math.abs(IMUheading() + 90) <= 3) { //within 3 of -90
+                leftMotor.setPower(0.1);
+                rightMotor.setPower(0.1);
             } else if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
                 telemetry.addLine("Moving right");
                 leftMotor.setPower(0.2);
