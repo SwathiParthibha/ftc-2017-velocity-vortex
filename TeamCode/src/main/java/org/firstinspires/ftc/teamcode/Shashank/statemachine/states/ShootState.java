@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Shashank.statemachine.states;
 
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -40,6 +41,8 @@ public class ShootState extends BasicAbstractState {
     private ShooterMotor leftShooter, rightShooter;
     private ElapsedTime elapsedTime = new ElapsedTime();
     private boolean hasInit = false;
+    private long startingTime = 0;
+    private static final long NANO_PER_SEC = 1000000000;
 
     public ShootState(StateName stateName, StateName nextStateName, DcMotor scooper, DcMotor shooter1, DcMotor shooter2, DcMotor sweeper, Servo leftArm, Servo rightArm) {
         this.scooper = scooper;
@@ -77,7 +80,7 @@ public class ShootState extends BasicAbstractState {
 
         Constants.REQUESTED_ETPS = 1650;//1590;//1750 good for close shots
         Constants.DEFAULT_POWER = 0.45;//0.455;//0.42
-        elapsedTime.reset();
+        startingTime = System.nanoTime();
     }
 
     @Override
@@ -91,17 +94,21 @@ public class ShootState extends BasicAbstractState {
         leftShooterPowerMgr.regulatePower();
         rightShooterPowerMgr.regulatePower();
 
-        if(elapsedTime.seconds() > 2){
+        if(getTimeDifference() > 2*NANO_PER_SEC){
             shooter1.setPower(0);
             shooter1.setPower(0);
             leftArm.setPosition(LEFT_OUT_VAL);
             rightArm.setPosition(RIGHT_OUT_VAL);
         }
-        if(elapsedTime.seconds() > 0.9){
+        if(getTimeDifference() > 0.9*NANO_PER_SEC){
             leftArm.setPosition(LEFT_IN_VAL);
             rightArm.setPosition(RIGHT_IN_VAL);
         }
         return stateName;
+    }
+
+    private long getTimeDifference(){
+        return System.nanoTime() - startingTime;
     }
 
     @Override
