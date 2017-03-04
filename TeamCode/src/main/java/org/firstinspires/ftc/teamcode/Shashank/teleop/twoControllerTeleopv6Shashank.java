@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @TeleOp(name = "Two Controller Teleopv6 Shashank", group = "Teleop")
-public class twoControllerTeleopv6Shashank extends OpMode {
+public class TwoControllerTeleopv6Shashank extends OpMode {
     private final double SWEEPER_IN_POWER = -0.7;
     private final double SWEEPER_OUT_POWER = 0.7;
     private final double MAX_POWER = 1.0;
@@ -118,6 +118,7 @@ public class twoControllerTeleopv6Shashank extends OpMode {
         scheduledThreadPool.scheduleAtFixedRate(new RPMThread(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), 0L, Constants.DELTA_TIME, TimeUnit.MILLISECONDS);
         scheduledThreadPool.scheduleAtFixedRate(new RPMThread(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 0L, Constants.DELTA_TIME, TimeUnit.MILLISECONDS);
     }
+
 
 
     @Override
