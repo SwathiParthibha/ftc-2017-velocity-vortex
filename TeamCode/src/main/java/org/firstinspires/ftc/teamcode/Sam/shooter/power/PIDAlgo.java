@@ -61,6 +61,13 @@ public class PIDAlgo {
         return proportionAdjust + integralAdjust + derivativeAdjust;
     }
 
+    public void reset() {
+        kalminFilter.reset();
+        prevError = 0D;
+        integral = 0;
+
+    }
+
 
 }
 

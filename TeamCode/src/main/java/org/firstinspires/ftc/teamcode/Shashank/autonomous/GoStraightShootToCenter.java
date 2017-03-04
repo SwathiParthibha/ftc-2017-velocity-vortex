@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous.HardwarePushbot;
  * Created by SahilDoshi on 1/20/17.
  */
 
-@Autonomous(name="GoStraightShootToCenterShashankv2", group="Pushbot")
+@Autonomous(name="GoStraightShootToCenterShashank", group="Pushbot")
 public class GoStraightShootToCenter extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
@@ -30,6 +30,8 @@ public class GoStraightShootToCenter extends LinearOpMode {
     private DcMotor shooter2;
     private boolean state;
     private DcMotor scooper;
+    private Servo leftArm;
+    private Servo rightArm;
     LightSensor lightSensor;      // Primary LEGO Light sensor,
     I2cDeviceSynchImpl rangeSensor;
     I2cDeviceSynchImpl sideRangeSensor;
@@ -395,8 +397,7 @@ public class GoStraightShootToCenter extends LinearOpMode {
 
     }
 
-    private Servo leftArm;
-    private Servo rightArm;
+    private Servo capArm;
 
     private final double LEFT_IN_VAL = 0.56;
     private final double RIGHT_IN_VAL = 0.34;
@@ -422,14 +423,9 @@ public class GoStraightShootToCenter extends LinearOpMode {
         shooter1 = this.hardwareMap.dcMotor.get("shooter1");
         shooter2 = this.hardwareMap.dcMotor.get("shooter2");
         scooper = this.hardwareMap.dcMotor.get("scooper");
-
-        scooper.setDirection(DcMotorSimple.Direction.REVERSE);
-
         leftArm = this.hardwareMap.servo.get("leftservo");
         rightArm = this.hardwareMap.servo.get("rightservo");
-
-        leftArm.setPosition(LEFT_OUT_VAL);
-        rightArm.setPosition(RIGHT_OUT_VAL);
+        capArm = this.hardwareMap.servo.get("capArm");
 
         state = false;
 
@@ -448,8 +444,10 @@ public class GoStraightShootToCenter extends LinearOpMode {
             idle();
         }
 
+        capArm.setPosition(1);
+
         // sleep(10000);
-        encoderDrive(APPROACH_SPEED, 24 / 2, 24 / 2, 3);
+        encoderDrive(APPROACH_SPEED, 20 / 2, 20 / 2, 3);
         shoot();
         encoderDrive(APPROACH_SPEED, 40 / 2, 40 / 2, 10);
     }
@@ -588,24 +586,34 @@ public class GoStraightShootToCenter extends LinearOpMode {
     }
     public void shoot() {
 
-        while(opModeIsActive())
+        /*while(opModeIsActive())
         {
             EncoderShooter(RPM955);
             if(checkIfReadyToShoot(RPM955)){
                 scooper.setPower(1);
-                sleep(1500);
-                leftArm.setPosition(LEFT_IN_VAL);
-                rightArm.setPosition(RIGHT_IN_VAL);
-                sleep(500);
-                leftArm.setPosition(LEFT_OUT_VAL);
-                rightArm.setPosition(RIGHT_OUT_VAL);
-                sleep(1500);
-                leftArm.setPosition(LEFT_IN_VAL);
-                rightArm.setPosition(RIGHT_IN_VAL);
-                sleep(500);
+                sleep(3000);
                 break;
             }
-        }
+        }*/
+
+        shooter1.setPower(0.5);
+        shooter2.setPower(0.5);
+        scooper.setPower(1);
+        sleep(1500);
+        scooper.setPower(0);
+        leftArm.setPosition(LEFT_IN_VAL);
+        rightArm.setPosition(RIGHT_IN_VAL);
+        sleep(700);
+        leftArm.setPosition(LEFT_OUT_VAL);
+        rightArm.setPosition(RIGHT_OUT_VAL);
+        sleep(500);
+        scooper.setPower(1);
+        sleep(1500);
+        scooper.setPower(0);
+        leftArm.setPosition(LEFT_IN_VAL);
+        rightArm.setPosition(RIGHT_IN_VAL);
+        shooter1.setPower(0);
+        shooter2.setPower(0);
 
         telemetry.addData("Finish", "After");
     }

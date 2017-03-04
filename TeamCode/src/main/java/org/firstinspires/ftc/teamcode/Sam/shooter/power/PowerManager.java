@@ -83,6 +83,11 @@ public class PowerManager {
     public MotorTelemetry getMotorTelemetry() {
         return motorTelemetry;
     }
+
+    public void reset()
+    {
+        pidAlgo.reset();
+    }
 }
 
 
