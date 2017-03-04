@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @TeleOp(name = "Two Controller Teleopv6 Shashank", group = "Teleop")
-public class twoControllerTeleopv6Shashank extends OpMode {
+public class TwoControllerTeleopv6Shashank extends OpMode {
     private final double SWEEPER_IN_POWER = -0.7;
     private final double SWEEPER_OUT_POWER = 0.7;
     private final double MAX_POWER = 1.0;
