@@ -43,11 +43,13 @@ public class StateMachineOp extends OpMode {
     private LightSensor lightSensor;
 
     private ColorSensor leftColorSensor, rightColorSensor = null;
+    private static boolean RUN = true;
 
     enum S implements StateName {
         GO_FORWARD,
         WAIT_BEFORE_TURN,
         FIRST_TURN,
+        WAIT_TO_WHITE_LINE,
         TO_WHITE_LINE,
         DRIVE,
         WHITE_LINE_PIVOT_WAIT,
@@ -106,6 +108,39 @@ public class StateMachineOp extends OpMode {
             }
         });
 
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                Activity activity = (Activity) hardwareMap.appContext;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(hardwareMap.appContext);
+                        builder.setTitle(R.string.pickColor)
+                                .setMessage("Run the Opmdode")
+                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        RUN = true;
+                                    }
+                                })
+                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        RUN = false;
+                                    }
+                                });
+
+                        AlertDialog alertDialog = builder.create();
+                        telemetry.log().add("alert dialog created");
+                        telemetry.update();
+                        alertDialog.show();
+                    }
+                });
+
+            }
+        });
+
         leftMotor = this.hardwareMap.dcMotor.get("l");
         rightMotor = this.hardwareMap.dcMotor.get("r");
 
@@ -135,7 +170,7 @@ public class StateMachineOp extends OpMode {
 
         DbgLog.msg("SYSTEM STATUS OF IMU BEFORE INIT " + imu.getSystemStatus().toString());
 
-        final BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
@@ -143,12 +178,7 @@ public class StateMachineOp extends OpMode {
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                imu.initialize(parameters);
-            }
-        });
+        imu.initialize(parameters);
 
         DbgLog.msg("SYSTEM STATUS OF IMU after INIT " + imu.getSystemStatus().toString());
 
@@ -173,12 +203,12 @@ public class StateMachineOp extends OpMode {
         telemetry.log().add("Starting start method");
         telemetry.update();
 
-        while (beaconColor  == null || imu.getSystemStatus().toString().equals("UNKNOWN")){
+        while (beaconColor  == null){
             Util.waitUntil(50);
         }
 
-        int firstTurnAngle = 34;
-        int thirdTurnAngle = 121;
+        int firstTurnAngle = 30;
+        int thirdTurnAngle = 124;
 
         if(beaconColor == AllianceColor.RED){
             firstTurnAngle = 360 - firstTurnAngle;
@@ -188,19 +218,18 @@ public class StateMachineOp extends OpMode {
         AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.GO_FORWARD);
 
         //go forward a little
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_FORWARD, S.WAIT_BEFORE_TURN, 3);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_FORWARD, S.FIRST_TURN, 3);
 
         //turn to designated degree
-        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.FIRST_TURN, S.TO_WHITE_LINE, imu, firstTurnAngle);
+        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.FIRST_TURN, S.WAIT_TO_WHITE_LINE, imu, firstTurnAngle);
 
+        //autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.ENCODER_TO_WHITE_LINE, S.TO_WHITE_LINE, 18);
+        autoStateMachineBuilder.addWait(S.WAIT_TO_WHITE_LINE, S.TO_WHITE_LINE, 500);
         //go to the white line
-        autoStateMachineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.DRIVE, leftMotor, rightMotor, lightSensor);
-
-        //overshoot by a little bit
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.DRIVE, S.WHITE_LINE_PIVOT_WAIT, 0.7);
+        autoStateMachineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.WHITE_LINE_PIVOT_WAIT, leftMotor, rightMotor, lightSensor);
 
         //wait for a little bit
-        autoStateMachineBuilder.addWait(S.WHITE_LINE_PIVOT_WAIT, S.PIVOT_TO_LINE, 300);
+        autoStateMachineBuilder.addWait(S.WHITE_LINE_PIVOT_WAIT, S.PIVOT_TO_LINE, 500);
 
         //pivot to the line
         autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.PIVOT_TO_LINE, S.FOLLOW_lINE, beaconColor);
@@ -209,10 +238,10 @@ public class StateMachineOp extends OpMode {
         autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_lINE, S.PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
 
         //press the beacon
-        autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.GO_BACKWARD, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
-
+        //autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.GO_BACKWARD, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+        autoStateMachineBuilder.addPressBeacon(telemetry, S.PRESS_BEACON, S.STOP, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
         //go backward
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_BACKWARD, S.SECOND_TURN, -4);
+        /*autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_BACKWARD, S.SECOND_TURN, 0);
 
         //turn to 0 degrees
         autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.SECOND_TURN, S._2ND_TO_WHITE_LINE, imu, 0);
@@ -224,9 +253,9 @@ public class StateMachineOp extends OpMode {
         autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S._2ND_PIVOT_TO_LINE, S._2ND_FOLLOW_lINE, beaconColor);
         autoStateMachineBuilder.addLineFollow(telemetry, S._2ND_FOLLOW_lINE, S._2ND_PRESS_BEACON, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
         autoStateMachineBuilder.addPressBeacon(telemetry, S._2ND_PRESS_BEACON, S.SECOND_GO_BACKWARD, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.SECOND_GO_BACKWARD, S.THIRD_TURN, -4);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.SECOND_GO_BACKWARD, S.THIRD_TURN, 0);
         autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.THIRD_TURN, S.SECOND_GO_BACKWARD, imu, thirdTurnAngle);
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.SECOND_GO_BACKWARD, S.STOP, 36);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.SECOND_GO_BACKWARD, S.STOP, 36);*/
         autoStateMachineBuilder.addStop(S.STOP);
 
         stateMachine = autoStateMachineBuilder.build();
@@ -254,9 +283,11 @@ public class StateMachineOp extends OpMode {
         telemetry.addData("right connec", rightColorSensor.getConnectionInfo());
         telemetry.addData("IMU", imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX).firstAngle);
         telemetry.addData("IMU", imu.getAngularOrientation().firstAngle);
+        telemetry.addData("IMU SYSTEM STATUS", imu.getSystemStatus().toString());
         telemetry.update();
 
-        stateMachine.act();
+        if(RUN)
+            stateMachine.act();
     }
 
     @Override

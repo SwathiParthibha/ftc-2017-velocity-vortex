@@ -55,7 +55,7 @@ public class TestStateMachineOp extends OpMode {
 
     private StateMachine stateMachine;
 
-    private AllianceColor beaconColor = null;
+    private AllianceColor beaconColor = AllianceColor.BLUE;
 
     private BNO055IMU imu;
 
@@ -98,14 +98,16 @@ public class TestStateMachineOp extends OpMode {
 
         AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.STATE);
 
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.STATE, S.WAIT, 7);
+        //autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE, S.WAIT, imu, 10);
+        autoStateMachineBuilder.addToWhiteLine(S.STATE, S.WAIT, leftMotor, rightMotor, lightSensor);
         autoStateMachineBuilder.addWait(S.WAIT, S.STATE_2, 3000);
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.STATE_2, S.WAIT_2, -7);
-        autoStateMachineBuilder.addWait(S.WAIT_2, S.STATE_3, 3000);
-        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_3, S.WAIT_3, imu, 150);
-        autoStateMachineBuilder.addWait(S.WAIT_3, S.STATE_4, 3000);
-        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_4, S.WAIT_4, imu, 0);
-        autoStateMachineBuilder.addWait(S.WAIT_4, S.STOP, 3000);
+        autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.STATE_2, S.STOP, beaconColor);
+        //autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_2, S.WAIT_2, imu, 200);
+        //autoStateMachineBuilder.addWait(S.WAIT_2, S.STATE_3, 3000);
+        //autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_3, S.WAIT_3, imu, 90);
+        //autoStateMachineBuilder.addWait(S.WAIT_3, S.STATE_4, 3000);
+        //autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_4, S.WAIT_4, imu, 150);
+        //autoStateMachineBuilder.addWait(S.WAIT_4, S.STOP, 3000);
         autoStateMachineBuilder.addStop(S.STOP);
 
         stateMachine = autoStateMachineBuilder.build();
