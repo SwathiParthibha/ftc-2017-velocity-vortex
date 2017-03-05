@@ -5,6 +5,10 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import ftc.electronvolts.statemachine.BasicAbstractState;
 import ftc.electronvolts.statemachine.StateName;
 
@@ -25,7 +29,9 @@ public class PivotToWhiteLineState extends BasicAbstractState {
 
     private boolean hasInitialized = false;
 
-    private static final double MOTOR_POWER = 0.4;
+    private static final double MOTOR_POWER = 0.2;
+    private double lightDetected = 0.0;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public PivotToWhiteLineState(DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, StateName stateName, StateName nextStateName, AllianceColor beaconColor) {
         this.leftMotor = leftMotor;
@@ -41,11 +47,20 @@ public class PivotToWhiteLineState extends BasicAbstractState {
         if(!hasInitialized) {
             init();
             hasInitialized = true;
+
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (!executorService.isShutdown())
+                        lightDetected = lightSensor.getLightDetected();
+                }
+            });
         }
 
         if(isDone()) {
             leftMotor.setPower(0);
             rightMotor.setPower(0);
+            executorService.shutdown();
             return getNextStateName();
         } else {
             if(beaconColor == AllianceColor.BLUE){
@@ -74,7 +89,7 @@ public class PivotToWhiteLineState extends BasicAbstractState {
 
     @Override
     public boolean isDone() {
-        return lightSensor.getLightDetected() > WHITE_LINE_THRESHOLD;
+        return lightDetected > WHITE_LINE_THRESHOLD;
     }
 
     @Override
