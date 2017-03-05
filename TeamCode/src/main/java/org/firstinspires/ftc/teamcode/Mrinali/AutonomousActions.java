@@ -58,6 +58,10 @@ import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
  * It uses the common Pushbot hardware class to define the drive on the robot.
@@ -110,7 +114,7 @@ public class AutonomousActions extends LinearOpMode {
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
     public double angleZ = 0;
 
-    static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
+    static final double WHITE_THRESHOLD = 0.25;  // spans between 0.1 - 0.5 from dark to light
     public static final double APPROACH_SPEED = 0.5;
     double TURN_POWER_1 = .2;
     double TURN_POWER_2 = .05;
@@ -125,6 +129,7 @@ public class AutonomousActions extends LinearOpMode {
     public double backup = -2;
     double overLine1 = 2;
     double overLine2 = 2;
+    private double lightDetected = 0.0;
     private final double LEFT_IN_VAL = 0.56;
     private final double RIGHT_IN_VAL = 0.34;
     private final double LEFT_OUT_VAL = 0.12;
@@ -203,7 +208,7 @@ public class AutonomousActions extends LinearOpMode {
         rightArm.setPosition(rightServoPos);
 
         capArm = hardwareMap.servo.get("capArm");
-        capArm.setPosition(capServoPos);
+        capArm.setPosition(capServoPos - .01);
 
         state = false;
 
@@ -629,6 +634,14 @@ public class AutonomousActions extends LinearOpMode {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         telemetry.addLine("Following Line");
+        final ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                while (!executorService.isShutdown())
+                    lightDetected = lightSensor.getLightDetected();
+            }
+        });
         leftMotor.setPower(.2);
         rightMotor.setPower(-.2);
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
@@ -639,8 +652,9 @@ public class AutonomousActions extends LinearOpMode {
         rightMotor.setPower(0);
         ElapsedTime followTime = new ElapsedTime();
         followTime.reset();
-        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 13) {
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Angle", IMUheading());
             telemetry.addData("Light", lightSensor.getLightDetected());
             if (lightSensor.getLightDetected() > WHITE_THRESHOLD
                     && Math.abs(IMUheading() + 90) <= 3) { //within 3 of -90
@@ -662,6 +676,7 @@ public class AutonomousActions extends LinearOpMode {
         stopRobot();
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        executorService.shutdown();
     }
 
     public void pushBlueButton() throws InterruptedException {

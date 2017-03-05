@@ -55,9 +55,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Blue Shoot", group="Pushbot")
+@Autonomous(name="Beacons Blue 1", group="Pushbot")
 //@Disabled
-public class DriveToBeaconsBlueShoot extends LinearOpMode {
+public class DriveToBeaconsBlue1 extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
@@ -96,10 +96,7 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDriveSpinup(.3, 11, 11, 3);
-        auto.spinup(.5);
-        auto.shoot();
-        auto.encoderDrive(auto.APPROACH_SPEED, -4, -4, 3);
+        auto.encoderDrive(auto.APPROACH_SPEED, 3, 3, 3);
         auto.turn(-45); //The robot uses the IMU to turn to 40 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         //ElapsedTime coastTime = new ElapsedTime();
@@ -107,7 +104,8 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
 
         sleep(100);
-        auto.followLineBlueSide();
+        auto.followLineBlueSide1();
+        sleep(3000);
         auto.pushBlueButton(); //The robot then uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         auto.turn(0); //and turns parallel to the beacon using the IMU
@@ -122,10 +120,11 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
         sleep(100);
-        auto.followLineBlueSide();
+        auto.followLineBlueSide1();
+        sleep(3000);
         auto.pushBlueButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
-        auto.turn(155);
+        auto.turn(145);
         auto.encoderDrive(FASTER_SPEED, 20, 20, 5);
     }
 }
