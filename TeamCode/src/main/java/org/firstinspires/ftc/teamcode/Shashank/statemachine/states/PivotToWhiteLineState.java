@@ -23,7 +23,7 @@ public class PivotToWhiteLineState extends BasicAbstractState {
 
     private StateName stateName, nextStateName;
 
-    private static final double WHITE_LINE_THRESHOLD = 0.3;
+    private static final double WHITE_LINE_THRESHOLD = 0.188;
 
     private AllianceColor beaconColor;
 

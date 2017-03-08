@@ -25,11 +25,11 @@ public class ToWhiteLineState extends BasicAbstractState {
 
     private StateName stateName, nextStateName;
 
-    private static final double WHITE_LINE_THRESHOLD = 0.2;
+    private static final double WHITE_LINE_THRESHOLD = 0.187;
 
     private boolean hasInitialized = false;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private double lightDetected = 0.0;
+    private volatile double lightDetected = 0.0;
 
     public ToWhiteLineState(DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, StateName stateName, StateName nextStateName) {
         this.leftMotor = leftMotor;
@@ -46,6 +46,9 @@ public class ToWhiteLineState extends BasicAbstractState {
 
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
@@ -77,7 +80,7 @@ public class ToWhiteLineState extends BasicAbstractState {
 
     @Override
     public boolean isDone() {
-        return lightDetected > WHITE_LINE_THRESHOLD;
+        return lightDetected >= WHITE_LINE_THRESHOLD;
     }
 
     @Override

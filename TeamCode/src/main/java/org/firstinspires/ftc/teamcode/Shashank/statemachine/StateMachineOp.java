@@ -215,16 +215,16 @@ public class StateMachineOp extends OpMode {
             thirdTurnAngle = 360 - thirdTurnAngle;
         }
 
-        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.GO_FORWARD);
+        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.TO_WHITE_LINE);
 
         //go forward a little
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_FORWARD, S.FIRST_TURN, 3);
+        //autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_FORWARD, S.FIRST_TURN, 3);
 
         //turn to designated degree
-        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.FIRST_TURN, S.WAIT_TO_WHITE_LINE, imu, firstTurnAngle);
+        //autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.FIRST_TURN, S.WAIT_TO_WHITE_LINE, imu, firstTurnAngle);
 
         //autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.ENCODER_TO_WHITE_LINE, S.TO_WHITE_LINE, 18);
-        autoStateMachineBuilder.addWait(S.WAIT_TO_WHITE_LINE, S.TO_WHITE_LINE, 500);
+        //autoStateMachineBuilder.addWait(S.WAIT_TO_WHITE_LINE, S.TO_WHITE_LINE, 500);
         //go to the white line
         autoStateMachineBuilder.addToWhiteLine(S.TO_WHITE_LINE, S.WHITE_LINE_PIVOT_WAIT, leftMotor, rightMotor, lightSensor);
 
@@ -281,9 +281,9 @@ public class StateMachineOp extends OpMode {
         telemetry.addData("right blue", String.format("b=%d", rightColorSensor.blue()));
         telemetry.addData("left connec", leftColorSensor.getConnectionInfo());
         telemetry.addData("right connec", rightColorSensor.getConnectionInfo());
-        telemetry.addData("IMU", imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX).firstAngle);
         telemetry.addData("IMU", imu.getAngularOrientation().firstAngle);
         telemetry.addData("IMU SYSTEM STATUS", imu.getSystemStatus().toString());
+        telemetry.addData("light sensor", lightSensor.getLightDetected());
         telemetry.update();
 
         if(RUN)
