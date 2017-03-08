@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Shashank.teleop;
 
 import android.media.MediaPlayer;
 
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -13,15 +14,17 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
-import org.firstinspires.ftc.teamcode.Sam.shooter.RPMThread;
+import org.firstinspires.ftc.teamcode.Sam.shooter.RPMThreadMilliseconds;
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 import org.firstinspires.ftc.teamcode.Sam.util.Util;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 
@@ -68,8 +71,11 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
 
-    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(2);
+    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(10);
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+    private ScheduledFuture scheduledFuture = null;
     private ShooterMotor leftShooter, rightShooter;
+    private boolean alreadyScheduled = false;
 
     @Override
     public void init() {
@@ -115,8 +121,20 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
         rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
 
-        scheduledThreadPool.scheduleAtFixedRate(new RPMThread(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), 0L, Constants.DELTA_TIME, TimeUnit.MILLISECONDS);
-        scheduledThreadPool.scheduleAtFixedRate(new RPMThread(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 0L, Constants.DELTA_TIME, TimeUnit.MILLISECONDS);
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), 0L, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 0L, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), 200, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 200, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), 400, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 400, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), 600, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 600, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), 800, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 800, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
     }
 
 
@@ -128,6 +146,9 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
     @Override
     public void loop() {
+        DbgLog.msg(">LEFT RPM SHOOTER: " + leftShooter.getRpm());
+        DbgLog.msg(">RIGHT RPM SHOOTER: " + rightShooter.getRpm());
+        DbgLog.msg(">BATTERY LEVEL: " + hardwareMap.voltageSensor.get("sweepec").getVoltage());
 
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
@@ -175,22 +196,36 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         }
 
         if (gamepad2.a) {
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+            if(!alreadyScheduled) {
+                scheduledFuture = executorService.scheduleAtFixedRate(new Runnable() {
+                    @Override
+                    public void run() {
+                        DbgLog.msg("REGULATING POWER!!!!!");
+                        leftShooterPowerMgr.regulatePower();
+                        rightShooterPowerMgr.regulatePower();
+                    }
+                }, 0, 500, TimeUnit.MILLISECONDS);
+                alreadyScheduled = true;
+            }
         } else if (gamepad2.b) {
             shooter1.setPower(SHOOTER_POWER);
             shooter2.setPower(SHOOTER_POWER);
         } else if(gamepad2.y) {
-            Constants.REQUESTED_ETPS=1900;
-            Constants.DEFAULT_POWER=0.52;
+            Constants.REQUESTED_ETPS = 35150;//1855;//1590;//1750 good for close shots
+            Constants.DEFAULT_POWER = 0.51;//0.455;//0.42
+            leftShooterPowerMgr.reset();
         } else if(gamepad2.x){
-            Constants.REQUESTED_ETPS = 1650;//1590;//1750 good for close shots
-            Constants.DEFAULT_POWER = 0.45;//0.455;//0.42
+            Constants.REQUESTED_ETPS = 25150;//1855;//1590;//1750 good for close shots
+            Constants.DEFAULT_POWER = 0.47;//0.455;//0.42
+            leftShooterPowerMgr.reset();
         }else{
                 shooter1.setPower(0);
                 shooter2.setPower(0);
                 leftShooterPowerMgr.reset();
             rightShooterPowerMgr.reset();
+            if(scheduledFuture != null)
+                scheduledFuture.cancel(true);
+            alreadyScheduled = false;
         }
 
 
@@ -326,8 +361,20 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         super.stop();
 
         scheduledThreadPool.shutdown();
-        Util.waitUntil(5);
+        try {
+            scheduledThreadPool.awaitTermination(750, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         scheduledThreadPool.shutdownNow();
+
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(750, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        executorService.shutdownNow();
     }
 
     /*
