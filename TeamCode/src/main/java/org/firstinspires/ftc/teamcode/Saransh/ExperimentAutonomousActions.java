@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.Mrinali;
+package org.firstinspires.ftc.teamcode.Saransh;
 
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
@@ -45,22 +45,16 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-
 import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -82,7 +76,7 @@ import java.util.concurrent.Executors;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-public class AutonomousActions extends LinearOpMode {
+public class ExperimentAutonomousActions extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
@@ -114,7 +108,7 @@ public class AutonomousActions extends LinearOpMode {
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
     public double angleZ = 0;
 
-    static final double WHITE_THRESHOLD = 0.25;  // spans between 0.1 - 0.5 from dark to light
+    static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
     public static final double APPROACH_SPEED = 0.5;
     double TURN_POWER_1 = .2;
     double TURN_POWER_2 = .05;
@@ -129,7 +123,6 @@ public class AutonomousActions extends LinearOpMode {
     public double backup = -2;
     double overLine1 = 2;
     double overLine2 = 2;
-    private double lightDetected = 0.0;
     private final double LEFT_IN_VAL = 0.56;
     private final double RIGHT_IN_VAL = 0.34;
     private final double LEFT_OUT_VAL = 0.12;
@@ -146,10 +139,12 @@ public class AutonomousActions extends LinearOpMode {
     I2cDevice rangeA;
     I2cDevice rangeB;
     double initialTilt;
-
     private boolean USE_TELEMETRY = false;
 
-    public AutonomousActions(LinearOpMode anOpMode) {
+    int whiteCounter = 0;
+    int blackCounter = 0;
+
+    public ExperimentAutonomousActions(LinearOpMode anOpMode) {
         opMode = anOpMode;
     }
 
@@ -208,7 +203,7 @@ public class AutonomousActions extends LinearOpMode {
         rightArm.setPosition(rightServoPos);
 
         capArm = hardwareMap.servo.get("capArm");
-        capArm.setPosition(capServoPos - .01);
+        capArm.setPosition(capServoPos);
 
         state = false;
 
@@ -289,6 +284,8 @@ public class AutonomousActions extends LinearOpMode {
                 leftMotor.setPower(APPROACH_SPEED * .4);
                 rightMotor.setPower(APPROACH_SPEED * .4);
             }
+
+            whiteCounter = 1;
         }
 
         // Stop all motors
@@ -634,14 +631,6 @@ public class AutonomousActions extends LinearOpMode {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         telemetry.addLine("Following Line");
-        final ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                while (!executorService.isShutdown())
-                    lightDetected = lightSensor.getLightDetected();
-            }
-        });
         leftMotor.setPower(.2);
         rightMotor.setPower(-.2);
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
@@ -650,24 +639,40 @@ public class AutonomousActions extends LinearOpMode {
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
-        ElapsedTime followTime = new ElapsedTime();
-        followTime.reset();
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
-            telemetry.addData("Angle", IMUheading());
             telemetry.addData("Light", lightSensor.getLightDetected());
-            if (lightSensor.getLightDetected() > WHITE_THRESHOLD
-                    && Math.abs(IMUheading() + 90) <= 3) { //within 3 of -90
-                leftMotor.setPower(0.1);
-                rightMotor.setPower(0.1);
-            } else if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+                whiteCounter++;
                 telemetry.addLine("Moving right");
                 leftMotor.setPower(0.2);
                 rightMotor.setPower(0);
-            } else {
+            }
+            else if (lightSensor.getLightDetected() < WHITE_THRESHOLD && whiteCounter - blackCounter == 1){
+                blackCounter++;
                 telemetry.addLine("Moving left");
                 leftMotor.setPower(0);
                 rightMotor.setPower(0.2);
+            }
+            else if (whiteCounter - blackCounter < 1)
+            {
+                whiteCounter++;
+                long start = System.currentTimeMillis();
+                while (System.currentTimeMillis()- start < 500) {
+                    telemetry.addLine("Moving right");
+                    leftMotor.setPower(0.2);
+                    rightMotor.setPower(0);
+                }
+            }
+            else
+            {
+                blackCounter++;
+                long start = System.currentTimeMillis();
+                while (System.currentTimeMillis()- start < 500) {
+                    telemetry.addLine("Moving right");
+                    leftMotor.setPower(0.2);
+                    rightMotor.setPower(0);
+                }
             }
             telemetry.update();
 
@@ -676,7 +681,6 @@ public class AutonomousActions extends LinearOpMode {
         stopRobot();
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        executorService.shutdown();
     }
 
     public void pushBlueButton() throws InterruptedException {
@@ -985,8 +989,8 @@ public class AutonomousActions extends LinearOpMode {
     }
 
     public void encoderDriveCheckTilt(double speed,
-                             double leftInches, double rightInches,
-                             double timeoutS, String color) throws InterruptedException {
+                                      double leftInches, double rightInches,
+                                      double timeoutS, String color) throws InterruptedException {
 
         ElapsedTime runtime = new ElapsedTime();
         int newLeftTarget;
@@ -1049,8 +1053,8 @@ public class AutonomousActions extends LinearOpMode {
     }
 
     public void encoderDriveSpinup(double speed,
-                             double leftInches, double rightInches,
-                             double timeoutS) throws InterruptedException {
+                                   double leftInches, double rightInches,
+                                   double timeoutS) throws InterruptedException {
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -137,7 +137,6 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 800, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
     }
 
-
     @Override
     public void start() {
         runtime.reset();

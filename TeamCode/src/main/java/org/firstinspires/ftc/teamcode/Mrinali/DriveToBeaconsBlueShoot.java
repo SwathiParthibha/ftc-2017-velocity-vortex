@@ -97,7 +97,7 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
         }
 
         auto.encoderDriveSpinup(.3, 11, 11, 3);
-        auto.spinup(1);
+        auto.spinup(.5);
         auto.shoot();
         auto.encoderDrive(auto.APPROACH_SPEED, -4, -4, 3);
         auto.turn(-45); //The robot uses the IMU to turn to 40 degrees
