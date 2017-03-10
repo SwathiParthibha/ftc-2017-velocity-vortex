@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.EncoderDriveS
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.LineFollowState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PivotToWhiteLineState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.PressBeaconState;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.ShootState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.ToWhiteLineState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnState;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnStateEncoderDrive;
@@ -70,7 +69,7 @@ public class AutoStates extends States {
     }
 
     public static State shootWithoutPID(StateName stateName, StateName nextStateName, DcMotor scooper, DcMotor shooter1, DcMotor shooter2, DcMotor sweeper, Servo leftArm, Servo rightArm){
-        return new ShootState(stateName, nextStateName, scooper, shooter1, shooter2, sweeper, leftArm, rightArm);
+        return null;
     }
 
 }

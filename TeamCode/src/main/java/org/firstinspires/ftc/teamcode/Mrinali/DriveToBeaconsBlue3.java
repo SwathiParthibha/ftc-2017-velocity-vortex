@@ -96,9 +96,9 @@ public class DriveToBeaconsBlue3 extends LinearOpMode {
             idle();
         }
 
-        auto.toWhiteLine(true); //and then proceeds to the white line using encoders and a NXT light sensor
+        auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
 
         sleep(100);
-        auto.followLineBlueSide1();
+        auto.followLineBlueSide2();
     }
 }

@@ -208,7 +208,7 @@ public class AutonomousActions extends LinearOpMode {
         rightArm.setPosition(rightServoPos);
 
         capArm = hardwareMap.servo.get("capArm");
-        capArm.setPosition(capServoPos - .01);
+        capArm.setPosition(capServoPos + .02);
 
         state = false;
 
@@ -657,7 +657,7 @@ public class AutonomousActions extends LinearOpMode {
             telemetry.addData("Angle", IMUheading());
             telemetry.addData("Light", lightSensor.getLightDetected());
             if (lightSensor.getLightDetected() > WHITE_THRESHOLD
-                    && Math.abs(IMUheading() + 90) <= 3) { //within 3 of -90
+                    && Math.abs(IMUheading() + 90) <= 1) { //within 2 of -90
                 leftMotor.setPower(0.1);
                 rightMotor.setPower(0.1);
             } else if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
@@ -677,6 +677,58 @@ public class AutonomousActions extends LinearOpMode {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         executorService.shutdown();
+    }
+
+    public void followLineBlueSide2() throws InterruptedException {
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        telemetry.addLine("Following Line");
+        leftMotor.setPower(.2);
+        rightMotor.setPower(-.2);
+        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            idle();
+        }
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        boolean side = false;
+        boolean white = false;
+        leftMotor.setPower(.1);
+        rightMotor.setPower(.1);
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 13) {
+            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            telemetry.addData("Angle", IMUheading());
+            if (lightSensor.getLightDetected() >= WHITE_THRESHOLD) {
+                if (!white) // ensures that it only switches once when line is detected
+                    side = !side;
+                white = true;
+                /*
+                if (Math.abs(IMUheading() + 90) <= 1) { //within 2 of -90
+                    leftMotor.setPower(0.1);
+                    rightMotor.setPower(0.1);
+                }
+                */
+            } else if (side){
+                white = false;
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(-0.1);
+            } else {
+                white = false;
+                telemetry.addLine("Moving left");
+                leftMotor.setPower(-0.1);
+                rightMotor.setPower(0.2);
+            }
+            telemetry.update();
+
+            idle();
+        }
+        stopRobot();
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     public void pushBlueButton() throws InterruptedException {
