@@ -11,6 +11,16 @@ public class MotorTelemetry {
     private double kk;
     private double pk;
     private double kalminX;
+    private double rpmErrorAdjustment = 0.0;
+    private double powerAdjustment = 0.0;
+
+    public void setRpmErrorAdjustment(double rpmErrorAdjustment) {
+        this.rpmErrorAdjustment = rpmErrorAdjustment;
+    }
+
+    public void setPowerAdjustment(double powerAdjustment) {
+        this.powerAdjustment = powerAdjustment;
+    }
 
     public Constants.MOTORNAME getMotorName() {
         return motorName;
@@ -119,6 +129,8 @@ public class MotorTelemetry {
         strBuffer.append("KalminX: ").append(this.kalminX).append(System.lineSeparator());
         strBuffer.append("KalminP: ").append(this.kalminP).append(System.lineSeparator());
         strBuffer.append("RequiredPwr: ").append(this.requiredPwr).append(System.lineSeparator());
+        strBuffer.append("rpm Error: ").append(this.rpmErrorAdjustment).append(System.lineSeparator());
+        strBuffer.append("power error: ").append(this.powerAdjustment).append(System.lineSeparator());
 
         return strBuffer.toString();
 

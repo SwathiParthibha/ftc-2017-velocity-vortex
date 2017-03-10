@@ -11,6 +11,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import ftc.electronvolts.statemachine.BasicAbstractState;
 import ftc.electronvolts.statemachine.StateName;
 
@@ -38,7 +41,7 @@ public class TurnState extends BasicAbstractState {
     double TURN_POWER_1 = .2;
     double TURN_POWER_2 = .1;
 
-    ElapsedTime runtime = new ElapsedTime();
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public TurnState(StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, BNO055IMU imu, int turnAngle) {
         this.stateName = stateName;
@@ -80,10 +83,10 @@ public class TurnState extends BasicAbstractState {
             init();
             hasInitialized = true;
 
-            AsyncTask.execute(new Runnable() {
+            executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    while (!isDone()){
+                    while (!executorService.isShutdown()){
                         angDiff = getAngleDifference(turnAngle);
                         direction = getDirection();
                     }

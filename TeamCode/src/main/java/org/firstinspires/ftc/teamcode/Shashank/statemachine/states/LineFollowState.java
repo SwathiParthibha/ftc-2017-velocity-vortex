@@ -38,7 +38,7 @@ public class LineFollowState extends BasicAbstractState {
 
     private AllianceColor color = null;
 
-    private static final int DISTANCE_FROM_BEACON = 11;
+    private static final int DISTANCE_FROM_BEACON = 9;
 
     public LineFollowState(Telemetry telemetry, StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, I2cDeviceSynchImpl rangeSensor, AllianceColor color) {
         this.stateName = stateName;
@@ -79,21 +79,21 @@ public class LineFollowState extends BasicAbstractState {
 
         if(!isDone()) {
             if(color == AllianceColor.RED){
-                if (lightSensor.getLightDetected() > 0.3) {
+                if (lightSensor.getLightDetected() > 0.27) {
                     leftMotor.setPower(0);
-                    rightMotor.setPower(0.2);
+                    rightMotor.setPower(0.3);
                 } else {
-                    leftMotor.setPower(0.2);
+                    leftMotor.setPower(0.3);
                     rightMotor.setPower(0);
                 }
                 return stateName;
             } else if(color == AllianceColor.BLUE){
-                if (lightSensor.getLightDetected() > 0.3) {
-                    leftMotor.setPower(0.2);
+                if (lightSensor.getLightDetected() > 0.27) {
+                    leftMotor.setPower(0.3);
                     rightMotor.setPower(0);
                 } else {
                     leftMotor.setPower(0);
-                    rightMotor.setPower(0.2);
+                    rightMotor.setPower(0.3);
                 }
                 return stateName;
             } else {
