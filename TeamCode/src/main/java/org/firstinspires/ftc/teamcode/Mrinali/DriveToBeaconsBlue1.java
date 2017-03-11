@@ -109,12 +109,11 @@ public class DriveToBeaconsBlue1 extends LinearOpMode {
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 1, auto.backup - 1, 3); //The robot then moves backward using encoders
         auto.turn(0); //and turns parallel to the beacon using the IMU
         // auto.encoderDrive(.5, 3, 3, 5);
-        auto.turn(0);
         // auto.encoderDrive(FASTER_SPEED, 4, 4, 1);
         auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
         //coastTime.reset();
         //while (opModeIsActive() && coastTime.seconds() < .4); //waits 1 second before powering motors again
-        //auto.turn(0);
+        auto.turn(0);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
@@ -122,7 +121,7 @@ public class DriveToBeaconsBlue1 extends LinearOpMode {
         auto.followLineBlueSide2();
         auto.pushBlueButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
-        auto.turn(145);
+        auto.turn(155);
         auto.encoderDrive(FASTER_SPEED, 20, 20, 5);
     }
 }

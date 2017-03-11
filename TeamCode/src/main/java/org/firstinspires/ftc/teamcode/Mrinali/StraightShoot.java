@@ -55,9 +55,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Straight Shoot Center", group="Pushbot")
+@Autonomous(name="Delayed Straight Shoot", group="Pushbot")
 //@Disabled
-public class ShootDriveToCenter extends LinearOpMode {
+public class StraightShoot extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
@@ -96,8 +96,8 @@ public class ShootDriveToCenter extends LinearOpMode {
             idle();
         }
 
+        sleep(3000);
         auto.encoderDriveSpinup(.3, 12, 12, 3);
         auto.shoot();
-        auto.encoderDrive(auto.APPROACH_SPEED, 10, 10, 3);
     }
 }

@@ -714,13 +714,13 @@ public class AutonomousActions extends LinearOpMode {
             } else if (side){
                 white = false;
                 telemetry.addLine("Moving right");
-                leftMotor.setPower(0.2);
-                rightMotor.setPower(-0.1);
+                leftMotor.setPower(0.1);
+                rightMotor.setPower(0);
             } else {
                 white = false;
                 telemetry.addLine("Moving left");
-                leftMotor.setPower(-0.1);
-                rightMotor.setPower(0.2);
+                leftMotor.setPower(0);
+                rightMotor.setPower(0.1);
             }
             telemetry.update();
 
