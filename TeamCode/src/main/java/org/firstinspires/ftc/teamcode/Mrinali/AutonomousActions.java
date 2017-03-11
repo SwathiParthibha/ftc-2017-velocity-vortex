@@ -1023,6 +1023,15 @@ public class AutonomousActions extends LinearOpMode {
             telemetry.addData("Right motor busy", rightMotor.isBusy());
             telemetry.update();
 
+            /*
+            if (speed >= .5
+                    && Math.abs(newLeftTarget - leftMotor.getCurrentPosition()) < 3*ROTATION
+                    && Math.abs(newRightTarget - rightMotor.getCurrentPosition()) < 3*ROTATION) {
+                rightMotor.setPower(rightMotor.getPower() - 0.05*speed);
+                leftMotor.setPower(leftMotor.getPower() - 0.05*speed);
+            }
+            */
+
             idle();
         }
         // Stop all motion;

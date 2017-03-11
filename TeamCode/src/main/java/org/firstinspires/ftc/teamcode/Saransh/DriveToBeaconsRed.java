@@ -85,7 +85,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
             // Display the light level while we are waiting to start
             telemetry.addData("Light Level", auto.lightSensor.getLightDetected());
             telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
-            auto.angleInit = auto.IMUheading();
+            //auto.angleInit = auto.IMUheading();
             auto.angleZ = auto.IMUheading();
             telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
             telemetry.addData("Angle", auto.angleZ);
