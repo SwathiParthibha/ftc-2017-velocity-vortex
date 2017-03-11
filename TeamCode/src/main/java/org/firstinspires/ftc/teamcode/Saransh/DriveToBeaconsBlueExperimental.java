@@ -35,7 +35,7 @@ package org.firstinspires.ftc.teamcode.Saransh;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions;
+import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActionsColor;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -64,7 +64,7 @@ public class DriveToBeaconsBlueExperimental extends LinearOpMode {
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
-    org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions auto = new AutonomousActions(this);
+    AutonomousActionsColor auto = new AutonomousActionsColor(this);
     double FASTER_SPEED = .7;
 
     @Override

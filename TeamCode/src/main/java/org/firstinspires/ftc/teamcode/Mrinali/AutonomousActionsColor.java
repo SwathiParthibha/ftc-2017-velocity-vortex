@@ -45,17 +45,21 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
 import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -79,7 +83,7 @@ import java.util.concurrent.Executors;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-public class AutonomousActions extends LinearOpMode {
+public class AutonomousActionsColor extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
@@ -107,6 +111,7 @@ public class AutonomousActions extends LinearOpMode {
     public ColorSensor rightColorSensor;
     BNO055IMU imu;
     Orientation angles;
+    AllianceColor color;
 
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
     public double angleZ = 0;
@@ -146,7 +151,7 @@ public class AutonomousActions extends LinearOpMode {
 
     private boolean USE_TELEMETRY = false;
 
-    public AutonomousActions(LinearOpMode anOpMode) {
+    public AutonomousActionsColor(LinearOpMode anOpMode) {
         opMode = anOpMode;
     }
 
@@ -157,6 +162,102 @@ public class AutonomousActions extends LinearOpMode {
 
     public double startShootingtime = 0;
     public double prevTime = 0;
+
+    public void init(HardwareMap hardwareMap, Telemetry telem, AllianceColor allianceColor) throws InterruptedException {
+
+        // Define and Initialize Motors
+        leftMotor = hardwareMap.dcMotor.get("l");
+        rightMotor = hardwareMap.dcMotor.get("r");
+
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        // Set all motors to zero power
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        shooter1 = hardwareMap.dcMotor.get("shooter1");
+        shooter2 = hardwareMap.dcMotor.get("shooter2");
+
+        MotorFactory motorFactory = MotorFactory.getInstance();
+        ShooterMotor leftShooter = new ShooterMotor();
+        leftShooter.setName(Constants.MOTORNAME.LEFT_SHOOTER);
+        motorFactory.addMotor(leftShooter);
+
+        ShooterMotor rightShooter = new ShooterMotor();
+        rightShooter.setName(Constants.MOTORNAME.RIGHT_SHOOTER);
+        motorFactory.addMotor(rightShooter);
+
+        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
+        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
+
+        scooper = hardwareMap.dcMotor.get("scooper");
+
+        leftArm = hardwareMap.servo.get("leftservo");
+        rightArm = hardwareMap.servo.get("rightservo");
+        leftServoPos = LEFT_START_VAL;
+        rightServoPos = RIGHT_START_VAL;
+        leftArm.setPosition(leftServoPos);
+        rightArm.setPosition(rightServoPos);
+
+        capArm = hardwareMap.servo.get("capArm");
+        capArm.setPosition(capServoPos + .02);
+
+        state = false;
+        color = allianceColor;
+
+        shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        telemetry = telem;
+
+        // get a reference to our Light Sensor object.
+        lightSensor = hardwareMap.lightSensor.get("light sensor");
+        rangeA = hardwareMap.i2cDevice.get("range sensor");// Primary LEGO Light Sensor
+        rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x2a), false);
+        rangeA = hardwareMap.i2cDevice.get("r side range");// Primary LEGO Light Sensor
+        sideRangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x28), false);
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu.initialize(parameters);
+
+        initialTilt = frontTilt();
+
+        rangeSensor.engage();
+        sideRangeSensor.engage();
+
+        //angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
+        //origAngle = angles.firstAngle;
+
+        leftColorSensor = hardwareMap.colorSensor.get("lcs");
+
+        rightColorSensor = hardwareMap.colorSensor.get("rcs");
+        I2cAddr i2cAddr = I2cAddr.create8bit(0x4c);
+        rightColorSensor.setI2cAddress(i2cAddr);
+
+        lightSensor.enableLed(true);
+    }
 
     public void init(HardwareMap hardwareMap, Telemetry telem) throws InterruptedException {
 
@@ -243,12 +344,6 @@ public class AutonomousActions extends LinearOpMode {
 
         //angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         //origAngle = angles.firstAngle;
-
-        leftColorSensor = hardwareMap.colorSensor.get("lcs");
-
-        rightColorSensor = hardwareMap.colorSensor.get("rcs");
-        I2cAddr i2cAddr = I2cAddr.create8bit(0x4c);
-        rightColorSensor.setI2cAddress(i2cAddr);
 
         lightSensor.enableLed(true);
     }
@@ -676,6 +771,64 @@ public class AutonomousActions extends LinearOpMode {
         executorService.shutdown();
     }
 
+    public  void followLine() throws InterruptedException {
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        boolean side;
+        if (color == AllianceColor.BLUE) {
+            leftMotor.setPower(.2);
+            rightMotor.setPower(-.2);
+            side = false;
+        }
+        else {
+            leftMotor.setPower(-.2);
+            rightMotor.setPower(.2);
+            side = true;
+        }
+        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            idle();
+        }
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+
+        boolean white = false;
+        leftMotor.setPower(.1);
+        rightMotor.setPower(.1);
+
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 13) {
+            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            telemetry.addData("Angle", IMUheading());
+            if (lightSensor.getLightDetected() >= WHITE_THRESHOLD) {
+                if (!white) // ensures that it only switches once when line is detected
+                    side = !side;
+                white = true;
+            } else if (side){
+                white = false;
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(0);
+            } else {
+                white = false;
+                telemetry.addLine("Moving left");
+                leftMotor.setPower(0);
+                rightMotor.setPower(0.2);
+            }
+            telemetry.update();
+
+            idle();
+        }
+
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
     public void followLineBlueSide2() throws InterruptedException {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -726,6 +879,155 @@ public class AutonomousActions extends LinearOpMode {
         stopRobot();
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
+    public void pushButton() throws InterruptedException {
+
+        telemetry.log().add("in the push button method");
+
+        telemetry.update();
+        leftColorSensor.enableLed(true);
+        rightColorSensor.enableLed(true);
+
+        telemetry.update();
+
+        ElapsedTime time = new ElapsedTime();
+        time.reset();
+
+        boolean wrongColor;
+
+        do {
+            telemetry.addData("Time", time.seconds());
+            telemetry.log().add("in the push button method while loop");
+            telemetry.addLine("Left blue: " + leftColorSensor.blue() + " | Left red: " + leftColorSensor.red());
+            telemetry.addLine("Right blue: " + rightColorSensor.blue() + " | Right red: " + rightColorSensor.red());
+
+            telemetry.update();
+
+            wrongColor = false;
+
+            if (color == AllianceColor.BLUE) {
+                if (leftColorSensor.blue() > rightColorSensor.blue()) {// && !verifyBlue()){
+                    //write the code here to press the left button
+                    telemetry.log().add("left is blue");
+                    telemetry.update();
+
+                    leftMotor.setPower(APPROACH_SPEED * .6); //motors seem to work in reverse
+                    rightMotor.setPower(0);
+                } else if (rightColorSensor.blue() > leftColorSensor.blue()) {// && !verifyBlue()){
+                    //write the code here to press the right button
+                    telemetry.log().add("right is blue");
+                    telemetry.update();
+
+                    rightMotor.setPower(APPROACH_SPEED * .6); //motors seem to work in reverse
+                    leftMotor.setPower(0);
+                } else if (leftColorSensor.red() > leftColorSensor.blue() &&
+                        rightColorSensor.red() > rightColorSensor.blue()) {
+                    //red button has been pressed
+                    telemetry.log().add("beacon is red");
+                    telemetry.update();
+
+                    //sleep(4000); // wait 5 seconds total
+                    leftMotor.setPower(APPROACH_SPEED * .6);
+                    rightMotor.setPower(APPROACH_SPEED * .6);
+
+                    wrongColor = true;
+                } else if (getcmUltrasonic(rangeSensor) > 8) {
+                    telemetry.log().add("too far");
+                    encoderDrive(APPROACH_SPEED * .6, 1, 1, 1);
+                } else {
+                    leftMotor.setPower(0);
+                    rightMotor.setPower(0);
+                    telemetry.log().add("blue is not detected");
+                    telemetry.update();
+                    break;
+                }
+            }
+            else if (color == AllianceColor.RED) {
+                if (leftColorSensor.red() > rightColorSensor.red()) {// && !verifyBlue()){
+                    //write the code here to press the left button
+                    telemetry.log().add("left is red");
+                    telemetry.update();
+
+                    leftMotor.setPower(APPROACH_SPEED * .6); //motors seem to work in reverse
+                    rightMotor.setPower(0);
+                } else if (rightColorSensor.red() > leftColorSensor.red()) {// && !verifyBlue()){
+                    //write the code here to press the right button
+                    telemetry.log().add("right is red");
+                    telemetry.update();
+
+                    rightMotor.setPower(APPROACH_SPEED * .6); //motors seem to work in reverse
+                    leftMotor.setPower(0);
+                } else if (leftColorSensor.blue() > leftColorSensor.red()
+                        && rightColorSensor.blue() > rightColorSensor.red()) {
+                    //blue button has been pressed
+                    telemetry.log().add("beacon is blue");
+                    telemetry.update();
+
+                    //sleep(4000); // wait 5 seconds total
+                    leftMotor.setPower(APPROACH_SPEED * .6);
+                    rightMotor.setPower(APPROACH_SPEED * .6);
+
+                    wrongColor = true;
+                } else if (getcmUltrasonic(rangeSensor) > 8) {
+                    encoderDrive(APPROACH_SPEED * .6, 1, 1, 1);
+                } else {
+                    leftMotor.setPower(0);
+                    rightMotor.setPower(0);
+                    telemetry.log().add("red is not detected");
+                    telemetry.update();
+                    break;
+                }
+            }
+            telemetry.update();
+            sleep(1500);
+            leftMotor.setPower(0);
+            rightMotor.setPower(0);
+
+            //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            leftMotor.setPower(-APPROACH_SPEED * .8);
+            rightMotor.setPower(-APPROACH_SPEED * .8);
+            sleep(100);
+            leftMotor.setPower(0);
+            rightMotor.setPower(0);
+
+            telemetry.addLine("Left blue: " + leftColorSensor.blue() + " | Left red: " + leftColorSensor.red());
+            telemetry.addLine("Right blue: " + rightColorSensor.blue() + " | Right red: " + rightColorSensor.red());
+            telemetry.update();
+
+            idle();
+            //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        } while (opMode.opModeIsActive() && !verify()
+                && (time.seconds() < 4 || wrongColor));
+
+        telemetry.log().add("end of the push button method");
+
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+    }
+
+    public boolean verify() {
+        if (leftColorSensor.alpha() == 255 || rightColorSensor.alpha() == 255)
+            throw new RuntimeException("Color Sensor problems");
+        if (color == AllianceColor.BLUE) {
+            if (leftColorSensor.blue() > leftColorSensor.red() && rightColorSensor.blue() > rightColorSensor.red()) {
+                telemetry.addLine("Beacon is blue");
+                return true;
+            }
+            telemetry.addLine("Beacon is red");
+        }
+        else if (color == AllianceColor.RED) {
+            if (leftColorSensor.red() > leftColorSensor.blue() && rightColorSensor.red() > rightColorSensor.blue()) {
+                telemetry.addLine("Beacon is red");
+                return true;
+            }
+            telemetry.addLine("Beacon is blue");
+        }
+        telemetry.update();
+        return false;
     }
 
     public void pushBlueButton() throws InterruptedException {
