@@ -45,17 +45,20 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
 import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -711,13 +714,13 @@ public class AutonomousActions extends LinearOpMode {
             } else if (side){
                 white = false;
                 telemetry.addLine("Moving right");
-                leftMotor.setPower(0.1);
-                rightMotor.setPower(0);
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(-0.1);
             } else {
                 white = false;
                 telemetry.addLine("Moving left");
-                leftMotor.setPower(0);
-                rightMotor.setPower(0.1);
+                leftMotor.setPower(-0.1);
+                rightMotor.setPower(0.2);
             }
             telemetry.update();
 
@@ -1019,15 +1022,6 @@ public class AutonomousActions extends LinearOpMode {
             telemetry.addData("Left motor busy", leftMotor.isBusy());
             telemetry.addData("Right motor busy", rightMotor.isBusy());
             telemetry.update();
-
-            /*
-            if (speed >= .5
-                    && Math.abs(newLeftTarget - leftMotor.getCurrentPosition()) < 3*ROTATION
-                    && Math.abs(newRightTarget - rightMotor.getCurrentPosition()) < 3*ROTATION) {
-                rightMotor.setPower(rightMotor.getPower() - 0.05*speed);
-                leftMotor.setPower(leftMotor.getPower() - 0.05*speed);
-            }
-            */
 
             idle();
         }

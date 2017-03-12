@@ -55,14 +55,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Straight Shoot Center", group="Pushbot")
+@Autonomous(name="Shoot Straight", group="Pushbot")
 //@Disabled
 public class ShootDriveToCenter extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
-    AutonomousActionsColor auto = new AutonomousActionsColor(this);
+    AutonomousActions auto = new AutonomousActions(this);
     double FASTER_SPEED = .7;
 
     @Override
@@ -74,6 +74,8 @@ public class ShootDriveToCenter extends LinearOpMode {
         auto.init(hardwareMap, telemetry);
         auto.runOpMode();
 
+        telemetry.addData("verifyBlue", auto.verifyBlue()); //checks color sensors
+
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to runIMU");    //
         telemetry.update();
@@ -84,15 +86,18 @@ public class ShootDriveToCenter extends LinearOpMode {
             // Display the light level while we are waiting to start
             telemetry.addData("Light Level", auto.lightSensor.getLightDetected());
             telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
-            telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
             auto.angleZ = auto.IMUheading();
+            telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
             telemetry.addData("Angle", auto.angleZ);
+            //telemetry.addData("verifyBlue", verifyBlue());
+            telemetry.addData("leftColorSensor", auto.leftColorSensor.argb());
+            telemetry.addData("rightColorSensor", auto.rightColorSensor.argb());
             telemetry.update();
             idle();
         }
 
         auto.encoderDriveSpinup(.3, 12, 12, 3);
         auto.shoot();
-        auto.encoderDrive(auto.APPROACH_SPEED, 12, 12, 3);
+        auto.encoderDrive(auto.APPROACH_SPEED, 10, 10, 3);
     }
 }

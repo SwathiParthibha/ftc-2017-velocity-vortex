@@ -34,8 +34,7 @@ package org.firstinspires.ftc.teamcode.Mrinali;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -64,7 +63,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
     //To change blue to red: positive angles, red line follow and button push
 
     /* Declare OpMode members. */
-    AutonomousActionsColor auto = new AutonomousActionsColor(this);
+    AutonomousActions auto = new AutonomousActions(this);
     double FASTER_SPEED = .7;
 
     @Override
@@ -73,10 +72,10 @@ public class DriveToBeaconsRed extends LinearOpMode {
         /* Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        auto.init(hardwareMap, telemetry, AllianceColor.RED);
+        auto.init(hardwareMap, telemetry);
         auto.runOpMode();
 
-        telemetry.addData("verify", auto.verifyRed()); //checks color sensors
+        telemetry.addData("verifyBlue", auto.verifyBlue()); //checks color sensors
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to runIMU");    //
@@ -91,6 +90,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
             auto.angleZ = auto.IMUheading();
             telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
             telemetry.addData("Angle", auto.angleZ);
+            //telemetry.addData("verifyBlue", verifyBlue());
             telemetry.addData("leftColorSensor", auto.leftColorSensor.argb());
             telemetry.addData("rightColorSensor", auto.rightColorSensor.argb());
             telemetry.update();
