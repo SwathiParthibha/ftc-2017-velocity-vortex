@@ -76,7 +76,7 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
         auto.init(hardwareMap, telemetry, AllianceColor.RED);
         auto.runOpMode();
 
-        telemetry.addData("verify", auto.verifyRed()); //checks color sensors
+        telemetry.addData("verify", auto.verify()); //checks color sensors
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to runIMU");    //
@@ -108,7 +108,7 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
         sleep(100);
         auto.followLine();
         auto.pushButton(); //The robot then uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 1, auto.backup - 1, 3); //The robot then moves backward using encoders
+        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         auto.turn(0); //and turns parallel to the beacon using the IMU
         auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
         auto.turn(0);

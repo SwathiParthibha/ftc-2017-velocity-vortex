@@ -30,11 +30,13 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.Mrinali;
+package org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 /**
@@ -57,14 +59,14 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Red 1", group="Pushbot")
-//@Disabled
+@Autonomous(name="Beacons Red Old 1", group="Pushbot")
+@Disabled
 public class DriveToBeaconsRed1 extends LinearOpMode {
 
-    //To change red to blue: negative angles, color sensors sense blue, right side range sensor
+    //To change blue to red: positive angles, red line follow and button push
 
     /* Declare OpMode members. */
-    AutonomousActionsColor auto = new AutonomousActionsColor(this);
+    AutonomousActions auto = new AutonomousActions(this);
     double FASTER_SPEED = .7;
 
     @Override
@@ -73,15 +75,13 @@ public class DriveToBeaconsRed1 extends LinearOpMode {
         /* Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        auto.init(hardwareMap, telemetry, AllianceColor.RED);
+        auto.init(hardwareMap, telemetry);
         auto.runOpMode();
 
-        telemetry.addData("verify", auto.verify()); //checks color sensors
-        telemetry.addData("leftColorSensor", auto.leftColorSensor.argb());
-        telemetry.addData("rightColorSensor", auto.rightColorSensor.argb());
+        telemetry.addData("verify", auto.verifyRed()); //checks color sensors
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to runIMU");
+        telemetry.addData("Status", "Ready to runIMU");    //
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
@@ -100,23 +100,27 @@ public class DriveToBeaconsRed1 extends LinearOpMode {
         }
 
         auto.encoderDrive(auto.APPROACH_SPEED, 3, 3, 3);
-        auto.turn(45); //The robot uses the IMU to turn to 45 degrees
+        auto.turn(45); //The robot uses the IMU to turn to 40 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
+        //ElapsedTime coastTime = new ElapsedTime();
+        //while (opModeIsActive() && coastTime.seconds() < .5); //waits .5 seconds before powering motors again
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
 
         sleep(100);
-        auto.followLine();
-        auto.pushButton(); //The robot then uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 1, auto.backup - 1, 3); //The robot then moves backward using encoders
+        auto.followLineRedSide();
+        auto.pushRedButton(); //The robot then uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
+        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         auto.turn(0); //and turns parallel to the beacon using the IMU
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
         auto.turn(0);
+        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
+        //coastTime.reset();
+        //while (opModeIsActive() && coastTime.seconds() < .5); //waits 1 second before powering motors again
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
         sleep(100);
-        auto.followLine();
-        auto.pushButton(); //It uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
+        auto.followLineRedSide();
+        auto.pushRedButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(-155);
         auto.encoderDrive(FASTER_SPEED, 20, 20, 5);
