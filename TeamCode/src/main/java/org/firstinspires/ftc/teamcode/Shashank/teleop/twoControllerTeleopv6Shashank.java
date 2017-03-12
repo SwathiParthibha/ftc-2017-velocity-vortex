@@ -60,8 +60,6 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private PowerManager leftShooterPowerMgr;
     private PowerManager rightShooterPowerMgr;
 
-    boolean pid;
-
 
     private boolean swap = false;
     private MediaPlayer wrongBallSound = null, correctBallSound = null;
@@ -96,9 +94,8 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         swap = true;
 
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        pid = false;
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
         correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
@@ -176,18 +173,6 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
             swap = true;
-        }
-
-        if (gamepad1.a) {
-            pid = !pid;
-            if (pid) {
-                leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
-            else {
-                leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            }
         }
 
         if(gamepad1.x){
