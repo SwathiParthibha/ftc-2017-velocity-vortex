@@ -62,8 +62,7 @@ public class ShootDriveToCenter extends LinearOpMode {
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
-    AutonomousActionsColor auto = new AutonomousActionsColor(this);
-    double FASTER_SPEED = .7;
+    AutonomousActions auto = new AutonomousActions(this);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -75,18 +74,13 @@ public class ShootDriveToCenter extends LinearOpMode {
         auto.runOpMode();
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to runIMU");    //
+        telemetry.addData("Status", "Ready to Run");    //
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         while (!isStarted()) {
 
-            // Display the light level while we are waiting to start
-            telemetry.addData("Light Level", auto.lightSensor.getLightDetected());
-            telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
-            telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
-            auto.angleZ = auto.IMUheading();
-            telemetry.addData("Angle", auto.angleZ);
+            telemetry.addData("Status", "Ready to Run");    //
             telemetry.update();
             idle();
         }

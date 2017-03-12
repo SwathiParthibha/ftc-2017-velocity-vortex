@@ -26,7 +26,7 @@ public class RPMThreadSeconds implements Runnable {
     public void run() {
         DbgLog.msg("LOGGING RPM THREAD "+ this.toString());
         ShooterMotor shooterMotor = MotorFactory.getInstance().getMotor(motorName);
-        double rpm = MotorUtil.getCurrentRPM(1, TimeUnit.SECONDS, shooter.getCurrentPosition(), previousPosition);
+        int rpm = MotorUtil.getCurrentRPM(Constants.DELTA_TIME, shooter.getCurrentPosition(), previousPosition);
         shooterMotor.setRpm(rpm);
         previousPosition = shooter.getCurrentPosition();
     }

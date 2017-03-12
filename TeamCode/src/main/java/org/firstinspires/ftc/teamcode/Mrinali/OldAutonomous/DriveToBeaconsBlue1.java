@@ -37,7 +37,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.

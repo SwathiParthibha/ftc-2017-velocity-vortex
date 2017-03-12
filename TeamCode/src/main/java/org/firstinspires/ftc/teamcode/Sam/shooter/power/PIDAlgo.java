@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode.Sam.shooter.power;
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 
 public class PIDAlgo {
-    private static final double DEAD_BAND = 20;
+    private static final double DEAD_BAND = 100;
     private static final double KP = 0.00000000001;
     private static final double KI = 0.00000000001;//0.00000001
     private static final double KD = 0.00000000001;

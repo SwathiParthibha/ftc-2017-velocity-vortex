@@ -24,8 +24,11 @@ public class RPMThreadMilliseconds implements Runnable {
 
     @Override
     public void run() {
+        //at 50% power, you should be reading around 3769920 encoder ticks per second
         ShooterMotor shooterMotor = MotorFactory.getInstance().getMotor(motorName);
-        double rpm = MotorUtil.getCurrentRPM(Constants.DELTA_TIME, TimeUnit.MILLISECONDS, shooter.getCurrentPosition(), previousPosition);
+        int rpm = shooterMotor.getRpm();
+        if(shooter.getPower() > 0)
+            rpm = MotorUtil.getCurrentRPM(Constants.ONE_SECOND, shooter.getCurrentPosition(), previousPosition);
         shooterMotor.setRpm(rpm);
         previousPosition = shooter.getCurrentPosition();
     }

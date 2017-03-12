@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 
 public class ShooterMotor {
     private Constants.MOTORNAME name;
-    private double rpm = 0D;
+    private int rpm = 0;
 
     public Constants.MOTORNAME getName() {
         return name;
@@ -16,12 +16,12 @@ public class ShooterMotor {
         this.name = name;
     }
 
-    public double getRpm() {
+    public int getRpm() {
         //DbgLog.msg("rpm: "+rpm);
         return rpm;
     }
 
-    public void setRpm(double rpm) {
+    public void setRpm(int rpm) {
         this.rpm = rpm;
     }
 
