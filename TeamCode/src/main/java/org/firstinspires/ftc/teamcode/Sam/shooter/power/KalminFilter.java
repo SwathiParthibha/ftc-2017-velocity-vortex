@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Sam.shooter.power;
 
 
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
+import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -9,7 +10,7 @@ import java.util.concurrent.Executors;
 public class KalminFilter {
 
     private static final double STD_DEVIATION=0.2;
-    private double prevValue=0D;
+    private double prevValue= Constants.REQUESTED_ETPS;
     private double prevError = 1D;
     private double trustVal;
     private volatile double filteredRPM = 0.0;
@@ -50,7 +51,7 @@ public class KalminFilter {
 
     public void reset()
     {
-        prevValue=0D;
+        prevValue=Constants.REQUESTED_ETPS;
         prevError = 1D;
 
     }
