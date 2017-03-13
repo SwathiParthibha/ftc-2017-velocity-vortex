@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Shoot Straight", group="Pushbot")
+@Autonomous(name="Straight Shoot Center", group="Pushbot")
 //@Disabled
 public class ShootDriveToCenter extends LinearOpMode {
 
@@ -63,7 +63,6 @@ public class ShootDriveToCenter extends LinearOpMode {
 
     /* Declare OpMode members. */
     AutonomousActions auto = new AutonomousActions(this);
-    double FASTER_SPEED = .7;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -74,30 +73,20 @@ public class ShootDriveToCenter extends LinearOpMode {
         auto.init(hardwareMap, telemetry);
         auto.runOpMode();
 
-        telemetry.addData("verifyBlue", auto.verifyBlue()); //checks color sensors
-
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to runIMU");    //
+        telemetry.addData("Status", "Ready to Run");    //
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         while (!isStarted()) {
 
-            // Display the light level while we are waiting to start
-            telemetry.addData("Light Level", auto.lightSensor.getLightDetected());
-            telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
-            auto.angleZ = auto.IMUheading();
-            telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
-            telemetry.addData("Angle", auto.angleZ);
-            //telemetry.addData("verifyBlue", verifyBlue());
-            telemetry.addData("leftColorSensor", auto.leftColorSensor.argb());
-            telemetry.addData("rightColorSensor", auto.rightColorSensor.argb());
+            telemetry.addData("Status", "Ready to Run");    //
             telemetry.update();
             idle();
         }
 
         auto.encoderDriveSpinup(.3, 12, 12, 3);
         auto.shoot();
-        auto.encoderDrive(auto.APPROACH_SPEED, 10, 10, 3);
+        auto.encoderDrive(auto.APPROACH_SPEED, 12, 12, 3);
     }
 }

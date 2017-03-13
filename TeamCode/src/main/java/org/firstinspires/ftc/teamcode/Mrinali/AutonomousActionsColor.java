@@ -58,10 +58,14 @@ import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AutoStateMachineBuilder;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import ftc.electronvolts.statemachine.StateMachine;
+import ftc.electronvolts.statemachine.StateName;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -116,7 +120,7 @@ public class AutonomousActionsColor extends LinearOpMode {
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
     public double angleZ = 0;
 
-    static final double WHITE_THRESHOLD = 0.25;  // spans between 0.1 - 0.5 from dark to light
+    static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
     public static final double APPROACH_SPEED = 0.5;
     double TURN_POWER_1 = .2;
     double TURN_POWER_2 = .05;
@@ -150,6 +154,11 @@ public class AutonomousActionsColor extends LinearOpMode {
     double initialTilt;
 
     private boolean USE_TELEMETRY = false;
+
+    private enum S implements StateName {
+        FOLLOW_LINE,
+        STOP
+    }
 
     public AutonomousActionsColor(LinearOpMode anOpMode) {
         opMode = anOpMode;
@@ -319,33 +328,6 @@ public class AutonomousActionsColor extends LinearOpMode {
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         telemetry = telem;
-
-        // get a reference to our Light Sensor object.
-        lightSensor = hardwareMap.lightSensor.get("light sensor");
-        rangeA = hardwareMap.i2cDevice.get("range sensor");// Primary LEGO Light Sensor
-        rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x2a), false);
-        rangeA = hardwareMap.i2cDevice.get("r side range");// Primary LEGO Light Sensor
-        sideRangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x28), false);
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        imu.initialize(parameters);
-
-        initialTilt = frontTilt();
-
-        rangeSensor.engage();
-        sideRangeSensor.engage();
-
-        //angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
-        //origAngle = angles.firstAngle;
-
-        lightSensor.enableLed(true);
     }
 
     public double IMUheading() {
@@ -720,55 +702,19 @@ public class AutonomousActionsColor extends LinearOpMode {
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
-    public void followLineBlueSide1() throws InterruptedException {
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        telemetry.addLine("Following Line");
-        final ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                while (!executorService.isShutdown())
-                    lightDetected = lightSensor.getLightDetected();
-            }
-        });
-        leftMotor.setPower(.2);
-        rightMotor.setPower(-.2);
-        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
-            telemetry.addData("Light", lightSensor.getLightDetected());
-            idle();
+    public void followLineStateMachineBlue(){
+        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.FOLLOW_LINE);
+        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_LINE, S.STOP, leftMotor, rightMotor, lightSensor, rangeSensor, AllianceColor.BLUE);
+        autoStateMachineBuilder.addStop(S.STOP);
+        StateMachine stateMachine = autoStateMachineBuilder.build();
+        while(stateMachine.getCurrentStateName() != S.STOP){
+            stateMachine.act();
         }
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-        ElapsedTime followTime = new ElapsedTime();
-        followTime.reset();
-        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
-            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
-            telemetry.addData("Angle", IMUheading());
-            telemetry.addData("Light", lightSensor.getLightDetected());
-            if (lightSensor.getLightDetected() > WHITE_THRESHOLD
-                    && Math.abs(IMUheading() + 90) <= 1) { //within 2 of -90
-                leftMotor.setPower(0.1);
-                rightMotor.setPower(0.1);
-            } else if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
-                telemetry.addLine("Moving right");
-                leftMotor.setPower(0.2);
-                rightMotor.setPower(0);
-            } else {
-                telemetry.addLine("Moving left");
-                leftMotor.setPower(0);
-                rightMotor.setPower(0.2);
-            }
-            telemetry.update();
+    }
 
-            idle();
-        }
-        stopRobot();
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        executorService.shutdown();
+    public void followLineStateMachineRed(){
+        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.FOLLOW_LINE);
+        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_LINE, S.STOP, leftMotor, rightMotor, lightSensor, rangeSensor, AllianceColor.RED);
     }
 
     public  void followLine() throws InterruptedException {
@@ -776,16 +722,13 @@ public class AutonomousActionsColor extends LinearOpMode {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        boolean side;
         if (color == AllianceColor.BLUE) {
             leftMotor.setPower(.2);
             rightMotor.setPower(-.2);
-            side = false;
         }
-        else {
+        else if (color == AllianceColor.RED){
             leftMotor.setPower(-.2);
             rightMotor.setPower(.2);
-            side = true;
         }
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
             telemetry.addData("Light", lightSensor.getLightDetected());
@@ -794,7 +737,6 @@ public class AutonomousActionsColor extends LinearOpMode {
         leftMotor.setPower(0);
         rightMotor.setPower(0);
 
-        boolean white = false;
         leftMotor.setPower(.1);
         rightMotor.setPower(.1);
 
@@ -802,81 +744,35 @@ public class AutonomousActionsColor extends LinearOpMode {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
             telemetry.addData("Light", lightSensor.getLightDetected());
             telemetry.addData("Angle", IMUheading());
-            if (lightSensor.getLightDetected() >= WHITE_THRESHOLD) {
-                if (!white) // ensures that it only switches once when line is detected
-                    side = !side;
-                white = true;
-            } else if (side){
-                white = false;
-                telemetry.addLine("Moving right");
-                leftMotor.setPower(0.2);
-                rightMotor.setPower(0);
-            } else {
-                white = false;
-                telemetry.addLine("Moving left");
-                leftMotor.setPower(0);
-                rightMotor.setPower(0.2);
+
+            int expectedAngle = 0;
+            if (color == AllianceColor.BLUE) {
+                expectedAngle = -90;
             }
-            telemetry.update();
+            else if (color == AllianceColor.RED)
+                expectedAngle = 90;
 
-            idle();
-        }
-
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-    }
-
-    public void followLineBlueSide2() throws InterruptedException {
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        telemetry.addLine("Following Line");
-        leftMotor.setPower(.2);
-        rightMotor.setPower(-.2);
-        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
-            telemetry.addData("Light", lightSensor.getLightDetected());
-            idle();
-        }
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-        boolean side = false;
-        boolean white = false;
-        leftMotor.setPower(.1);
-        rightMotor.setPower(.1);
-        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 13) {
-            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
-            telemetry.addData("Light", lightSensor.getLightDetected());
-            telemetry.addData("Angle", IMUheading());
-            if (lightSensor.getLightDetected() >= WHITE_THRESHOLD) {
-                if (!white) // ensures that it only switches once when line is detected
-                    side = !side;
-                white = true;
-                /*
-                if (Math.abs(IMUheading() + 90) <= 1) { //within 2 of -90
-                    leftMotor.setPower(0.1);
-                    rightMotor.setPower(0.1);
+            if (lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+                if (IMUheading() < expectedAngle) {
+                    leftMotor.setPower(0);
+                    rightMotor.setPower(.2);
+                } else if (IMUheading() > expectedAngle) {
+                    leftMotor.setPower(.2);
+                    rightMotor.setPower(0);
                 }
-                */
-            } else if (side){
-                white = false;
-                telemetry.addLine("Moving right");
-                leftMotor.setPower(0.1);
-                rightMotor.setPower(0);
-            } else {
-                white = false;
-                telemetry.addLine("Moving left");
-                leftMotor.setPower(0);
-                rightMotor.setPower(0.1);
+            }
+            else {
+                leftMotor.setPower(.1);
+                rightMotor.setPower(.1);
             }
             telemetry.update();
 
             idle();
         }
-        stopRobot();
+
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
@@ -1028,246 +924,6 @@ public class AutonomousActionsColor extends LinearOpMode {
         }
         telemetry.update();
         return false;
-    }
-
-    public void pushBlueButton() throws InterruptedException {
-
-        telemetry.log().add("in the push button method");
-
-        telemetry.update();
-        leftColorSensor.enableLed(true);
-        rightColorSensor.enableLed(true);
-
-        telemetry.update();
-        int leftBlue = leftColorSensor.blue();
-        int rightBlue = rightColorSensor.blue();
-
-        ElapsedTime time = new ElapsedTime();
-        time.reset();
-
-        boolean wrongColor;
-
-        do {
-            telemetry.addData("Time", time.seconds());
-            telemetry.log().add("in the push button method while loop");
-            telemetry.addData("Left blue: ", leftColorSensor.blue());
-            telemetry.addData("Right blue: ", rightColorSensor.blue());
-
-            telemetry.update();
-
-            wrongColor = false;
-
-            if (leftColorSensor.blue() > rightColorSensor.blue()) {// && !verifyBlue()){
-                //write the code here to press the left button
-                telemetry.log().add("left is blue");
-                telemetry.update();
-
-                leftMotor.setPower(APPROACH_SPEED * .6); //motors seem to work in reverse
-                rightMotor.setPower(0);
-            } else if (rightColorSensor.blue() > leftColorSensor.blue()) {// && !verifyBlue()){
-                //write the code here to press the right button
-                telemetry.log().add("right is blue");
-                telemetry.update();
-
-                rightMotor.setPower(APPROACH_SPEED * .6); //motors seem to work in reverse
-                leftMotor.setPower(0);
-            } else if (leftColorSensor.red() > leftColorSensor.blue() &&
-                    rightColorSensor.red() > rightColorSensor.blue()) {
-                //red button has been pressed
-                telemetry.log().add("beacon is red");
-                telemetry.update();
-
-                //sleep(4000); // wait 5 seconds total
-                leftMotor.setPower(APPROACH_SPEED * .6);
-                rightMotor.setPower(APPROACH_SPEED * .6);
-
-                wrongColor = true;
-            } else if (getcmUltrasonic(rangeSensor) > 8) {
-                telemetry.log().add("too far");
-                encoderDrive(APPROACH_SPEED * .6, 1, 1, 1);
-            } else {
-                leftMotor.setPower(0);
-                rightMotor.setPower(0);
-                telemetry.log().add("blue is not detected");
-                telemetry.update();
-                break;
-            }
-            telemetry.update();
-            sleep(1500);
-            leftMotor.setPower(0);
-            rightMotor.setPower(0);
-
-            //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-            leftMotor.setPower(-APPROACH_SPEED * .8);
-            rightMotor.setPower(-APPROACH_SPEED * .8);
-            sleep(100);
-            leftMotor.setPower(0);
-            rightMotor.setPower(0);
-
-            telemetry.addData("Left blue: ", leftColorSensor.blue());
-            telemetry.addData("Right blue: ", rightColorSensor.blue());
-            telemetry.update();
-
-            idle();
-            //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        } while (opMode.opModeIsActive() && !verifyBlue()
-                && (time.seconds() < 4 || wrongColor));
-
-        telemetry.log().add("end of the push button method");
-
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-    }
-
-    public void pushRedButton() throws InterruptedException {
-
-        telemetry.log().add("in the push button method");
-
-        telemetry.update();
-        leftColorSensor.enableLed(true);
-        rightColorSensor.enableLed(true);
-
-        telemetry.update();
-        int leftBlue = leftColorSensor.blue();
-        int rightBlue = rightColorSensor.blue();
-
-        ElapsedTime time = new ElapsedTime();
-        time.reset();
-
-        boolean wrongColor;
-
-        do {
-            telemetry.log().add("in the push button method while loop");
-            telemetry.addData("Left red: ", leftColorSensor.red());
-            telemetry.addData("Right red: ", rightColorSensor.red());
-
-            telemetry.update();
-
-            wrongColor = false;
-
-            if (leftColorSensor.red() > rightColorSensor.red()) {// && !verifyBlue()){
-                //write the code here to press the left button
-                telemetry.log().add("left is red");
-                telemetry.update();
-
-                leftMotor.setPower(APPROACH_SPEED * .6); //motors seem to work in reverse
-                rightMotor.setPower(0);
-            } else if (rightColorSensor.red() > leftColorSensor.red()) {// && !verifyBlue()){
-                //write the code here to press the right button
-                telemetry.log().add("right is red");
-                telemetry.update();
-
-                rightMotor.setPower(APPROACH_SPEED * .6); //motors seem to work in reverse
-                leftMotor.setPower(0);
-            } else if (leftColorSensor.blue() > leftColorSensor.red()
-                    && rightColorSensor.blue() > rightColorSensor.red()) {
-                //red button has been pressed
-                telemetry.log().add("beacon is blue");
-                telemetry.update();
-
-                //sleep(4000); // wait 5 seconds total
-                leftMotor.setPower(APPROACH_SPEED * .6);
-                rightMotor.setPower(APPROACH_SPEED * .6);
-
-                wrongColor = true;
-            } else if (getcmUltrasonic(rangeSensor) > 8) {
-                encoderDrive(APPROACH_SPEED * .6, 1, 1, 1);
-            } else {
-                leftMotor.setPower(0);
-                rightMotor.setPower(0);
-                telemetry.log().add("red is not detected");
-                telemetry.update();
-                break;
-            }
-            telemetry.update();
-            sleep(1500);
-            leftMotor.setPower(0);
-            rightMotor.setPower(0);
-
-            //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-            rightMotor.setPower(-APPROACH_SPEED * .8);
-            leftMotor.setPower(-APPROACH_SPEED * .8);
-            sleep(80);
-            rightMotor.setPower(0);
-            leftMotor.setPower(0);
-
-            //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-            telemetry.addData("Left red: ", leftColorSensor.red());
-            telemetry.addData("Right red: ", rightColorSensor.red());
-            telemetry.update();
-
-            idle();
-        } while (opMode.opModeIsActive() && !verifyRed()
-                && (time.seconds() < 4 || wrongColor));
-
-        telemetry.log().add("end of the push button method");
-
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-    }
-
-    public boolean verifyBlue() {
-        if (leftColorSensor.alpha() == 255 || rightColorSensor.alpha() == 255)
-            throw new RuntimeException("Color Sensor problems");
-        /*else if (leftColorSensor.red() == rightColorSensor.red()
-                && leftColorSensor.blue() == rightColorSensor.blue()
-                && leftColorSensor.red() > 2
-                && rightColorSensor.red() > 2)
-            throw new RuntimeException("Color Sensor problems");*/
-
-        if (leftColorSensor.blue() > leftColorSensor.red() && rightColorSensor.blue() > rightColorSensor.red()) {
-            telemetry.addLine("Beacon is blue");
-            return true;
-        }
-        /*else if(Math.abs(leftColorSensor.blue() - rightColorSensor.blue()) < 2){
-            return true;
-        }*/
-        telemetry.addLine("Beacon is red");
-        return false;
-    }
-
-    public boolean verifyRed() {
-        if (leftColorSensor.alpha() == 255 || rightColorSensor.alpha() == 255)
-            throw new RuntimeException("Color Sensor problems");
-        /*else if (leftColorSensor.red() == rightColorSensor.red()
-                && leftColorSensor.blue() == rightColorSensor.blue()
-                && leftColorSensor.red() > 2
-                && rightColorSensor.red() > 2)
-            throw new RuntimeException("Color Sensor problems");*/
-
-        if (leftColorSensor.red() > leftColorSensor.blue() && rightColorSensor.red() > rightColorSensor.blue()) {
-            telemetry.addLine("Beacon is red");
-            return true;
-        }
-        /*else if(Math.abs(leftColorSensor.blue() - rightColorSensor.blue()) < 2){
-            return true;
-        }*/
-        telemetry.addLine("Beacon is blue");
-        return false;
-    }
-
-    void maintainDist() throws InterruptedException {
-
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-        sideRange = getcmUltrasonic(sideRangeSensor);
-        angleZ = IMUheading();
-        telemetry.addData("Side Range: ", getcmUltrasonic(sideRangeSensor));
-        telemetry.addData("Angle", angleZ);
-        telemetry.update();
-        double distCorrect = SIDE_DIST - sideRange; //positive if too close
-
-        //makes angle closer to 0
-        leftMotor.setPower(APPROACH_SPEED * .6 + angleZ / 50 - distCorrect / 60);
-        rightMotor.setPower(APPROACH_SPEED * .6 - angleZ / 50 + distCorrect / 60);
-
     }
 
     double frontTilt() {

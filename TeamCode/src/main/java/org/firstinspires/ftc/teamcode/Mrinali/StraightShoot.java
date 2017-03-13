@@ -55,14 +55,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Blue 3", group="Pushbot")
+@Autonomous(name="Delayed Straight Shoot", group="Pushbot")
 //@Disabled
-public class DriveToBeaconsBlue3 extends LinearOpMode {
+public class StraightShoot extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
-    AutonomousActions auto = new AutonomousActions(this);
+    AutonomousActionsColor auto = new AutonomousActionsColor(this);
     double FASTER_SPEED = .7;
 
     @Override
@@ -74,8 +74,6 @@ public class DriveToBeaconsBlue3 extends LinearOpMode {
         auto.init(hardwareMap, telemetry);
         auto.runOpMode();
 
-        telemetry.addData("verifyBlue", auto.verifyBlue()); //checks color sensors
-
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to runIMU");    //
         telemetry.update();
@@ -86,19 +84,15 @@ public class DriveToBeaconsBlue3 extends LinearOpMode {
             // Display the light level while we are waiting to start
             telemetry.addData("Light Level", auto.lightSensor.getLightDetected());
             telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
-            auto.angleZ = auto.IMUheading();
             telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
+            auto.angleZ = auto.IMUheading();
             telemetry.addData("Angle", auto.angleZ);
-            //telemetry.addData("verifyBlue", verifyBlue());
-            telemetry.addData("leftColorSensor", auto.leftColorSensor.argb());
-            telemetry.addData("rightColorSensor", auto.rightColorSensor.argb());
             telemetry.update();
             idle();
         }
 
-        auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
-
-        sleep(100);
-        auto.followLineBlueSide2();
+        sleep(3000);
+        auto.encoderDriveSpinup(.3, 12, 12, 3);
+        auto.shoot();
     }
 }

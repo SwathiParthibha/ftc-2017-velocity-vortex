@@ -648,7 +648,8 @@ public class ExperimentAutonomousActions extends LinearOpMode {
                 leftMotor.setPower(0.2);
                 rightMotor.setPower(0);
             }
-            else if (lightSensor.getLightDetected() < WHITE_THRESHOLD && whiteCounter - blackCounter == 1){
+            else if (lightSensor.getLightDetected() < WHITE_THRESHOLD &&
+                    (whiteCounter - blackCounter > 0 && whiteCounter - blackCounter < 4)){
                 blackCounter++;
                 telemetry.addLine("Moving left");
                 leftMotor.setPower(0);
