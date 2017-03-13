@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode.Mrinali;
 
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -54,15 +55,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
+import org.firstinspires.ftc.teamcode.Sam.shooter.RPMThreadMilliseconds;
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
+import org.firstinspires.ftc.teamcode.Sam.util.Util;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AutoStateMachineBuilder;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import ftc.electronvolts.statemachine.StateMachine;
 import ftc.electronvolts.statemachine.StateName;
@@ -94,7 +100,6 @@ public class AutonomousActionsColor extends LinearOpMode {
     /* Declare OpMode members. */
     //HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
     // could also use HardwarePushbotMatrix class.
-    LinearOpMode opMode;
     public DcMotor leftMotor = null;
     public DcMotor rightMotor = null;
     public DcMotor shooter1;
@@ -116,6 +121,12 @@ public class AutonomousActionsColor extends LinearOpMode {
     BNO055IMU imu;
     Orientation angles;
     AllianceColor color;
+    LinearOpMode opMode;
+
+    //MULTITHREADING
+    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(20);
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+    private ScheduledFuture scheduledFuture = null;
 
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
     public double angleZ = 0;
@@ -1134,9 +1145,23 @@ public class AutonomousActionsColor extends LinearOpMode {
 
     public void spinup(double seconds) {
         ElapsedTime shootTime = new ElapsedTime();
+        for(int i = 0; i <  20; i++){
+            //run a thread every fifty milliseconds, and each thread will re-run after a second
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+        }
+
+        scheduledFuture = executorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                DbgLog.msg("REGULATING POWER!!!!!");
+                leftShooterPowerMgr.regulatePower();
+                rightShooterPowerMgr.regulatePower();
+            }
+        }, 0, 250, TimeUnit.MILLISECONDS);
+
         while (opMode.opModeIsActive() && shootTime.seconds() < seconds) {
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+            //do nothing
         }
     }
 
@@ -1167,5 +1192,9 @@ public class AutonomousActionsColor extends LinearOpMode {
         rightServoPos = RIGHT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
         leftArm.setPosition(leftServoPos);
         rightArm.setPosition(rightServoPos);
+
+        scheduledFuture.cancel(true);
+        executorService.shutdown();
+        scheduledThreadPool.shutdown();
     }
 }
