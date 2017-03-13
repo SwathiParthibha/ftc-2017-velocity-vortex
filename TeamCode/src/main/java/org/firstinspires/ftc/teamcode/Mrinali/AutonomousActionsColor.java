@@ -715,6 +715,11 @@ public class AutonomousActionsColor extends LinearOpMode {
     public void followLineStateMachineRed(){
         AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.FOLLOW_LINE);
         autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_LINE, S.STOP, leftMotor, rightMotor, lightSensor, rangeSensor, AllianceColor.RED);
+        autoStateMachineBuilder.addStop(S.STOP);
+        StateMachine stateMachine = autoStateMachineBuilder.build();
+        while(stateMachine.getCurrentStateName() != S.STOP){
+            stateMachine.act();
+        }
     }
 
     public  void followLine() throws InterruptedException {
