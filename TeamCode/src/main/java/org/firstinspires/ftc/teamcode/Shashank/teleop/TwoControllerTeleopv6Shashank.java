@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -57,6 +58,8 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private Servo leftArm;
     private Servo rightArm;
     private Servo capArm;
+    private Servo flagServo;
+    private OpticalDistanceSensor opticalDistanceSensor = null;
     private PowerManager leftShooterPowerMgr;
     private PowerManager rightShooterPowerMgr;
 
@@ -89,6 +92,8 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         rightArm = this.hardwareMap.servo.get("rightservo");
         capArm = this.hardwareMap.servo.get("capArm");
         sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
+        flagServo = this.hardwareMap.servo.get("flagServo");
+        opticalDistanceSensor = this.hardwareMap.opticalDistanceSensor.get("ods");
 
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
