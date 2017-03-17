@@ -74,22 +74,18 @@ public class ShootDriveToCenter extends LinearOpMode {
         auto.runOpMode();
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to Run");
+        telemetry.addData("Status", "Ready to Run");    //
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         while (!isStarted()) {
 
-            telemetry.addData("Status", "Ready to Run");
+            telemetry.addData("Status", "Ready to Run");    //
             telemetry.update();
             idle();
         }
 
-        sleep(5000);
         auto.encoderDriveSpinup(.3, 12, 12, 3);
-        auto.shoot();
-        auto.scooper.setPower(-1);
-        auto.spinup(1.5);
         auto.shoot();
         auto.encoderDrive(auto.APPROACH_SPEED, 12, 12, 3);
     }

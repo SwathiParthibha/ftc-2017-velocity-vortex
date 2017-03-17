@@ -124,8 +124,8 @@ public class AutonomousActionsColor extends LinearOpMode {
     LinearOpMode opMode;
 
     //MULTITHREADING
-    private ScheduledExecutorService scheduledThreadPool = null;
-    private ScheduledExecutorService executorService = null;
+    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(20);
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
     private ScheduledFuture scheduledFuture = null;
 
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
@@ -166,15 +166,6 @@ public class AutonomousActionsColor extends LinearOpMode {
 
     private boolean USE_TELEMETRY = false;
 
-    public void shutDownThreads() {
-        if(scheduledThreadPool != null) {
-            scheduledThreadPool.shutdown();
-        }
-        if(executorService != null) {
-            executorService.shutdown();
-        }
-    }
-
     private enum S implements StateName {
         FOLLOW_LINE,
         STOP
@@ -182,14 +173,6 @@ public class AutonomousActionsColor extends LinearOpMode {
 
     public AutonomousActionsColor(LinearOpMode anOpMode) {
         opMode = anOpMode;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(opMode.opModeIsActive());
-                    //do nothing
-                shutDownThreads();
-            }
-        }).start();
     }
 
     @Override
@@ -343,7 +326,7 @@ public class AutonomousActionsColor extends LinearOpMode {
         rightArm.setPosition(rightServoPos);
 
         capArm = hardwareMap.servo.get("capArm");
-        capArm.setPosition(capServoPos - .02);
+        capArm.setPosition(capServoPos + .02);
 
         state = false;
 
@@ -1162,13 +1145,7 @@ public class AutonomousActionsColor extends LinearOpMode {
 
     public void spinup(double seconds) {
         ElapsedTime shootTime = new ElapsedTime();
-        if(scheduledThreadPool != null && !scheduledThreadPool.isShutdown())
-            scheduledThreadPool.shutdownNow();
-        if(executorService != null && !executorService.isShutdown())
-            executorService.shutdownNow();
-        scheduledThreadPool = Executors.newScheduledThreadPool(20);
-        executorService = Executors.newScheduledThreadPool(2);
-        for(int i = 0; i <  20; i++) {
+        for(int i = 0; i <  20; i++){
             //run a thread every fifty milliseconds, and each thread will re-run after a second
             scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
             scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
@@ -1192,27 +1169,32 @@ public class AutonomousActionsColor extends LinearOpMode {
         leftServoPos = LEFT_IN_VAL;
         rightServoPos = RIGHT_IN_VAL;
 
-        leftArm.setPosition(leftServoPos);
-        rightArm.setPosition(rightServoPos);
-
         ElapsedTime shootTime = new ElapsedTime();
-        shootTime.reset();
-        while (opMode.opModeIsActive() && shootTime.seconds() < 1.5) {
-            //leftShooterPowerMgr.regulatePower();        // This is where it shoots
-            //rightShooterPowerMgr.regulatePower();
+        scooper.setPower(1);
+        while (opMode.opModeIsActive() && shootTime.seconds() < .5) {
+            leftShooterPowerMgr.regulatePower();
+            rightShooterPowerMgr.regulatePower();
         }
+        scooper.setPower(0);
 
-        leftServoPos = LEFT_OUT_VAL;
-        rightServoPos = RIGHT_OUT_VAL;
         leftArm.setPosition(leftServoPos);
         rightArm.setPosition(rightServoPos);
 
+        shootTime.reset();
+        while (opMode.opModeIsActive() && shootTime.seconds() < .75) {
+            leftShooterPowerMgr.regulatePower();
+            rightShooterPowerMgr.regulatePower();
+        }
         shooter1.setPower(0);
         shooter2.setPower(0);
 
+        leftServoPos = LEFT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+        rightServoPos = RIGHT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+        leftArm.setPosition(leftServoPos);
+        rightArm.setPosition(rightServoPos);
+
+        scheduledFuture.cancel(true);
         executorService.shutdown();
         scheduledThreadPool.shutdown();
     }
-
-
 }
