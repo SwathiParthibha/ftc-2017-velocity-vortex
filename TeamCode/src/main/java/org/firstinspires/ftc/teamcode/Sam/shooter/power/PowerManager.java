@@ -86,13 +86,6 @@ public class PowerManager {
         motorTelemetry.setRpmErrorAdjustment(rpmErrorAdjustment);
         motorTelemetry.setPowerAdjustment(powerAdjustment);
 
-        if(motorName==Constants.MOTORNAME.RIGHT_SHOOTER) {
-            dcMotor.setPower(currentPower*1.09);//run right side faster
-        }
-        else {
-            dcMotor.setPower(currentPower);
-        }
-
     }
 
     private double clipPower(double power) {
