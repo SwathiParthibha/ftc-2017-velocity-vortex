@@ -43,6 +43,8 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private final double SERVO_ADJUSTMENT_VAL_LEFT = (Math.abs(LEFT_IN_VAL - LEFT_OUT_VAL) / 14);
     private final double SERVO_ADJUSTMENT_VAL_RIGHT = (Math.abs(RIGHT_IN_VAL - RIGHT_OUT_VAL) / 14);
     private final double SERVO_ADJUSTMENT_VAL_CAP = 0.02;
+    private final double ODS_MAX_VALUE = 0.44;
+    private final double ODS_MIN_VALUE = 0.32;
     double leftServoPos = 0.12;
     double rightServoPos = 0.76;
     double capServoPos = 0.38;
@@ -75,10 +77,11 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
 
     private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(20);
-    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(3);
     private ScheduledFuture scheduledFuture = null;
     private ShooterMotor leftShooter, rightShooter;
     private boolean alreadyScheduled = false;
+    private double amountOfLightDetected = 0;
 
     @Override
     public void init() {
@@ -131,6 +134,14 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
             scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
         }
+
+        executorService.schedule(new Runnable() {
+            @Override
+            public void run() {
+                while (!executorService.isShutdown())
+                    amountOfLightDetected = Range.clip(opticalDistanceSensor.getLightDetected(), ODS_MIN_VALUE, ODS_MAX_VALUE);
+            }
+        }, 0, TimeUnit.MILLISECONDS);
 
     }
 
@@ -191,6 +202,10 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
         }
 
+        //ods value without ball is 0.32 for getLightDetected()
+        //the max value is 0.6
+        flagServo.setPosition((((ODS_MAX_VALUE-amountOfLightDetected)/(ODS_MAX_VALUE-ODS_MIN_VALUE))+1)/2);
+
         if (gamepad2.a) {
             if(!alreadyScheduled) {
                 scheduledFuture = executorService.scheduleAtFixedRate(new Runnable() {
@@ -207,12 +222,12 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             shooter1.setPower(SHOOTER_POWER);
             shooter2.setPower(SHOOTER_POWER);
         } else if(gamepad2.y) {
-            Constants.REQUESTED_ETPS = 86856;//35150;//1855;//1590;//1750 good for close shots
-            Constants.DEFAULT_POWER = 0.47;//0.51;//0.455;//0.42
+            Constants.REQUESTED_ETPS = 77616;//35150;//1855;//1590;//1750 good for close shots
+            Constants.DEFAULT_POWER = 0.42;//0.51;//0.455;//0.42
             leftShooterPowerMgr.reset();
         } else if(gamepad2.x){
-            Constants.REQUESTED_ETPS = 66856;//1855;//1590;//1750 good for close shots
-            Constants.DEFAULT_POWER = 0.41;//0.455;//0.42
+            Constants.REQUESTED_ETPS = 68376;//1855;//1590;//1750 good for close shots
+            Constants.DEFAULT_POWER = 0.37;//0.455;//0.42
             leftShooterPowerMgr.reset();
         }else{
                 shooter1.setPower(0);
@@ -257,7 +272,6 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
                 wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
                 wrongBallSound.start();
             }
-            //sweeper.setPower(0.5);
         } else {
             isWrongBall();
             if (ballSensed) {
@@ -268,7 +282,6 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
                 correctBallSound.stop();
             }
             wrongBallSound.stop();
-            //sweeper.setPower(0);
         }
 
 
@@ -309,6 +322,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         telemetry.addData("Current right RPM", rightShooter.getRpm());
         telemetry.addData("gamepad1.x", gamepad1.x);
         telemetry.addData("cap arm", capArm.getPosition());
+        telemetry.addData("ods", opticalDistanceSensor.getLightDetected());
         telemetry.update();
     }
 
