@@ -81,18 +81,12 @@ public class StraightShoot extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         while (!isStarted()) {
 
-            // Display the light level while we are waiting to start
-            telemetry.addData("Light Level", auto.lightSensor.getLightDetected());
-            telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
-            telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
-            auto.angleZ = auto.IMUheading();
-            telemetry.addData("Angle", auto.angleZ);
+            telemetry.addData("Status", "Ready to Run");
             telemetry.update();
             idle();
         }
 
-        sleep(3000);
-        auto.encoderDriveSpinup(.3, 12, 12, 3);
-        auto.shoot();
+        sleep(15000);
+        auto.shoot(12, 2, 2);
     }
 }

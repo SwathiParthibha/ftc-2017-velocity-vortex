@@ -97,9 +97,7 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDriveSpinup(.3, 8, 8, 3);
-        auto.spinup(.5);
-        auto.shoot();
+        auto.shoot(8, 2, 1);
         auto.encoderDrive(auto.APPROACH_SPEED, -3.5, -3.5, 3);
         auto.turn(45); //The robot uses the IMU to turn to 45 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
@@ -110,6 +108,8 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
         auto.pushButton(); //The robot then uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         auto.turn(0); //and turns parallel to the beacon using the IMU
+        if (Math.abs(auto.IMUheading()) > 7)
+            auto.turn(0);
         auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
         auto.turn(0);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
