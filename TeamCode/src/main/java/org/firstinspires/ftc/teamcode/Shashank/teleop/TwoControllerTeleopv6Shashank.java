@@ -323,6 +323,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         telemetry.addData("gamepad1.x", gamepad1.x);
         telemetry.addData("cap arm", capArm.getPosition());
         telemetry.addData("ods", opticalDistanceSensor.getLightDetected());
+        telemetry.addData("alreadyScheduled", alreadyScheduled);
         telemetry.update();
     }
 
