@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.Mrinali;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
@@ -58,7 +59,7 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  */
 
 @Autonomous(name="Beacons Red Shoot", group="Pushbot")
-//@Disabled
+@Disabled
 public class DriveToBeaconsRedShoot extends LinearOpMode {
 
     //To change blue to red: positive angles, red line follow and button push

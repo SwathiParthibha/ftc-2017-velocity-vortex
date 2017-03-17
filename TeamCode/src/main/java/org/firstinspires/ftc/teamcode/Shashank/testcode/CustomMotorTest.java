@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Sam.util.Util;
  * Created by spmeg on 10/28/2016.
  */
 @Autonomous(name = "CustomMotorTest", group = "Tests")
-//@Disabled
+@Disabled
 public class CustomMotorTest extends OpMode {
     private DcMotor leftMotor;
     private DcMotor rightMotor;

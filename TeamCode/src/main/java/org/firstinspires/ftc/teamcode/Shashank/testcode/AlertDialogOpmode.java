@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.R;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  * Created by spmeg on 1/27/2017.
  */
 @Autonomous(name = "AlertDialogOpmode", group = "test Opmodes")
+@Disabled
 public class AlertDialogOpmode extends OpMode {
     private AllianceColor beaconColor = null;
 
