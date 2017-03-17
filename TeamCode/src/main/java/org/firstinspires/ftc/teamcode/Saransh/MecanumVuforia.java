@@ -2,7 +2,8 @@ package org.firstinspires.ftc.teamcode.Saransh;
 
         import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+        import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+        import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
@@ -25,7 +26,7 @@ import java.util.List;
  * Created by Saransh on 11/5/2016.
  */
 @Autonomous(name="MecanumVuforiaNavigation", group ="Tests")
-//@Disabled
+@Disabled
 public class MecanumVuforia extends LinearOpMode {
 
     public static final String TAG = "Vuforia Sample";

@@ -9,6 +9,7 @@ import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -33,6 +34,7 @@ import ftc.electronvolts.statemachine.StateName;
  * Created by spmeg on 1/21/2017.
  */
 @Autonomous(name = "GoStraightMachineOp", group = "StateOps")
+@Disabled
 public class GoStraightMachineOp extends OpMode {
     private DcMotor leftMotor = null;
     private DcMotor rightMotor = null;

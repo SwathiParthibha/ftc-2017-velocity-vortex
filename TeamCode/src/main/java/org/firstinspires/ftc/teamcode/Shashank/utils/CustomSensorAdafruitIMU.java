@@ -38,6 +38,7 @@ import com.google.gson.JsonParser;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -65,7 +66,7 @@ import java.util.Locale;
  * @see <a href="http://www.adafruit.com/products/2472">Adafruit IMU</a>
  */
 @TeleOp(name = "Sensor: Custom Adafruit IMU", group = "Sensor")
-//@Disabled                            // Uncomment this to add to the opmode list
+@Disabled                            // Uncomment this to add to the opmode list
 public class CustomSensorAdafruitIMU extends LinearOpMode
     {
     //----------------------------------------------------------------------------------------------

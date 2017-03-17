@@ -5,12 +5,14 @@ import android.media.MediaPlayer;
 import android.provider.MediaStore;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.R;
 /**
  * Created by spmeg on 1/27/2017.
  */
 @Autonomous(name = "SoundOpMode", group = "test op")
+@Disabled
 public class SoundOpMode extends OpMode {
     private MediaPlayer mediaPlayer = null;
     @Override

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Shashank.teleop;
 
 import android.media.MediaPlayer;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @TeleOp(name = "Two Controller Teleopv6 Shashank One Motor", group = "Teleop")
+@Disabled
 public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
     private final double SWEEPER_IN_POWER = -0.7;
     private final double SWEEPER_OUT_POWER = 0.7;

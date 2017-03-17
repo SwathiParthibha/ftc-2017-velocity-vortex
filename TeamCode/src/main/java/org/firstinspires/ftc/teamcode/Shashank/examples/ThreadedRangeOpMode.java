@@ -59,7 +59,7 @@ import org.firstinspires.ftc.teamcode.Shashank.utils.ThreadSharedObject;
  */
 
 @TeleOp(name="ThreadedRangeOpMode", group="Tests")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class ThreadedRangeOpMode extends OpMode
 {
     /* Declare OpMode members. */

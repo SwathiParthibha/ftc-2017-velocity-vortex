@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Shashank.autonomous;
 
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous.HardwarePushbot;
  */
 
 @Autonomous(name="GoStraightShootToCenterShashank", group="Pushbot")
+@Disabled
 public class GoStraightShootToCenter extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
