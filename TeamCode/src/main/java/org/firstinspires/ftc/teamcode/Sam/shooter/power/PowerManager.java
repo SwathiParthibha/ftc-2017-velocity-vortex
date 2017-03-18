@@ -20,7 +20,7 @@ public class PowerManager {
 
     private double rpmErrorAdjustment = 0.0;
     private double powerAdjustment = 0.0;
-    private int REQUESTED_ETPS = 0;
+    private int REQUESTED_ETPS = Constants.REQUESTED_ETPS;
 
     public PowerManager(Constants.MOTORNAME motorName, DcMotor dcMotor) {
         pidAlgo = new PIDAlgo(MotorFactory.getInstance().getMotor(motorName));
@@ -30,6 +30,9 @@ public class PowerManager {
         this.dcMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         this.dcMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorTelemetry.setMotorName(motorName);
+
+        if(motorName==Constants.MOTORNAME.RIGHT_SHOOTER)
+            REQUESTED_ETPS*=1.05;
     }
 
     public Constants.MOTORNAME getMotorName() {
@@ -66,7 +69,7 @@ public class PowerManager {
 
     public void regulatePower() {
         ShooterMotor motor = MotorFactory.getInstance().getMotor(motorName);
-        rpmErrorAdjustment = pidAlgo.getAdjustment(motor.getRpm(), Constants.REQUESTED_ETPS, Constants.ONE_SECOND);
+        rpmErrorAdjustment = pidAlgo.getAdjustment(motor.getRpm(), REQUESTED_ETPS, Constants.ONE_SECOND);
         powerAdjustment = rpmErrorAdjustment/76;
         currentPower += powerAdjustment;
         currentPower = clipPower(currentPower);
