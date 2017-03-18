@@ -57,7 +57,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  */
 
 @Autonomous(name="Straight Shoot Center", group="Pushbot")
-@Disabled
+//@Disabled
 public class ShootDriveToCenter extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor

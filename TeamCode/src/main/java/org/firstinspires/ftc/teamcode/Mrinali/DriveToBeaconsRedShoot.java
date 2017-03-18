@@ -59,7 +59,7 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  */
 
 @Autonomous(name="Beacons Red Shoot", group="Pushbot")
-@Disabled
+//@Disabled
 public class DriveToBeaconsRedShoot extends LinearOpMode {
 
     //To change blue to red: positive angles, red line follow and button push

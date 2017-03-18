@@ -57,7 +57,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  */
 
 @Autonomous(name="Delayed Straight Shoot", group="Pushbot")
-@Disabled
+//@Disabled
 public class StraightShoot extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
