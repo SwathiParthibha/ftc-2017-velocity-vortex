@@ -1178,8 +1178,8 @@ public class AutonomousActions extends LinearOpMode {
         ElapsedTime shootTime = new ElapsedTime();
         scooper.setPower(1);
         while (opMode.opModeIsActive() && shootTime.seconds() < .5) {
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+            //leftShooterPowerMgr.regulatePower();
+            //rightShooterPowerMgr.regulatePower();
         }
         scooper.setPower(0);
 
@@ -1188,8 +1188,8 @@ public class AutonomousActions extends LinearOpMode {
 
         shootTime.reset();
         while (opMode.opModeIsActive() && shootTime.seconds() < .75) {
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+            //leftShooterPowerMgr.regulatePower();
+            //rightShooterPowerMgr.regulatePower();
         }
         shooter1.setPower(0);
         shooter2.setPower(0);

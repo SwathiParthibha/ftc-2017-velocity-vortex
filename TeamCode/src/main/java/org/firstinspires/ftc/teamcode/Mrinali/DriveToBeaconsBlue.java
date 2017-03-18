@@ -60,7 +60,7 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  */
 
 @Autonomous(name="Beacons Blue", group="Pushbot")
-@Disabled
+//@Disabled
 public class DriveToBeaconsBlue extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
@@ -99,7 +99,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDrive(auto.APPROACH_SPEED, 3, 3, 3);
+        auto.encoderDrive(0.3, 3, 3, 3);
         auto.turn(-45); //The robot uses the IMU to turn to 40 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
@@ -109,6 +109,8 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         auto.pushButton(); //The robot then uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         auto.turn(0); //and turns parallel to the beacon using the IMU
+        if (Math.abs(auto.IMUheading()) > 7)
+            auto.turn(0);
         auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
         auto.turn(0);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);

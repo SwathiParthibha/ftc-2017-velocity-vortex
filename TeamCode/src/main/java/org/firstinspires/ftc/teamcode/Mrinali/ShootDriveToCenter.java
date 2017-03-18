@@ -57,13 +57,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  */
 
 @Autonomous(name="Straight Shoot Center", group="Pushbot")
-@Disabled
+//@Disabled
 public class ShootDriveToCenter extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
-    AutonomousActions auto = new AutonomousActions(this);
+    AutonomousActionsColor auto = new AutonomousActionsColor(this);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -75,19 +75,19 @@ public class ShootDriveToCenter extends LinearOpMode {
         auto.runOpMode();
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to Run");    //
+        telemetry.addData("Status", "Ready to Run");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         while (!isStarted()) {
 
-            telemetry.addData("Status", "Ready to Run");    //
+            telemetry.addData("Status", "Ready to Run");
             telemetry.update();
             idle();
         }
 
-        auto.encoderDriveSpinup(.3, 12, 12, 3);
-        auto.shoot();
+        sleep(15000);
+        auto.shoot(12, 2, 2);
         auto.encoderDrive(auto.APPROACH_SPEED, 12, 12, 3);
     }
 }

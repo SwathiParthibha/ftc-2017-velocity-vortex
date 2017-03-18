@@ -124,7 +124,7 @@ public class AutonomousActionsColor extends LinearOpMode {
     LinearOpMode opMode;
 
     //MULTITHREADING
-    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(20);
+    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(40);
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
     private ScheduledFuture scheduledFuture = null;
 
@@ -770,11 +770,11 @@ public class AutonomousActionsColor extends LinearOpMode {
 
             if (lightSensor.getLightDetected() < WHITE_THRESHOLD) {
                 if (IMUheading() < expectedAngle) {
-                    leftMotor.setPower(0);
+                    leftMotor.setPower(-.05);
                     rightMotor.setPower(.2);
                 } else if (IMUheading() > expectedAngle) {
                     leftMotor.setPower(.2);
-                    rightMotor.setPower(0);
+                    rightMotor.setPower(-.05);
                 }
             }
             else {
@@ -1125,8 +1125,8 @@ public class AutonomousActionsColor extends LinearOpMode {
             telemetry.addData("Right motor busy", rightMotor.isBusy());
             telemetry.update();
 
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+            //leftShooterPowerMgr.regulatePower();
+            //rightShooterPowerMgr.regulatePower();
 
             idle();
         }
@@ -1145,20 +1145,6 @@ public class AutonomousActionsColor extends LinearOpMode {
 
     public void spinup(double seconds) {
         ElapsedTime shootTime = new ElapsedTime();
-        for(int i = 0; i <  20; i++){
-            //run a thread every fifty milliseconds, and each thread will re-run after a second
-            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
-            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
-        }
-
-        scheduledFuture = executorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                DbgLog.msg("REGULATING POWER!!!!!");
-                leftShooterPowerMgr.regulatePower();
-                rightShooterPowerMgr.regulatePower();
-            }
-        }, 0, 250, TimeUnit.MILLISECONDS);
 
         while (opMode.opModeIsActive() && shootTime.seconds() < seconds) {
             //do nothing
@@ -1166,14 +1152,15 @@ public class AutonomousActionsColor extends LinearOpMode {
     }
 
     public void shoot() {
+
         leftServoPos = LEFT_IN_VAL;
         rightServoPos = RIGHT_IN_VAL;
 
         ElapsedTime shootTime = new ElapsedTime();
         scooper.setPower(1);
         while (opMode.opModeIsActive() && shootTime.seconds() < .5) {
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+            //leftShooterPowerMgr.regulatePower();
+            //rightShooterPowerMgr.regulatePower();
         }
         scooper.setPower(0);
 
@@ -1182,8 +1169,8 @@ public class AutonomousActionsColor extends LinearOpMode {
 
         shootTime.reset();
         while (opMode.opModeIsActive() && shootTime.seconds() < .75) {
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+            //leftShooterPowerMgr.regulatePower();
+            //rightShooterPowerMgr.regulatePower();
         }
         shooter1.setPower(0);
         shooter2.setPower(0);
@@ -1193,8 +1180,121 @@ public class AutonomousActionsColor extends LinearOpMode {
         leftArm.setPosition(leftServoPos);
         rightArm.setPosition(rightServoPos);
 
-        scheduledFuture.cancel(true);
+        //executorService.shutdownNow();
+        //scheduledThreadPool.shutdownNow();
+    }
+
+    public void shoot(double distance, double spinupTime, int balls) {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(40);
+
+        for(int i = 0; i <  20; i++){
+            //run a thread every fifty milliseconds, and each thread will re-run after a second
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+        }
+
+        executorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                DbgLog.msg("REGULATING POWER!!!!!");
+                leftShooterPowerMgr.regulatePower();
+                rightShooterPowerMgr.regulatePower();
+            }
+        }, 0, 250, TimeUnit.MILLISECONDS);
+
+        double speed = 0.3;
+        double timeBetweenBalls = 2;
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        int newLeftTarget;
+        int newRightTarget;
+
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Determine new target position, and pass to motor controller
+        newLeftTarget = leftMotor.getCurrentPosition() + (int) (distance * COUNTS_PER_INCH);
+        newRightTarget = rightMotor.getCurrentPosition() + (int) (distance * COUNTS_PER_INCH);
+        leftMotor.setTargetPosition(newLeftTarget);
+        rightMotor.setTargetPosition(newRightTarget);
+
+        // Turn On RUN_TO_POSITION
+        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftMotor.setPower(Math.abs(speed));
+        rightMotor.setPower(Math.abs(speed));
+        while (opMode.opModeIsActive() &&
+                (leftMotor.isBusy() && rightMotor.isBusy())) {
+
+            // Display it for the driver.
+            telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
+            telemetry.addData("Path2", "Running at %7d :%7d",
+                    leftMotor.getCurrentPosition(),
+                    rightMotor.getCurrentPosition());
+            telemetry.update();
+
+            idle();
+        }
+        // Stop all motion;
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+
+        // Turn off RUN_TO_POSITION
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        //finished running forward, spin up shooters
+        ElapsedTime shootTime = new ElapsedTime();
+        while (opMode.opModeIsActive() && shootTime.seconds() < spinupTime);
+
+        for (int i = 0; i < balls; i++) {
+
+            leftServoPos = LEFT_IN_VAL;
+            rightServoPos = RIGHT_IN_VAL;
+            leftArm.setPosition(leftServoPos);       //servos go up
+            rightArm.setPosition(rightServoPos);
+
+            shootTime.reset();
+            while (opMode.opModeIsActive() && shootTime.seconds() < .75);
+
+            leftServoPos = LEFT_OUT_VAL;
+            rightServoPos = RIGHT_OUT_VAL;
+            leftArm.setPosition(leftServoPos);      //servos go down
+            rightArm.setPosition(rightServoPos);
+
+            if (i + 1 < balls) {
+                scooper.setPower(-1);
+                shootTime.reset();  //spins up for next ball
+                while (opMode.opModeIsActive() && shootTime.seconds() < timeBetweenBalls);
+                scooper.setPower(0);
+            }
+        }
+
+        //end the threads
         executorService.shutdown();
-        scheduledThreadPool.shutdown();
+        scheduledExecutorService.shutdown();
+        try {
+            boolean finishedExecuorService = executorService.awaitTermination(100, TimeUnit.MILLISECONDS);
+            boolean finishedScheduledExecutorService = scheduledExecutorService.awaitTermination(800, TimeUnit.MILLISECONDS);
+
+            if(!finishedExecuorService)
+                executorService.shutdownNow();
+            if(!finishedScheduledExecutorService)
+                scheduledExecutorService.shutdownNow();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            executorService.shutdownNow();
+            scheduledExecutorService.shutdownNow();
+        }
+
+        shooter1.setPower(0);
+        shooter2.setPower(0);
     }
 }
