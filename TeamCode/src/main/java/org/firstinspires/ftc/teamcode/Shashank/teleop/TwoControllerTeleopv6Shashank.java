@@ -78,7 +78,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
 
-    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(100);
+    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(200);
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(3);
     private ScheduledFuture scheduledFuture = null;
     private ShooterMotor leftShooter, rightShooter;
