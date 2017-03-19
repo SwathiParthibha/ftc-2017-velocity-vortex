@@ -756,7 +756,7 @@ public class AutonomousActionsColor extends LinearOpMode {
         leftMotor.setPower(.1);
         rightMotor.setPower(.1);
 
-        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 13) {
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 12) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
             telemetry.addData("Light", lightSensor.getLightDetected());
             telemetry.addData("Angle", IMUheading());
