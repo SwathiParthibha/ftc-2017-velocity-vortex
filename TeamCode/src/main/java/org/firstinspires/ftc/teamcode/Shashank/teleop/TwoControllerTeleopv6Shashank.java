@@ -78,7 +78,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
 
-    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(40);
+    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(100);
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(3);
     private ScheduledFuture scheduledFuture = null;
     private ShooterMotor leftShooter, rightShooter;
@@ -133,8 +133,8 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
         for(int i = 0; i <  20; i++){
             //run a thread every fifty milliseconds, and each thread will re-run after a second
-            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
-            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 10, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 10, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
         }
 
         executorService.schedule(new Runnable() {
@@ -217,7 +217,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
                         leftShooterPowerMgr.regulatePower();
                         rightShooterPowerMgr.regulatePower();
                     }
-                }, 0, 250, TimeUnit.MILLISECONDS);
+                }, 0, 50, TimeUnit.MILLISECONDS);
                 alreadyScheduled = true;
             }
         } else if (gamepad2.b) {
