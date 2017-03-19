@@ -243,10 +243,10 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
 
         if(gamepad2.left_stick_y > 0.3) {
-            SHOOTER_POWER = SHOOTER_POWER + 0.03;
+            //SHOOTER_POWER = SHOOTER_POWER + 0.03;
             SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
         } else if (gamepad2.left_stick_y < -0.3){
-            SHOOTER_POWER = SHOOTER_POWER - 0.03;
+            //SHOOTER_POWER = SHOOTER_POWER - 0.03;
             SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
         }
 

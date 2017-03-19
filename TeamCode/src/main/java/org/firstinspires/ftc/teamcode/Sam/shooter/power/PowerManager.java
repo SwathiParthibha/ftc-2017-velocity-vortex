@@ -31,8 +31,7 @@ public class PowerManager {
         this.dcMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorTelemetry.setMotorName(motorName);
 
-        if(motorName==Constants.MOTORNAME.RIGHT_SHOOTER)
-            REQUESTED_ETPS*=1.05;
+
     }
 
     public Constants.MOTORNAME getMotorName() {
@@ -70,7 +69,7 @@ public class PowerManager {
     public void regulatePower() {
         ShooterMotor motor = MotorFactory.getInstance().getMotor(motorName);
         rpmErrorAdjustment = pidAlgo.getAdjustment(motor.getRpm(), REQUESTED_ETPS, Constants.ONE_SECOND);
-        powerAdjustment = rpmErrorAdjustment/76;
+        powerAdjustment = rpmErrorAdjustment / 76;
         currentPower += powerAdjustment;
         currentPower = clipPower(currentPower);
 
@@ -98,7 +97,7 @@ public class PowerManager {
         return power;
     }
 
-    public void shutdown(){
+    public void shutdown() {
         pidAlgo.shutDown();
     }
 
@@ -106,8 +105,7 @@ public class PowerManager {
         return motorTelemetry;
     }
 
-    public void reset()
-    {
+    public void reset() {
         pidAlgo.reset();
     }
 }
