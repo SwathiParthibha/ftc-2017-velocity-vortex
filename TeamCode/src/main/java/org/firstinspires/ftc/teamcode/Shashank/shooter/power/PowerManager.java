@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.Sam.shooter.power;
+package org.firstinspires.ftc.teamcode.Shashank.shooter.power;
 
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
-import org.firstinspires.ftc.teamcode.Sam.shooter.MotorTelemetry;
-import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
-import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.MotorFactory;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.MotorTelemetry;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.beans.ShooterMotor;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.util.Constants;
 
 public class PowerManager {
     private double defaultPower = Constants.DEFAULT_POWER;

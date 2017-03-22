@@ -88,6 +88,6 @@ public class StraightShoot extends LinearOpMode {
         }
 
         sleep(15000);
-        auto.shoot(12, 2, 2);
+        auto.shoot(16, 2, 2);
     }
 }
