@@ -131,7 +131,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
         leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
         rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
 
-        for(int i = 0; i <  20; i++){
+        for(int i = 0; i <  200; i++){
             //run a thread every fifty milliseconds, and each thread will re-run after a second
             scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 10, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
             scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 10, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
