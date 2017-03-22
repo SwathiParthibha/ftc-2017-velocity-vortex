@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Shashank.shooter.power;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 import org.firstinspires.ftc.teamcode.Shashank.shooter.beans.ShooterMotor;
 
 public class PIDAlgo {
@@ -17,8 +19,8 @@ public class PIDAlgo {
 
     private KalminFilter kalminFilter = null;
 
-    public PIDAlgo(ShooterMotor shooterMotor) {
-        kalminFilter = new KalminFilter(shooterMotor);
+    public PIDAlgo(ShooterMotor shooterMotor, OpMode opMode) {
+        kalminFilter = new KalminFilter(shooterMotor, opMode);
     }
 
     public double getProportionAdjust() {
@@ -47,6 +49,7 @@ public class PIDAlgo {
 
     public double getAdjustment(double rpm, double reqEtps, long deltaTime) {
 
+        //filteredRPM = kalminFilter.getFilteredRPM();
         filteredRPM = kalminFilter.getFilteredRPM();
 
         double error = reqEtps - filteredRPM;

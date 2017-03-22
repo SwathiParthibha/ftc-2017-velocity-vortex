@@ -128,8 +128,8 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
         capArm.setPosition(1);
 
-        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
-        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
+        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1, this);
+        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2, this);
 
         for(int i = 0; i <  200; i++){
             //run a thread every fifty milliseconds, and each thread will re-run after a second
@@ -217,7 +217,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
                         leftShooterPowerMgr.regulatePower();
                         rightShooterPowerMgr.regulatePower();
                     }
-                }, 0, 50, TimeUnit.MILLISECONDS);
+                }, 0, 100, TimeUnit.MILLISECONDS);
                 alreadyScheduled = true;
             }
         } else if (gamepad2.b) {

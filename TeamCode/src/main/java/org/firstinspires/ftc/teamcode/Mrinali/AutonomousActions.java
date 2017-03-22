@@ -195,8 +195,8 @@ public class AutonomousActions extends LinearOpMode {
         rightShooter.setName(Constants.MOTORNAME.RIGHT_SHOOTER);
         motorFactory.addMotor(rightShooter);
 
-        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
-        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
+        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1, this);
+        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2, this);
 
         scooper = hardwareMap.dcMotor.get("scooper");
 

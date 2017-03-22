@@ -217,8 +217,8 @@ public class AutonomousActionsColor extends LinearOpMode {
         rightShooter.setName(Constants.MOTORNAME.RIGHT_SHOOTER);
         motorFactory.addMotor(rightShooter);
 
-        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
-        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
+        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1, opMode);
+        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2, opMode);
 
         scooper = hardwareMap.dcMotor.get("scooper");
 
@@ -313,8 +313,8 @@ public class AutonomousActionsColor extends LinearOpMode {
         rightShooter.setName(Constants.MOTORNAME.RIGHT_SHOOTER);
         motorFactory.addMotor(rightShooter);
 
-        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
-        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
+        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1,  opMode);
+        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2, opMode);
 
         scooper = hardwareMap.dcMotor.get("scooper");
 

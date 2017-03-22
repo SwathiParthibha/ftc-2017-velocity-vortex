@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Sam.shooter.power;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
 
@@ -16,12 +18,13 @@ public class KalminFilter {
     private volatile double filteredRPM = 0.0;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public KalminFilter(final ShooterMotor shooterMotor) {
+    public KalminFilter(final ShooterMotor shooterMotor, final OpMode opMode) {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 while(!executorService.isShutdown()){
-                    filteredRPM = applyFilter(shooterMotor.getRpm());
+                    if(opMode.gamepad2.a)
+                        filteredRPM = applyFilter(shooterMotor.getRpm());
                 }
             }
         });
@@ -44,7 +47,7 @@ public class KalminFilter {
         double filteredData = prevValue + trustVal * (rpm - prevValue);
 
         prevError = (1 - trustVal) * prevError;
-        prevValue= filteredData;
+        prevValue = filteredData;
 
         return filteredData;
     }

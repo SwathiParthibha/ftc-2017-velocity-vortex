@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Shashank.shooter.power;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Shashank.shooter.MotorFactory;
@@ -22,8 +23,8 @@ public class PowerManager {
     private double powerAdjustment = 0.0;
     private int REQUESTED_ETPS = Constants.REQUESTED_ETPS;
 
-    public PowerManager(Constants.MOTORNAME motorName, DcMotor dcMotor) {
-        pidAlgo = new PIDAlgo(MotorFactory.getInstance().getMotor(motorName));
+    public PowerManager(Constants.MOTORNAME motorName, DcMotor dcMotor, OpMode opMode) {
+        pidAlgo = new PIDAlgo(MotorFactory.getInstance().getMotor(motorName), opMode);
         this.motorName = motorName;
         this.dcMotor = dcMotor;
 
@@ -84,7 +85,7 @@ public class PowerManager {
         motorTelemetry.setRpmErrorAdjustment(rpmErrorAdjustment);
         motorTelemetry.setPowerAdjustment(powerAdjustment);
 
-        dcMotor.setPower(currentPower);
+        dcMotor.setPower(Constants.DEFAULT_POWER+powerAdjustment);
 
     }
 
