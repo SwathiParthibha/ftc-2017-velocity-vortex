@@ -11,6 +11,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import ftc.electronvolts.statemachine.BasicAbstractState;
 import ftc.electronvolts.statemachine.StateName;
 
@@ -27,7 +30,7 @@ public class TurnState extends BasicAbstractState {
     private BNO055IMU imu = null;
 
     private boolean hasInitialized = false;
-
+    private static boolean IS_LARGER_THAN_180 = false;
     Orientation angles;
     double angleZ;
     private int turnAngle;
@@ -38,7 +41,7 @@ public class TurnState extends BasicAbstractState {
     double TURN_POWER_1 = .2;
     double TURN_POWER_2 = .1;
 
-    ElapsedTime runtime = new ElapsedTime();
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public TurnState(StateName stateName, StateName nextStateName, DcMotor leftMotor, DcMotor rightMotor, BNO055IMU imu, int turnAngle) {
         this.stateName = stateName;
@@ -60,17 +63,14 @@ public class TurnState extends BasicAbstractState {
         angleZ = getIMUheading();
         angDiff = turnAngle-angleZ; //negative: turn left
 
+
+
         //angDiff = (angDiff + 180) % 360 - 180; //changes to number between -180 and 180
 
         log("angDiff in init is " + angDiff);
         log("turnAngle in init is " + turnAngle);
         log("angleZ in init is " + angleZ);
         log("\n\n");
-
-        if (angDiff < 0)
-            direction = TurnDirection.LEFT;
-        else if (angDiff > 0)
-            direction = TurnDirection.RIGHT;
 
         log("direction in init is " + direction);
         log("FINISHED INIT");
@@ -83,12 +83,12 @@ public class TurnState extends BasicAbstractState {
             init();
             hasInitialized = true;
 
-            AsyncTask.execute(new Runnable() {
+            executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    while (!isDone()){
-                        angleZ = getIMUheading();
-                        angDiff = turnAngle-angleZ;
+                    while (!executorService.isShutdown()){
+                        angDiff = getAngleDifference(turnAngle);
+                        direction = getDirection();
                     }
                 }
             });
@@ -138,13 +138,50 @@ public class TurnState extends BasicAbstractState {
         }
     }
 
+    private TurnDirection getDirection(){
+        if (angDiff < 0) {
+            if(Math.abs(angDiff) > 180){
+                IS_LARGER_THAN_180 = true;
+                return TurnDirection.RIGHT;
+            }
+            return TurnDirection.LEFT;
+        }
+        else if (angDiff > 0){
+            if(Math.abs(angDiff) > 180){
+                IS_LARGER_THAN_180 = true;
+                return TurnDirection.LEFT;
+            }
+            return TurnDirection.RIGHT;
+        }
+
+        return null;
+    }
+
+    private double getAngleDifference(int turnAngle){
+        double angDiff = turnAngle-Math.abs(imu.getAngularOrientation().firstAngle);
+        if(Math.abs(angDiff) > 180){
+            IS_LARGER_THAN_180 = true;
+        } else {
+            IS_LARGER_THAN_180 = false;
+        }
+
+        if(IS_LARGER_THAN_180){
+            if(angDiff < 0){
+                angDiff = (360 - angleZ) + turnAngle;
+            } else if(angDiff > 0){
+                angDiff = (360 - turnAngle) + angleZ;
+            }
+        }
+        return angDiff;
+    }
+
     double getIMUheading() {
         return Math.abs(imu.getAngularOrientation().firstAngle);
     }
 
     @Override
     public boolean isDone() {
-        if(Math.abs(angDiff) < 1.7)
+        if(Math.abs(angDiff) < 3)
             return true;
         else return false;
     }

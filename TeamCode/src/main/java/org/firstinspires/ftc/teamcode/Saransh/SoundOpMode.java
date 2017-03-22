@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.media.MediaPlayer;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.R;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.R;
  * Created by spmeg on 1/27/2017.
  */
 @Autonomous(name = "Gotta Catch Em All Test", group = "test op")
+@Disabled
 public class SoundOpMode extends OpMode {
     private MediaPlayer mediaPlayer = null;
     @Override

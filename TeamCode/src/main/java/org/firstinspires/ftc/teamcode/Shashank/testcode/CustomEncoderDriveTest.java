@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Shashank.testcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
  * Created by spmeg on 11/3/2016.
  */
 @TeleOp(name = "CustomEncoderDriveTest", group = "Tests")
+@Disabled
 public class CustomEncoderDriveTest extends OpMode{
     private DcMotor leftMotor;
     private DcMotor rightMotor;

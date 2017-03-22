@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Sam;
 import com.google.gson.internal.Streams;
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbDcMotorController;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import static java.lang.Thread.sleep;
 
-
+@Disabled
 @TeleOp(name = "old Teleop", group = "Teleop")
 public class EncoderTeleop extends OpMode {
     private DcMotor leftMotor;

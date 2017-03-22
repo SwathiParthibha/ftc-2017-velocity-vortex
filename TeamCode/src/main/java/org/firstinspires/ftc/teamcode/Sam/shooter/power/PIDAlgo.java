@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.Sam.shooter.power;
 
 
+import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
+
 public class PIDAlgo {
-    private static final double DEAD_BAND = 20;
-    private static final double KP = 0.000001;
-    private static final double KI = 0.0000001;//0.00000001
-    private static final double KD = 0.0000001;
+    private static final double DEAD_BAND = 100;
+    private static final double KP = 0.00000000001;
+    private static final double KI = 0.00000000001;//0.00000001
+    private static final double KD = 0.00000000001;
     private double proportionAdjust;
     private double filteredRPM;
     private double integralAdjust;
@@ -13,8 +15,11 @@ public class PIDAlgo {
     private double prevError = 0D;
     private double integral = 0;
 
-    private KalminFilter kalminFilter = new KalminFilter();
+    private KalminFilter kalminFilter = null;
 
+    public PIDAlgo(ShooterMotor shooterMotor) {
+        kalminFilter = new KalminFilter(shooterMotor);
+    }
 
     public double getProportionAdjust() {
         return proportionAdjust;
@@ -42,7 +47,7 @@ public class PIDAlgo {
 
     public double getAdjustment(double rpm, double reqEtps, long deltaTime) {
 
-        filteredRPM = kalminFilter.applyFilter(rpm);
+        filteredRPM = kalminFilter.getFilteredRPM();
 
         double error = reqEtps - filteredRPM;
 
@@ -59,6 +64,17 @@ public class PIDAlgo {
         derivativeAdjust = KD * derivative;
 
         return proportionAdjust + integralAdjust + derivativeAdjust;
+    }
+
+    public void reset() {
+        kalminFilter.reset();
+        prevError = 0D;
+        integral = 0;
+
+    }
+
+    public void shutDown(){
+        kalminFilter.shutdown();
     }
 
 

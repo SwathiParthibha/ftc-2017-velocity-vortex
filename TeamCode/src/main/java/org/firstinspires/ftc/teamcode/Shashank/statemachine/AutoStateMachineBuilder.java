@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.TurnState;
@@ -60,6 +61,10 @@ public class AutoStateMachineBuilder extends StateMachineBuilder {
 
     public void addTurnEncoderDrive(DcMotor leftMotor, DcMotor rightMotor, StateName stateName, StateName nextStateName, int turnAngle, TurnStateEncoderDrive.TurnDirection turnDirection){
         add(stateName, AutoStates.turnEncoderDrive(leftMotor, rightMotor, stateName, nextStateName, turnAngle, turnDirection));
+    }
+
+    public void addShoot(StateName stateName, StateName nextStateName, DcMotor scooper, DcMotor shooter1, DcMotor shooter2, DcMotor sweeper, Servo leftArm, Servo rightArm){
+        add(stateName, AutoStates.shootWithoutPID(stateName, nextStateName, scooper, shooter1, shooter2, sweeper, leftArm, rightArm));
     }
 
 }

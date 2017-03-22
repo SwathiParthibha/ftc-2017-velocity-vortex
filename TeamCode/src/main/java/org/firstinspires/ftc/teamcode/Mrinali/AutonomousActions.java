@@ -53,7 +53,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
+import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
+import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -91,6 +98,7 @@ public class AutonomousActions extends LinearOpMode {
     private PowerManager rightShooterPowerMgr;
     private Servo leftArm;
     private Servo rightArm;
+    private Servo capArm;
     private boolean state;
     public DcMotor scooper;
     public LightSensor lightSensor;      // Primary LEGO Light sensor,
@@ -106,7 +114,7 @@ public class AutonomousActions extends LinearOpMode {
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
     public double angleZ = 0;
 
-    static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
+    static final double WHITE_THRESHOLD = 0.25;  // spans between 0.1 - 0.5 from dark to light
     public static final double APPROACH_SPEED = 0.5;
     double TURN_POWER_1 = .2;
     double TURN_POWER_2 = .05;
@@ -121,14 +129,18 @@ public class AutonomousActions extends LinearOpMode {
     public double backup = -2;
     double overLine1 = 2;
     double overLine2 = 2;
+    private double lightDetected = 0.0;
     private final double LEFT_IN_VAL = 0.56;
     private final double RIGHT_IN_VAL = 0.34;
     private final double LEFT_OUT_VAL = 0.12;
     private final double RIGHT_OUT_VAL = 0.76;
     private final double SERVO_ADJUSTMENT_VAL_LEFT = (Math.abs(LEFT_IN_VAL - LEFT_OUT_VAL) / 14);
     private final double SERVO_ADJUSTMENT_VAL_RIGHT = (Math.abs(RIGHT_IN_VAL - RIGHT_OUT_VAL) / 14);
+    private final double LEFT_START_VAL = (LEFT_IN_VAL + 2*LEFT_OUT_VAL) /3;
+    private final double RIGHT_START_VAL = (RIGHT_IN_VAL + 2*RIGHT_OUT_VAL) /3;
     double leftServoPos = 0;
     double rightServoPos = 1.0;
+    double capServoPos = 1.0;
     byte[] rangeSensorCache;
     byte[] sideRangeSensorCache;
     I2cDevice rangeA;
@@ -173,16 +185,30 @@ public class AutonomousActions extends LinearOpMode {
 
         shooter1 = hardwareMap.dcMotor.get("shooter1");
         shooter2 = hardwareMap.dcMotor.get("shooter2");
+
+        MotorFactory motorFactory = MotorFactory.getInstance();
+        ShooterMotor leftShooter = new ShooterMotor();
+        leftShooter.setName(Constants.MOTORNAME.LEFT_SHOOTER);
+        motorFactory.addMotor(leftShooter);
+
+        ShooterMotor rightShooter = new ShooterMotor();
+        rightShooter.setName(Constants.MOTORNAME.RIGHT_SHOOTER);
+        motorFactory.addMotor(rightShooter);
+
+        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
+        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
+
         scooper = hardwareMap.dcMotor.get("scooper");
+
         leftArm = hardwareMap.servo.get("leftservo");
         rightArm = hardwareMap.servo.get("rightservo");
-        leftServoPos -= SERVO_ADJUSTMENT_VAL_LEFT;
-        rightServoPos += SERVO_ADJUSTMENT_VAL_RIGHT;
-        leftServoPos = Range.clip(leftServoPos, LEFT_OUT_VAL, LEFT_IN_VAL);//clip the range so it won't go over 1 or under 0
-        rightServoPos = Range.clip(rightServoPos, RIGHT_IN_VAL, RIGHT_OUT_VAL);//clip the range so it won't go over 1 or under 0
+        leftServoPos = LEFT_START_VAL;
+        rightServoPos = RIGHT_START_VAL;
         leftArm.setPosition(leftServoPos);
         rightArm.setPosition(rightServoPos);
 
+        capArm = hardwareMap.servo.get("capArm");
+        capArm.setPosition(capServoPos + .02);
 
         state = false;
 
@@ -243,7 +269,38 @@ public class AutonomousActions extends LinearOpMode {
         return rangeSensor.read(0x04, 2)[0] & 0xFF;
     }
 
-    public void toWhiteLine(boolean wall, String color) throws InterruptedException {
+    public void toWhiteLine(boolean wall) throws InterruptedException {
+        // Start the robot moving forward, and then begin looking for a white line.
+        /*
+        if (!wall) {
+            leftMotor.setPower(APPROACH_SPEED * .4);
+            rightMotor.setPower(APPROACH_SPEED * .4);
+        }
+        */
+
+        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+
+            // Display the light level while we are looking for the line
+            telemetry.addData("Light Level", lightSensor.getLightDetected());
+            telemetry.update();
+            idle();
+
+            if (imu.getLinearAcceleration().zAccel < 0.2) {
+                leftMotor.setPower(APPROACH_SPEED * .4);
+                rightMotor.setPower(APPROACH_SPEED * .4);
+            }
+        }
+
+        // Stop all motors
+        stopRobot();
+
+        if (!wall) {
+            encoderDrive(APPROACH_SPEED * .4, .75, .75, 1);
+        } else
+            encoderDrive(APPROACH_SPEED * .4, 1, 1, 2);
+    }
+
+    public void toWhiteLineCheckTilt(boolean wall, String color) throws InterruptedException {
         // Start the robot moving forward, and then begin looking for a white line.
         /*
         if (!wall) {
@@ -269,7 +326,7 @@ public class AutonomousActions extends LinearOpMode {
                 encoderDrive(APPROACH_SPEED * .6, -.5, -.5, 1);
                 if (color == "blue")
                     spinLeft();
-                if (color == "red")
+                else if (color == "red")
                     spinRight();
             }
         }
@@ -571,6 +628,109 @@ public class AutonomousActions extends LinearOpMode {
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
+    public void followLineBlueSide1() throws InterruptedException {
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        telemetry.addLine("Following Line");
+        final ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                while (!executorService.isShutdown())
+                    lightDetected = lightSensor.getLightDetected();
+            }
+        });
+        leftMotor.setPower(.2);
+        rightMotor.setPower(-.2);
+        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            idle();
+        }
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        ElapsedTime followTime = new ElapsedTime();
+        followTime.reset();
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
+            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Angle", IMUheading());
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            if (lightSensor.getLightDetected() > WHITE_THRESHOLD
+                    && Math.abs(IMUheading() + 90) <= 1) { //within 2 of -90
+                leftMotor.setPower(0.1);
+                rightMotor.setPower(0.1);
+            } else if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(0);
+            } else {
+                telemetry.addLine("Moving left");
+                leftMotor.setPower(0);
+                rightMotor.setPower(0.2);
+            }
+            telemetry.update();
+
+            idle();
+        }
+        stopRobot();
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        executorService.shutdown();
+    }
+
+    public void followLineBlueSide2() throws InterruptedException {
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        telemetry.addLine("Following Line");
+        leftMotor.setPower(.2);
+        rightMotor.setPower(-.2);
+        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            idle();
+        }
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        boolean side = false;
+        boolean white = false;
+        leftMotor.setPower(.1);
+        rightMotor.setPower(.1);
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 13) {
+            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            telemetry.addData("Angle", IMUheading());
+            if (lightSensor.getLightDetected() >= WHITE_THRESHOLD) {
+                if (!white) // ensures that it only switches once when line is detected
+                    side = !side;
+                white = true;
+                /*
+                if (Math.abs(IMUheading() + 90) <= 1) { //within 2 of -90
+                    leftMotor.setPower(0.1);
+                    rightMotor.setPower(0.1);
+                }
+                */
+            } else if (side){
+                white = false;
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(-0.1);
+            } else {
+                white = false;
+                telemetry.addLine("Moving left");
+                leftMotor.setPower(-0.1);
+                rightMotor.setPower(0.2);
+            }
+            telemetry.update();
+
+            idle();
+        }
+        stopRobot();
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
     public void pushBlueButton() throws InterruptedException {
 
         telemetry.log().add("in the push button method");
@@ -655,7 +815,7 @@ public class AutonomousActions extends LinearOpMode {
             //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         } while (opMode.opModeIsActive() && !verifyBlue()
-                && (time.seconds() < 8 || wrongColor));
+                && (time.seconds() < 4 || wrongColor));
 
         telemetry.log().add("end of the push button method");
 
@@ -746,7 +906,7 @@ public class AutonomousActions extends LinearOpMode {
 
             idle();
         } while (opMode.opModeIsActive() && !verifyRed()
-                && (time.seconds() < 8 || wrongColor));
+                && (time.seconds() < 4 || wrongColor));
 
         telemetry.log().add("end of the push button method");
 
@@ -923,7 +1083,7 @@ public class AutonomousActions extends LinearOpMode {
                 encoderDrive(APPROACH_SPEED * .6, -.5, -.5, 1);
                 if (color == "blue")
                     spinLeft();
-                if (color == "red")
+                else if (color == "red")
                     spinRight();
             }
 
@@ -943,6 +1103,9 @@ public class AutonomousActions extends LinearOpMode {
     public void encoderDriveSpinup(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) throws InterruptedException {
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         ElapsedTime runtime = new ElapsedTime();
         int newLeftTarget;
@@ -995,20 +1158,28 @@ public class AutonomousActions extends LinearOpMode {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         //  sleep(250);   // optional pause after each move
     }
 
+    public void spinup(double seconds) {
+        ElapsedTime shootTime = new ElapsedTime();
+        while (opMode.opModeIsActive() && shootTime.seconds() < seconds) {
+            leftShooterPowerMgr.regulatePower();
+            rightShooterPowerMgr.regulatePower();
+        }
+    }
+
     public void shoot() {
-        leftServoPos += SERVO_ADJUSTMENT_VAL_LEFT;
-        rightServoPos -= SERVO_ADJUSTMENT_VAL_RIGHT;
-        leftServoPos = Range.clip(leftServoPos, LEFT_OUT_VAL, LEFT_IN_VAL);//clip the range so it won't go over 1 or under 0
-        rightServoPos = Range.clip(rightServoPos, RIGHT_IN_VAL, RIGHT_OUT_VAL);//clip the range so it won't go over 1 or under 0
+        leftServoPos = LEFT_IN_VAL;
+        rightServoPos = RIGHT_IN_VAL;
 
         ElapsedTime shootTime = new ElapsedTime();
         scooper.setPower(1);
-        while (opMode.opModeIsActive() && shootTime.seconds() < .25) {
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+        while (opMode.opModeIsActive() && shootTime.seconds() < .5) {
+            //leftShooterPowerMgr.regulatePower();
+            //rightShooterPowerMgr.regulatePower();
         }
         scooper.setPower(0);
 
@@ -1017,16 +1188,14 @@ public class AutonomousActions extends LinearOpMode {
 
         shootTime.reset();
         while (opMode.opModeIsActive() && shootTime.seconds() < .75) {
-            leftShooterPowerMgr.regulatePower();
-            rightShooterPowerMgr.regulatePower();
+            //leftShooterPowerMgr.regulatePower();
+            //rightShooterPowerMgr.regulatePower();
         }
         shooter1.setPower(0);
         shooter2.setPower(0);
 
-        leftServoPos -= SERVO_ADJUSTMENT_VAL_LEFT;
-        rightServoPos += SERVO_ADJUSTMENT_VAL_RIGHT;
-        leftServoPos = Range.clip(leftServoPos, LEFT_OUT_VAL, LEFT_IN_VAL);//clip the range so it won't go over 1 or under 0
-        rightServoPos = Range.clip(rightServoPos, RIGHT_IN_VAL, RIGHT_OUT_VAL);//clip the range so it won't go over 1 or under 0
+        leftServoPos = LEFT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+        rightServoPos = RIGHT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
         leftArm.setPosition(leftServoPos);
         rightArm.setPosition(rightServoPos);
     }

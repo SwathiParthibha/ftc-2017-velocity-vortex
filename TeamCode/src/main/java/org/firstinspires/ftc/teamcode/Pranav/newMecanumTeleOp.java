@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Pranav;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -16,6 +17,7 @@ import static android.os.Build.VERSION_CODES.M;
 /**
  * Created by spmeg on 10/22/2016.
  */
+@Disabled
 @TeleOp(name = "New Mecanum TeleOp", group = "Teleop")
 public class newMecanumTeleOp extends OpMode
 {

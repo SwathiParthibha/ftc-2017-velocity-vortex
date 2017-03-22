@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import ftc.electronvolts.statemachine.BasicAbstractState;
 import ftc.electronvolts.statemachine.StateName;
 
@@ -22,9 +25,11 @@ public class ToWhiteLineState extends BasicAbstractState {
 
     private StateName stateName, nextStateName;
 
-    private static final double WHITE_LINE_THRESHOLD = 0.3;
+    private static final double WHITE_LINE_THRESHOLD = 0.187;
 
     private boolean hasInitialized = false;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private volatile double lightDetected = 0.0;
 
     public ToWhiteLineState(DcMotor leftMotor, DcMotor rightMotor, LightSensor lightSensor, StateName stateName, StateName nextStateName) {
         this.leftMotor = leftMotor;
@@ -41,6 +46,9 @@ public class ToWhiteLineState extends BasicAbstractState {
 
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
@@ -48,22 +56,31 @@ public class ToWhiteLineState extends BasicAbstractState {
         if(!hasInitialized){
             init();
             hasInitialized = true;
+
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (!executorService.isShutdown())
+                        lightDetected = lightSensor.getLightDetected();
+                }
+            });
         }
 
         if (!isDone()){
-            leftMotor.setPower(0.6);
-            rightMotor.setPower(0.6);
+            leftMotor.setPower(0.2);
+            rightMotor.setPower(0.2);
             return stateName;
         } else {
             leftMotor.setPower(0);
             rightMotor.setPower(0);
+            executorService.shutdown();
             return nextStateName;
         }
     }
 
     @Override
     public boolean isDone() {
-        return lightSensor.getLightDetected() > WHITE_LINE_THRESHOLD;
+        return lightDetected >= WHITE_LINE_THRESHOLD;
     }
 
     @Override

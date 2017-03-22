@@ -26,9 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package org.firstinspires.ftc.teamcode.Pranav.oldMecanumCode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name = "Mecanum Autonomous", group = "Pushbot")
-//@Disabled
+@Disabled
 
 /*
 This is an example of a Basic Autonomous utilizing the functions from RobotHardware Class

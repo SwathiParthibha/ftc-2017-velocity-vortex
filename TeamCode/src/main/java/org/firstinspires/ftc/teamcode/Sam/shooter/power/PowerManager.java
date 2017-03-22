@@ -15,18 +15,24 @@ public class PowerManager {
 
     private DcMotor dcMotor;
     private Constants.MOTORNAME motorName;
-    private PIDAlgo pidAlgo = new PIDAlgo();
+    private PIDAlgo pidAlgo = null;
     private MotorTelemetry motorTelemetry = new MotorTelemetry();
 
+    private double rpmErrorAdjustment = 0.0;
+    private double powerAdjustment = 0.0;
+    private int REQUESTED_ETPS = Constants.REQUESTED_ETPS;
+
     public PowerManager(Constants.MOTORNAME motorName, DcMotor dcMotor) {
+        pidAlgo = new PIDAlgo(MotorFactory.getInstance().getMotor(motorName));
         this.motorName = motorName;
         this.dcMotor = dcMotor;
 
         this.dcMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         this.dcMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //this.dcMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //this.dcMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorTelemetry.setMotorName(motorName);
+
+        if(motorName==Constants.MOTORNAME.RIGHT_SHOOTER)
+            REQUESTED_ETPS*=1.05;
     }
 
     public Constants.MOTORNAME getMotorName() {
@@ -49,14 +55,23 @@ public class PowerManager {
         return allowedPowerDifference;
     }
 
+    public double getRpmErrorAdjustment() {
+        return rpmErrorAdjustment;
+    }
+
+    public double getPowerAdjustment() {
+        return powerAdjustment;
+    }
+
     public void setAllowedPowerDifference(double allowedPowerDifference) {
         this.allowedPowerDifference = allowedPowerDifference;
     }
 
     public void regulatePower() {
         ShooterMotor motor = MotorFactory.getInstance().getMotor(motorName);
-
-        currentPower += pidAlgo.getAdjustment(motor.getRpm(), Constants.REQUESTED_ETPS, Constants.DELTA_TIME);
+        rpmErrorAdjustment = pidAlgo.getAdjustment(motor.getRpm(), REQUESTED_ETPS, Constants.ONE_SECOND);
+        powerAdjustment = rpmErrorAdjustment/76;
+        currentPower += powerAdjustment;
         currentPower = clipPower(currentPower);
 
         motorTelemetry.setCurrentRpm(motor.getRpm());
@@ -67,8 +82,11 @@ public class PowerManager {
         motorTelemetry.setKalminP(pidAlgo.getKalminPrevError());
         motorTelemetry.setKk(pidAlgo.getKalminTrustVal());
         motorTelemetry.setRequiredPwr(currentPower);
+        motorTelemetry.setRpmErrorAdjustment(rpmErrorAdjustment);
+        motorTelemetry.setPowerAdjustment(powerAdjustment);
 
         dcMotor.setPower(currentPower);
+
     }
 
     private double clipPower(double power) {
@@ -80,8 +98,17 @@ public class PowerManager {
         return power;
     }
 
+    public void shutdown(){
+        pidAlgo.shutDown();
+    }
+
     public MotorTelemetry getMotorTelemetry() {
         return motorTelemetry;
+    }
+
+    public void reset()
+    {
+        pidAlgo.reset();
     }
 }
 

@@ -66,7 +66,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="AutoBlueBall", group="Pushbot")
-//@Disabled
+@Disabled
 public class AutoStraightRevolution extends LinearOpMode {
 
     /* Declare OpMode members. */

@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Mecanum TeleOp", group="TeleOp")
-//@Disabled
+@Disabled
 public class Mecanum_Drive_Code extends OpMode {
 
     /* Declare OpMode members. */

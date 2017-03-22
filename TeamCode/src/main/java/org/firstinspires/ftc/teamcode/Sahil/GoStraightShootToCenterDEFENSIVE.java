@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Sahil;
 
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,7 +19,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  * Created by SahilDoshi on 2/11/17.
  */
 
-@Autonomous(name = "GoStraightShootToCenterDEFENSIVE", group = "Pushbot")
+@Autonomous(name="GoStraightShootToCenterDEFENSIVE", group="Pushbot")
+@Disabled
 public class GoStraightShootToCenterDEFENSIVE extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
@@ -43,11 +45,17 @@ public class GoStraightShootToCenterDEFENSIVE extends LinearOpMode {
     double angleZ = 0;
 
     static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
-    static final double APPROACH_SPEED = 0.3;
+    static final double APPROACH_SPEED = 0.5;
     double WHEEL_SIZE_IN = 4;
     public int ROTATION = 1220; // # of ticks
     double COUNTS_PER_INCH = ROTATION /
             (WHEEL_SIZE_IN * Math.PI);
+    double DIST = 18;
+    double SIDE_DIST = 30;
+    byte[] rangeSensorCache;
+    byte[] sideRangeSensorCache;
+    I2cDevice rangeA;
+    I2cDevice rangeB;
 
     public class shooterSettings {//data members can be replaced, but default values are for 1750 ETPS = 955 RPM
 
@@ -408,30 +416,21 @@ public class GoStraightShootToCenterDEFENSIVE extends LinearOpMode {
         }
 
         // sleep(10000);
-        encoderDrive(APPROACH_SPEED, 8.3/2, 8.3/2, 10);
-        encoderDrive(APPROACH_SPEED, -16.6 / 2, 16.6 / 2, 10); //Initial Turn
-        encoderDrive(APPROACH_SPEED, 33.3 / 2, 33.3 / 2, 3);
-        sleep(2000);// Drive
+        encoderDrive(APPROACH_SPEED, -10 / 2, 10 / 2, 10); //Initial Turn
+        encoderDrive(APPROACH_SPEED, 30 / 2, 30 / 2, 3); // Drive
         //encoderDrive(APPROACH_SPEED, 15 / 2, -15 / 2, 1); // Turn and Get Ready To Shoot
         //shoot();
-        //The robot has now shot the ball into the central vortex.
         telemetry.addData("Shoot", "Done");
-        encoderDrive(APPROACH_SPEED, 36.6 / 2, 36.6/2, 10);
-        encoderDrive(APPROACH_SPEED, 13.3 / 2, -13.3 / 2, 1);
-        encoderDrive(APPROACH_SPEED, 16.6 / 2, 16.6 / 2, 10);
+        encoderDrive(APPROACH_SPEED, 15 / 2, -15 / 2, 1);
+        encoderDrive(APPROACH_SPEED, 17 / 2, 17 / 2, 10);
         sleep(1000);
-        //This has now shot the ball and headed to the cap ball and started to move it so that it can redirect the ball to the opposing teams' beacon.
-        encoderDrive(APPROACH_SPEED, -13.3 / 2, 13.3 / 2, 10);
-        encoderDrive(APPROACH_SPEED, 4.9/2, 4.9/2,  10);
-        encoderDrive(APPROACH_SPEED, 1.666 / 2, -13.3 / 2, 10);
-        encoderDrive(APPROACH_SPEED, 4.99 /2, 4.99 /2,  10);
-        encoderDrive(APPROACH_SPEED, -13.3 / 2, 1.666 /2, 10);
-        encoderDrive(APPROACH_SPEED, 4.99/2, 4.99/2,  10);
-        encoderDrive(APPROACH_SPEED, 1.666 / 2, -13.3 / 2, 10);
+        encoderDrive(APPROACH_SPEED, 20 / 2, 0 / 2, 10);
+        encoderDrive(APPROACH_SPEED, 5 / 2, 5 / 2, 10);
         sleep(500);
-        encoderDrive(APPROACH_SPEED, -24.99 / 2, 24.99 / 2, 10);
-    }
+        encoderDrive(APPROACH_SPEED, 5 / 2, 5 / 2, 10);
+        encoderDrive(APPROACH_SPEED, -15 / 2, 15 / 2, 10);
 
+    }
 
     public void drive(double distance, double speed) throws InterruptedException {
         //1220 ticks per rotation
@@ -558,4 +557,3 @@ public class GoStraightShootToCenterDEFENSIVE extends LinearOpMode {
     }
 
 }
-

@@ -8,6 +8,7 @@ import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -29,6 +30,7 @@ import ftc.electronvolts.statemachine.StateName;
  * Created by spmeg on 1/21/2017.
  */
 @Autonomous(name = "TestStateMachineOp", group = "StateOps")
+@Disabled
 public class TestStateMachineOp extends OpMode {
     private DcMotor leftMotor = null;
     private DcMotor rightMotor = null;
@@ -42,20 +44,28 @@ public class TestStateMachineOp extends OpMode {
     private ColorSensor leftColorSensor, rightColorSensor = null;
 
     enum S implements StateName {
+        GO_FORWARD,
+        FIRST_TURN,
         STATE,
         WAIT,
         STATE_2,
         WAIT_2,
+        OVERSHOOT,
         STATE_3,
         WAIT_3,
         STATE_4,
         WAIT_4,
+        STATE_5,
+        STATE_6,
+        STATE_7,
+        STATE_8,
+        STATE_9,
         STOP
     };
 
     private StateMachine stateMachine;
 
-    private AllianceColor beaconColor = null;
+    private AllianceColor beaconColor = AllianceColor.BLUE;
 
     private BNO055IMU imu;
 
@@ -69,6 +79,9 @@ public class TestStateMachineOp extends OpMode {
 
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         rangeA = hardwareMap.i2cDevice.get("range sensor");// Primary range sensor
         rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x2a), false);
@@ -94,18 +107,30 @@ public class TestStateMachineOp extends OpMode {
         parameters.loggingEnabled      = true;
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
         imu.initialize(parameters);
 
-        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.STATE);
+        AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.GO_FORWARD);
 
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.STATE, S.WAIT, 7);
-        autoStateMachineBuilder.addWait(S.WAIT, S.STATE_2, 3000);
-        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.STATE_2, S.WAIT_2, -7);
-        autoStateMachineBuilder.addWait(S.WAIT_2, S.STATE_3, 3000);
-        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_3, S.WAIT_3, imu, 150);
-        autoStateMachineBuilder.addWait(S.WAIT_3, S.STATE_4, 3000);
-        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_4, S.WAIT_4, imu, 0);
-        autoStateMachineBuilder.addWait(S.WAIT_4, S.STOP, 3000);
+        //autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE, S.WAIT, imu, 10);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.GO_FORWARD, S.FIRST_TURN, 5);
+        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.FIRST_TURN, S.STATE, imu, 30);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.STATE, S.STATE_2, 18);
+        autoStateMachineBuilder.addToWhiteLine(S.STATE_2, S.OVERSHOOT, leftMotor, rightMotor, lightSensor);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.OVERSHOOT, S.WAIT, 3);
+        autoStateMachineBuilder.addWait(S.WAIT, S.STATE_3, 300);
+        autoStateMachineBuilder.addPivotToWhiteLine(leftMotor, rightMotor, lightSensor, S.STATE_3, S.WAIT_2, beaconColor);
+        autoStateMachineBuilder.addWait(S.WAIT_2, S.STATE_4, 300);
+        autoStateMachineBuilder.addLineFollow(telemetry, S.STATE_4, S.STATE_5, leftMotor, rightMotor, lightSensor, rangeSensor, beaconColor);
+        autoStateMachineBuilder.addPressBeacon(telemetry, S.STATE_5, S.STATE_6, leftMotor, rightMotor, leftColorSensor, rightColorSensor, beaconColor);
+        autoStateMachineBuilder.addEncoderDrive(leftMotor, rightMotor, S.STATE_6, S.STATE_7, -5);
+        autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_7, S.STOP, imu, 30);
+        //autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_2, S.WAIT_2, imu, 200);
+        //autoStateMachineBuilder.addWait(S.WAIT_2, S.STATE_3, 3000);
+        //autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_3, S.WAIT_3, imu, 90);
+        //autoStateMachineBuilder.addWait(S.WAIT_3, S.STATE_4, 3000);
+        //autoStateMachineBuilder.addTurn(leftMotor, rightMotor, S.STATE_4, S.WAIT_4, imu, 150);
+        //autoStateMachineBuilder.addWait(S.WAIT_4, S.STOP, 3000);
         autoStateMachineBuilder.addStop(S.STOP);
 
         stateMachine = autoStateMachineBuilder.build();
