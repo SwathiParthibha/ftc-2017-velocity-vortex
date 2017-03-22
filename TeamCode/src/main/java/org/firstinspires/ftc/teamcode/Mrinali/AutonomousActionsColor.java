@@ -93,13 +93,14 @@ import ftc.electronvolts.statemachine.StateName;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-public class AutonomousActionsColor extends LinearOpMode {
+public class AutonomousActionsColor {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
     //HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
     // could also use HardwarePushbotMatrix class.
+    Telemetry telemetry;
     public DcMotor leftMotor = null;
     public DcMotor rightMotor = null;
     public DcMotor shooter1;
@@ -173,11 +174,6 @@ public class AutonomousActionsColor extends LinearOpMode {
 
     public AutonomousActionsColor(LinearOpMode anOpMode) {
         opMode = anOpMode;
-    }
-
-    @Override
-    public void runOpMode() throws InterruptedException {
-
     }
 
     public double startShootingtime = 0;
@@ -368,7 +364,7 @@ public class AutonomousActionsColor extends LinearOpMode {
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", lightSensor.getLightDetected());
             telemetry.update();
-            idle();
+            opMode.idle();
 
             if (imu.getLinearAcceleration().zAccel < 0.2) {
                 leftMotor.setPower(APPROACH_SPEED * .4);
@@ -399,7 +395,7 @@ public class AutonomousActionsColor extends LinearOpMode {
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", lightSensor.getLightDetected());
             telemetry.update();
-            idle();
+            opMode.idle();
 
             if (imu.getLinearAcceleration().zAccel < 0.2) {
                 leftMotor.setPower(APPROACH_SPEED * .4);
@@ -429,10 +425,10 @@ public class AutonomousActionsColor extends LinearOpMode {
         angleZ = IMUheading();
         leftMotor.setPower(APPROACH_SPEED); //spinRight right
         rightMotor.setPower(-APPROACH_SPEED);
-        while (opModeIsActive() && IMUheading() > -180) {
+        while (opMode.opModeIsActive() && IMUheading() > -180) {
             telemetry.addData("Angle", IMUheading());
         }
-        while (opModeIsActive() && IMUheading() > 90) {
+        while (opMode.opModeIsActive() && IMUheading() > 90) {
             telemetry.addData("Angle", IMUheading());
         }
         turn(0);
@@ -444,10 +440,10 @@ public class AutonomousActionsColor extends LinearOpMode {
         angleZ = IMUheading();
         leftMotor.setPower(-APPROACH_SPEED); //spinRight right
         rightMotor.setPower(APPROACH_SPEED);
-        while (opModeIsActive() && IMUheading() < 180) {
+        while (opMode.opModeIsActive() && IMUheading() < 180) {
             telemetry.addData("Angle", IMUheading());
         }
-        while (opModeIsActive() && IMUheading() < -90) {
+        while (opMode.opModeIsActive() && IMUheading() < -90) {
             telemetry.addData("Angle", IMUheading());
         }
         turn(0);
@@ -496,7 +492,7 @@ public class AutonomousActionsColor extends LinearOpMode {
                     resetIMuandPos(leftPos, rightPos);
                 }
 
-                idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+                opMode.idle(); // Always call opMode.idle() at the bottom of your while(opModeIsActive()) loop
             }
             leftMotor.setPower(0);
             rightMotor.setPower(0);
@@ -525,7 +521,7 @@ public class AutonomousActionsColor extends LinearOpMode {
                     resetIMuandPos(leftPos, rightPos);
                 }
 
-                idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+                opMode.idle(); // Always call opMode.idle() at the bottom of your while(opModeIsActive()) loop
             }
             leftMotor.setPower(0);
             rightMotor.setPower(0);
@@ -572,7 +568,7 @@ public class AutonomousActionsColor extends LinearOpMode {
                     rightMotor.getCurrentPosition());
             telemetry.update();
 
-            idle();
+            opMode.idle();
         }
 
         rightMotor.setPower(0);
@@ -593,7 +589,7 @@ public class AutonomousActionsColor extends LinearOpMode {
         //Momentarily stop
         leftMotor.setPower(0);
         rightMotor.setPower(0);
-        sleep(200);
+        opMode.sleep(200);
 
         telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
         telemetry.update();
@@ -609,12 +605,12 @@ public class AutonomousActionsColor extends LinearOpMode {
                 telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
                 telemetry.update();
 
-                idle();
+                opMode.idle();
             }
             //Momentarily stop
             leftMotor.setPower(0);
             rightMotor.setPower(0);
-            sleep(100);
+            opMode.sleep(100);
         }
 
         if (getcmUltrasonic(rangeSensor) > DIST) {
@@ -627,11 +623,11 @@ public class AutonomousActionsColor extends LinearOpMode {
                 telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
                 telemetry.update();
 
-                idle();
+                opMode.idle();
             }
             leftMotor.setPower(0);
             rightMotor.setPower(0);
-            sleep(100);
+            opMode.sleep(100);
         }
 
         telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
@@ -653,7 +649,7 @@ public class AutonomousActionsColor extends LinearOpMode {
         rightMotor.setPower(-.2);
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
             telemetry.addData("Light", lightSensor.getLightDetected());
-            idle();
+            opMode.idle();
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
@@ -671,7 +667,7 @@ public class AutonomousActionsColor extends LinearOpMode {
             }
             telemetry.update();
 
-            idle();
+            opMode.idle();
         }
         stopRobot();
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -688,7 +684,7 @@ public class AutonomousActionsColor extends LinearOpMode {
         rightMotor.setPower(.2);
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
             telemetry.addData("Light", lightSensor.getLightDetected());
-            idle();
+            opMode.idle();
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
@@ -706,7 +702,7 @@ public class AutonomousActionsColor extends LinearOpMode {
             }
             telemetry.update();
 
-            idle();
+            opMode.idle();
         }
         stopRobot();
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -748,7 +744,7 @@ public class AutonomousActionsColor extends LinearOpMode {
         }
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
             telemetry.addData("Light", lightSensor.getLightDetected());
-            idle();
+            opMode.idle();
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
@@ -770,11 +766,11 @@ public class AutonomousActionsColor extends LinearOpMode {
 
             if (lightSensor.getLightDetected() < WHITE_THRESHOLD) {
                 if (IMUheading() < expectedAngle) {
-                    leftMotor.setPower(-.05);
+                    leftMotor.setPower(-.1);
                     rightMotor.setPower(.2);
                 } else if (IMUheading() > expectedAngle) {
                     leftMotor.setPower(.2);
-                    rightMotor.setPower(-.05);
+                    rightMotor.setPower(-.1);
                 }
             }
             else {
@@ -783,7 +779,7 @@ public class AutonomousActionsColor extends LinearOpMode {
             }
             telemetry.update();
 
-            idle();
+            opMode.idle();
         }
 
         leftMotor.setPower(0);
@@ -839,7 +835,7 @@ public class AutonomousActionsColor extends LinearOpMode {
                     telemetry.log().add("beacon is red");
                     telemetry.update();
 
-                    //sleep(4000); // wait 5 seconds total
+                    //opMode.sleep(4000); // wait 5 seconds total
                     leftMotor.setPower(APPROACH_SPEED * .6);
                     rightMotor.setPower(APPROACH_SPEED * .6);
 
@@ -876,7 +872,7 @@ public class AutonomousActionsColor extends LinearOpMode {
                     telemetry.log().add("beacon is blue");
                     telemetry.update();
 
-                    //sleep(4000); // wait 5 seconds total
+                    //opMode.sleep(4000); // wait 5 seconds total
                     leftMotor.setPower(APPROACH_SPEED * .6);
                     rightMotor.setPower(APPROACH_SPEED * .6);
 
@@ -892,7 +888,7 @@ public class AutonomousActionsColor extends LinearOpMode {
                 }
             }
             telemetry.update();
-            sleep(1500);
+            opMode.sleep(1500);
             leftMotor.setPower(0);
             rightMotor.setPower(0);
 
@@ -901,7 +897,7 @@ public class AutonomousActionsColor extends LinearOpMode {
 
             leftMotor.setPower(-APPROACH_SPEED * .8);
             rightMotor.setPower(-APPROACH_SPEED * .8);
-            sleep(100);
+            opMode.sleep(100);
             leftMotor.setPower(0);
             rightMotor.setPower(0);
 
@@ -909,7 +905,7 @@ public class AutonomousActionsColor extends LinearOpMode {
             telemetry.addLine("Right blue: " + rightColorSensor.blue() + " | Right red: " + rightColorSensor.red());
             telemetry.update();
 
-            idle();
+            opMode.idle();
             //leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             //rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         } while (opMode.opModeIsActive() && !verify()
@@ -1003,7 +999,7 @@ public class AutonomousActionsColor extends LinearOpMode {
             }
             */
 
-            idle();
+            opMode.idle();
         }
         // Stop all motion;
         leftMotor.setPower(0);
@@ -1013,7 +1009,7 @@ public class AutonomousActionsColor extends LinearOpMode {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //  sleep(250);   // optional pause after each move
+        //  opMode.sleep(250);   // optional pause after each move
     }
 
     public void encoderDriveCheckTilt(double speed,
@@ -1067,7 +1063,7 @@ public class AutonomousActionsColor extends LinearOpMode {
                     spinRight();
             }
 
-            idle();
+            opMode.idle();
         }
         // Stop all motion;
         leftMotor.setPower(0);
@@ -1077,7 +1073,7 @@ public class AutonomousActionsColor extends LinearOpMode {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //  sleep(250);   // optional pause after each move
+        //  opMode.sleep(250);   // optional pause after each move
     }
 
     public void encoderDriveSpinup(double speed,
@@ -1128,7 +1124,7 @@ public class AutonomousActionsColor extends LinearOpMode {
             //leftShooterPowerMgr.regulatePower();
             //rightShooterPowerMgr.regulatePower();
 
-            idle();
+            opMode.idle();
         }
         // Stop all motion;
         leftMotor.setPower(0);
@@ -1140,7 +1136,7 @@ public class AutonomousActionsColor extends LinearOpMode {
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        //  sleep(250);   // optional pause after each move
+        //  opMode.sleep(250);   // optional pause after each move
     }
 
     public void spinup(double seconds) {
@@ -1237,7 +1233,7 @@ public class AutonomousActionsColor extends LinearOpMode {
                     rightMotor.getCurrentPosition());
             telemetry.update();
 
-            idle();
+            opMode.idle();
         }
         // Stop all motion;
         leftMotor.setPower(0);

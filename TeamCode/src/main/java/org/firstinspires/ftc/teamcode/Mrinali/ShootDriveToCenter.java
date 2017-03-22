@@ -72,7 +72,7 @@ public class ShootDriveToCenter extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         auto.init(hardwareMap, telemetry);
-        auto.runOpMode();
+        //auto.runOpMode();
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to Run");
