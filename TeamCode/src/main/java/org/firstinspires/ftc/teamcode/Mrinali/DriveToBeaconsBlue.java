@@ -76,7 +76,6 @@ public class DriveToBeaconsBlue extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         auto.init(hardwareMap, telemetry, AllianceColor.BLUE);
-        auto.runOpMode();
 
         telemetry.addData("verify", auto.verify()); //checks color sensors
 
