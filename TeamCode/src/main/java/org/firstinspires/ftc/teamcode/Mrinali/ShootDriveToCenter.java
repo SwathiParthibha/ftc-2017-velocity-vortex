@@ -33,7 +33,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.Mrinali;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 /**
@@ -63,7 +62,7 @@ public class ShootDriveToCenter extends LinearOpMode {
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
-    AutonomousActionsColor auto = new AutonomousActionsColor(this);
+    AutonomousActions auto = new AutonomousActions(this);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -72,7 +71,6 @@ public class ShootDriveToCenter extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         auto.init(hardwareMap, telemetry);
-        //auto.runOpMode();
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to Run");

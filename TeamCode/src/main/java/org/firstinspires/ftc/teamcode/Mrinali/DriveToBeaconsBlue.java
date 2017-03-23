@@ -33,9 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.Mrinali;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
@@ -66,7 +64,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
-    AutonomousActionsColor auto = new AutonomousActionsColor(this);
+    AutonomousActions auto = new AutonomousActions(this);
     double FASTER_SPEED = .7;
 
     @Override
