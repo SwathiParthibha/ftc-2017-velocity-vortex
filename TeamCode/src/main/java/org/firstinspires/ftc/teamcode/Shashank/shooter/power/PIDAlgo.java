@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.Sam.shooter.power;
+package org.firstinspires.ftc.teamcode.Shashank.shooter.power;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.beans.ShooterMotor;
 
 public class PIDAlgo {
     private static final double DEAD_BAND = 100;
@@ -49,6 +49,7 @@ public class PIDAlgo {
 
     public double getAdjustment(double rpm, double reqEtps, long deltaTime) {
 
+        //filteredRPM = kalminFilter.getFilteredRPM();
         filteredRPM = kalminFilter.getFilteredRPM();
 
         double error = reqEtps - filteredRPM;

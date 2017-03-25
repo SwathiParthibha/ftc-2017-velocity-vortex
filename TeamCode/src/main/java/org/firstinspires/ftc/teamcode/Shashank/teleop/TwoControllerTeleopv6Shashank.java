@@ -78,7 +78,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
 
-    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(40);
+    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(200);
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(3);
     private ScheduledFuture scheduledFuture = null;
     private ShooterMotor leftShooter, rightShooter;
@@ -128,13 +128,13 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
         capArm.setPosition(1);
 
-        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
-        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2);
+        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1, this);
+        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2, this);
 
-        for(int i = 0; i <  20; i++){
+        for(int i = 0; i <  200; i++){
             //run a thread every fifty milliseconds, and each thread will re-run after a second
-            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
-            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 50, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 10, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 10, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
         }
 
         executorService.schedule(new Runnable() {
@@ -217,7 +217,7 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
                         leftShooterPowerMgr.regulatePower();
                         rightShooterPowerMgr.regulatePower();
                     }
-                }, 0, 250, TimeUnit.MILLISECONDS);
+                }, 0, 100, TimeUnit.MILLISECONDS);
                 alreadyScheduled = true;
             }
         } else if (gamepad2.b) {
@@ -243,10 +243,10 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
 
 
         if(gamepad2.left_stick_y > 0.3) {
-            SHOOTER_POWER = SHOOTER_POWER + 0.03;
+            //SHOOTER_POWER = SHOOTER_POWER + 0.03;
             SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
         } else if (gamepad2.left_stick_y < -0.3){
-            SHOOTER_POWER = SHOOTER_POWER - 0.03;
+            //SHOOTER_POWER = SHOOTER_POWER - 0.03;
             SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
         }
 

@@ -2,32 +2,34 @@ package org.firstinspires.ftc.teamcode.Shashank.teleop;
 
 import android.media.MediaPlayer;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
-import org.firstinspires.ftc.teamcode.Sam.shooter.RPMThreadMilliseconds;
-import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
-import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
-import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
-import org.firstinspires.ftc.teamcode.Sam.util.Util;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.MotorFactory;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.RPMThreadMilliseconds;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.beans.ShooterMotor;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.power.PowerManager;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.util.Constants;
+import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 
-@TeleOp(name = "Two Controller Teleopv6 Shashank One Motor", group = "Teleop")
-@Disabled
-public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
+@TeleOp(name = "Two Controller Teleopv7 Shashank", group = "Teleop")
+//@Disabled
+public class TwoControllerTeleopv7Shashank extends OpMode {
     private final double SWEEPER_IN_POWER = -0.7;
     private final double SWEEPER_OUT_POWER = 0.7;
     private final double MAX_POWER = 1.0;
@@ -40,6 +42,8 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
     private final double SERVO_ADJUSTMENT_VAL_LEFT = (Math.abs(LEFT_IN_VAL - LEFT_OUT_VAL) / 14);
     private final double SERVO_ADJUSTMENT_VAL_RIGHT = (Math.abs(RIGHT_IN_VAL - RIGHT_OUT_VAL) / 14);
     private final double SERVO_ADJUSTMENT_VAL_CAP = 0.02;
+    private final double ODS_MAX_VALUE = 0.44;
+    private final double ODS_MIN_VALUE = 0.32;
     double leftServoPos = 0.12;
     double rightServoPos = 0.76;
     double capServoPos = 0.38;
@@ -55,21 +59,28 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
     private Servo leftArm;
     private Servo rightArm;
     private Servo capArm;
+    private Servo flagServo;
+    private OpticalDistanceSensor opticalDistanceSensor = null;
     private PowerManager leftShooterPowerMgr;
+    private PowerManager rightShooterPowerMgr;
 
 
     private boolean swap = false;
     private MediaPlayer wrongBallSound = null, correctBallSound = null;
     private ColorSensor sweeperColorSensor;
-    private org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor allianceColor = null;
+    private AllianceColor allianceColor = null;
 
     private boolean ballSensed = false;
 
     private ElapsedTime runtime = new ElapsedTime();
 
 
-    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(2);
+    private ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(200);
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(3);
+    private ScheduledFuture scheduledFuture = null;
     private ShooterMotor leftShooter, rightShooter;
+    private boolean alreadyScheduled = false;
+    private double amountOfLightDetected = 0;
 
     @Override
     public void init() {
@@ -83,13 +94,15 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
         rightArm = this.hardwareMap.servo.get("rightservo");
         capArm = this.hardwareMap.servo.get("capArm");
         sweeperColorSensor = this.hardwareMap.colorSensor.get("colorLegacy");
+        flagServo = this.hardwareMap.servo.get("flagServo");
+        opticalDistanceSensor = this.hardwareMap.opticalDistanceSensor.get("ods");
 
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         swap = true;
 
-        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
         correctBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.super_mario_power_up);
@@ -112,12 +125,24 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
 
         capArm.setPosition(1);
 
-        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1);
+        leftShooterPowerMgr = new PowerManager(Constants.MOTORNAME.LEFT_SHOOTER, shooter1, this);
+        rightShooterPowerMgr = new PowerManager(Constants.MOTORNAME.RIGHT_SHOOTER, shooter2, this);
 
-        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), 0L, Constants.DELTA_TIME, TimeUnit.MILLISECONDS);
-        scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), 0L, Constants.DELTA_TIME, TimeUnit.MILLISECONDS);
+        for(int i = 0; i <  200; i++){
+            //run a thread every fifty milliseconds, and each thread will re-run after a second
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter1, Constants.MOTORNAME.LEFT_SHOOTER), i * 10, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+            scheduledThreadPool.scheduleAtFixedRate(new RPMThreadMilliseconds(shooter2, Constants.MOTORNAME.RIGHT_SHOOTER), i * 10, Constants.ONE_SECOND, TimeUnit.MILLISECONDS);
+        }
+
+        executorService.schedule(new Runnable() {
+            @Override
+            public void run() {
+                while (!executorService.isShutdown())
+                    amountOfLightDetected = Range.clip(opticalDistanceSensor.getLightDetected(), ODS_MIN_VALUE, ODS_MAX_VALUE);
+            }
+        }, 0, TimeUnit.MILLISECONDS);
+
     }
-
 
     @Override
     public void start() {
@@ -127,6 +152,9 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
 
     @Override
     public void loop() {
+        DbgLog.msg(">LEFT RPM SHOOTER: " + leftShooter.getRpm());
+        DbgLog.msg(">RIGHT RPM SHOOTER: " + rightShooter.getRpm());
+        DbgLog.msg(">BATTERY LEVEL: " + hardwareMap.voltageSensor.get("sweepec").getVoltage());
 
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
@@ -173,30 +201,49 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
 
         }
 
+        //ods value without ball is 0.32 for getLightDetected()
+        //the max value is 0.6
+        flagServo.setPosition((((ODS_MAX_VALUE-amountOfLightDetected)/(ODS_MAX_VALUE-ODS_MIN_VALUE))+1)/2);
+
         if (gamepad2.a) {
-            leftShooterPowerMgr.regulatePower();
+            if(!alreadyScheduled) {
+                scheduledFuture = executorService.scheduleAtFixedRate(new Runnable() {
+                    @Override
+                    public void run() {
+                        DbgLog.msg("REGULATING POWER!!!!!");
+                        leftShooterPowerMgr.regulatePower();
+                        rightShooterPowerMgr.regulatePower();
+                    }
+                }, 0, 100, TimeUnit.MILLISECONDS);
+                alreadyScheduled = true;
+            }
         } else if (gamepad2.b) {
             shooter1.setPower(SHOOTER_POWER);
             shooter2.setPower(SHOOTER_POWER);
         } else if(gamepad2.y) {
-            Constants.REQUESTED_ETPS=1900;
-            Constants.DEFAULT_POWER=0.52;
-        } else if(gamepad2.x){
-            Constants.REQUESTED_ETPS = 1800;//1590;//1750 good for close shots
-            Constants.DEFAULT_POWER = 0.49;//0.455;//0.42
-        }else{
-            shooter1.setPower(0);
-            shooter2.setPower(0);
+            Constants.REQUESTED_ETPS = 83160;//35150;//1855;//1590;//1750 good for close shots
+            Constants.DEFAULT_POWER = 0.45;//0.51;//0.455;//0.42
             leftShooterPowerMgr.reset();
+        } else if(gamepad2.x){
+            Constants.REQUESTED_ETPS = 77616;//1855;//1590;//1750 good for close shots
+            Constants.DEFAULT_POWER = 0.42;//0.455;//0.42
+            leftShooterPowerMgr.reset();
+        }else{
+                shooter1.setPower(0);
+                shooter2.setPower(0);
+                leftShooterPowerMgr.reset();
+            rightShooterPowerMgr.reset();
+            if(scheduledFuture != null)
+                scheduledFuture.cancel(true);
+            alreadyScheduled = false;
         }
 
 
         if(gamepad2.left_stick_y > 0.3) {
-            SHOOTER_POWER = SHOOTER_POWER + 0.03;
+            //SHOOTER_POWER = SHOOTER_POWER + 0.03;
             SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
-
         } else if (gamepad2.left_stick_y < -0.3){
-            SHOOTER_POWER = SHOOTER_POWER - 0.03;
+            //SHOOTER_POWER = SHOOTER_POWER - 0.03;
             SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
         }
 
@@ -224,7 +271,6 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
                 wrongBallSound = MediaPlayer.create(this.hardwareMap.appContext, R.raw.police_siren);
                 wrongBallSound.start();
             }
-            //sweeper.setPower(0.5);
         } else {
             isWrongBall();
             if (ballSensed) {
@@ -235,7 +281,6 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
                 correctBallSound.stop();
             }
             wrongBallSound.stop();
-            //sweeper.setPower(0);
         }
 
 
@@ -267,8 +312,6 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
         }
 
 
-        shooter2.setPower(shooter1.getPower());
-
         printTelemetry();
         telemetry.addData("cap", capServoPos);
         telemetry.addData("", "");//need to output something or else the telemetry won't update
@@ -277,12 +320,16 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
         telemetry.addData("Current left RPM", leftShooter.getRpm());
         telemetry.addData("Current right RPM", rightShooter.getRpm());
         telemetry.addData("gamepad1.x", gamepad1.x);
+        telemetry.addData("cap arm", capArm.getPosition());
+        telemetry.addData("ods", opticalDistanceSensor.getLightDetected());
+        telemetry.addData("alreadyScheduled", alreadyScheduled);
         telemetry.update();
     }
 
     private void printTelemetry() {
         if (Constants.USE_TELEMETRY) {
             telemetry.addData("", leftShooterPowerMgr.getMotorTelemetry().toString());
+            telemetry.addData("", rightShooterPowerMgr.getMotorTelemetry().toString());
         }
     }
 
@@ -324,8 +371,22 @@ public class TwoControllerTeleopv6ShashankOneMotor extends OpMode {
         super.stop();
 
         scheduledThreadPool.shutdown();
-        Util.waitUntil(5);
+        try {
+            scheduledThreadPool.awaitTermination(750, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         scheduledThreadPool.shutdownNow();
+
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(750, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        executorService.shutdownNow();
+        leftShooterPowerMgr.shutdown();
+        rightShooterPowerMgr.shutdown();
     }
 
     /*

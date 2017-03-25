@@ -33,7 +33,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.Mrinali;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
@@ -65,7 +64,7 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
     //To change blue to red: positive angles, red line follow and button push
 
     /* Declare OpMode members. */
-    AutonomousActionsColor auto = new AutonomousActionsColor(this);
+    AutonomousActions auto = new AutonomousActions(this);
     double FASTER_SPEED = .7;
 
     @Override
@@ -75,7 +74,6 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         auto.init(hardwareMap, telemetry, AllianceColor.RED);
-        auto.runOpMode();
 
         telemetry.addData("verify", auto.verify()); //checks color sensors
 

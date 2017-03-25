@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.Sam.shooter.power;
+package org.firstinspires.ftc.teamcode.Shashank.shooter.power;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
-import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.beans.ShooterMotor;
+import org.firstinspires.ftc.teamcode.Shashank.shooter.util.Constants;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,6 +17,7 @@ public class KalminFilter {
     private double trustVal;
     private volatile double filteredRPM = 0.0;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private int unfilteredRpm = 0;
 
     public KalminFilter(final ShooterMotor shooterMotor, final OpMode opMode) {
         executorService.execute(new Runnable() {
@@ -24,10 +25,15 @@ public class KalminFilter {
             public void run() {
                 while(!executorService.isShutdown()){
                     if(opMode.gamepad2.a)
+                        unfilteredRpm = shooterMotor.getRpm();
                         filteredRPM = applyFilter(shooterMotor.getRpm());
                 }
             }
         });
+    }
+
+    public int getUnfilteredRpm() {
+        return unfilteredRpm;
     }
 
     public double getFilteredRPM() {
@@ -54,7 +60,7 @@ public class KalminFilter {
 
     public void reset()
     {
-        prevValue=Constants.REQUESTED_ETPS;
+        prevValue= Constants.REQUESTED_ETPS;
         prevError = 1D;
 
     }
