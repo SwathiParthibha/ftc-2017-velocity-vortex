@@ -36,9 +36,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
-
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
  * It uses the common Pushbot hardware class to define the drive on the robot.
@@ -66,7 +63,7 @@ public class DriveToBeaconsRed1 extends LinearOpMode {
     //To change blue to red: positive angles, red line follow and button push
 
     /* Declare OpMode members. */
-    AutonomousActions auto = new AutonomousActions(this);
+    OldAutonomousActions auto = new OldAutonomousActions(this);
     double FASTER_SPEED = .7;
 
     @Override
