@@ -1,106 +1,55 @@
 package org.firstinspires.ftc.teamcode.Pranav;
 
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import static android.os.Build.VERSION_CODES.M;
-
-/**
- * Created by spmeg on 10/22/2016.
- */
-@Disabled
-@TeleOp(name = "New Mecanum TeleOp", group = "Teleop")
+//@Disabled
+@TeleOp(name = "Mecanum TeleOp", group = "TeleOp")
 public class newMecanumTeleOp extends OpMode
 {
-    public DcMotor frontLeftMotor;
-    public DcMotor frontRightMotor;
-    public DcMotor backLeftMotor;
-    public DcMotor backRightMotor;
+    DcMotor shooterMotorRight;
+    DcMotor shooterMotorLeft;
 
-    GyroSensor sensorGyro;
+    Servo shooterServo;
 
-    double K;
-    double forward;
-    double right;
-    double clockwise;
-    double temp;
-    double theta = sensorGyro.getHeading();
 
-    double speedFrontLeftMotor;
-    double speedFrontRightMotor;
-    double speedBackLeftMotor;
-    double speedBackRightMotor;
+    double RESET_POSITION = 0.614;
+    double ARMED_POSITION = 0.577;
+    double SHOOT_POSITION = 0.398;
+
+    double shooterServoPosition = 0;
+
 
     @Override
     public void init()
     {
-        frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-        backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        sensorGyro = hardwareMap.gyroSensor.get("sensorGyro");
+        shooterServo = hardwareMap.servo.get("shooterServo");
+        shooterServo.setPosition(RESET_POSITION);
     }
 
     @Override
     public void loop()
     {
-        K = 0;
-        forward = gamepad1.left_stick_y;
-        right = gamepad1.left_stick_x;
-        clockwise = gamepad1.right_stick_x;
+        shooterServo.setPosition(shooterServoPosition);
 
-        clockwise = K*clockwise;
 
-        //Clockwise from Zero Reference
-        temp = forward * Math.cos(theta) + right * Math.sin(theta);
-        right = -forward * Math.sin(theta) + right * Math.cos(theta);
-        forward = temp;
+        if(gamepad1.a)
+        {
+            shooterServoPosition = RESET_POSITION;
+        }
 
-        /*
-        //Counter Clockwise from Zero Reference
-        temp = forward * Math.cos(theta) - right * Math.sin(theta);
-        right = forward * Math.sin(theta) + right * Math.cos(theta);
-        forward = temp;
-        */
+        if(gamepad1.b)
+        {
+            shooterServoPosition = SHOOT_POSITION;
+        }
 
-        speedFrontLeftMotor = forward + clockwise + right;
-        speedFrontRightMotor = forward - clockwise - right;
-        speedBackLeftMotor = forward + clockwise - right;
-        speedBackRightMotor = forward - clockwise + right;
-
-        speedFrontLeftMotor = Range.clip(speedFrontLeftMotor, -1, 1);
-        speedFrontRightMotor = Range.clip(speedFrontRightMotor, -1, 1);
-        speedBackLeftMotor = Range.clip(speedBackLeftMotor, -1, 1);
-        speedBackRightMotor = Range.clip(speedBackRightMotor, -1, 1);
-
-        frontLeftMotor.setPower(speedFrontLeftMotor);
-        frontRightMotor.setPower(speedFrontRightMotor);
-        backLeftMotor.setPower(speedBackLeftMotor);
-        backRightMotor.setPower(speedBackRightMotor);
-
-        telemetry.addData("Left Joystick Y Direction:", gamepad1.left_stick_y);
-        telemetry.addData("Left Joystick X Direction:", gamepad1.left_stick_x);
-        telemetry.addData("Right Joystick X Direction:", gamepad1.right_stick_x);
-        telemetry.addData("Theta:", theta);
-
-        telemetry.addData("Front Left ShooterMotor Speed:", frontLeftMotor.getPower());
-        telemetry.addData("Front Right ShooterMotor Speed:", frontRightMotor.getPower());
-        telemetry.addData("Back Left ShooterMotor Speed:", backLeftMotor.getPower());
-        telemetry.addData("Back Right ShooterMotor Speed:", backRightMotor.getPower());
-
+        telemetry.addData("Shooter Servo", shooterServo.getPosition());
     }
-
-
 
 
     /*
@@ -108,7 +57,8 @@ public class newMecanumTeleOp extends OpMode
      * scaled value is less than linear.  This is to make it easier to drive
      * the robot more precisely at slower speeds.
      */
-    double scaleInput(double dVal)  {
+    double scaleInput(double dVal)
+    {
         double[] scaleArray = { 0.0, 0.05, 0.09, 0.10, 0.12, 0.15, 0.18, 0.24,
                 0.30, 0.36, 0.43, 0.50, 0.60, 0.72, 0.85, 1.00, 1.00 };
 
