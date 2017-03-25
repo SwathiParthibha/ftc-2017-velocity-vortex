@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Sam.shooter.power;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Sam.shooter.MotorFactory;
@@ -22,8 +23,8 @@ public class PowerManager {
     private double powerAdjustment = 0.0;
     private int REQUESTED_ETPS = Constants.REQUESTED_ETPS;
 
-    public PowerManager(Constants.MOTORNAME motorName, DcMotor dcMotor) {
-        pidAlgo = new PIDAlgo(MotorFactory.getInstance().getMotor(motorName));
+    public PowerManager(Constants.MOTORNAME motorName, DcMotor dcMotor, OpMode opMode) {
+        pidAlgo = new PIDAlgo(MotorFactory.getInstance().getMotor(motorName), opMode);
         this.motorName = motorName;
         this.dcMotor = dcMotor;
 
@@ -31,8 +32,7 @@ public class PowerManager {
         this.dcMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorTelemetry.setMotorName(motorName);
 
-        if(motorName==Constants.MOTORNAME.RIGHT_SHOOTER)
-            REQUESTED_ETPS*=1.05;
+
     }
 
     public Constants.MOTORNAME getMotorName() {
@@ -70,7 +70,7 @@ public class PowerManager {
     public void regulatePower() {
         ShooterMotor motor = MotorFactory.getInstance().getMotor(motorName);
         rpmErrorAdjustment = pidAlgo.getAdjustment(motor.getRpm(), REQUESTED_ETPS, Constants.ONE_SECOND);
-        powerAdjustment = rpmErrorAdjustment/76;
+        powerAdjustment = rpmErrorAdjustment / 76;
         currentPower += powerAdjustment;
         currentPower = clipPower(currentPower);
 
@@ -98,7 +98,7 @@ public class PowerManager {
         return power;
     }
 
-    public void shutdown(){
+    public void shutdown() {
         pidAlgo.shutDown();
     }
 
@@ -106,8 +106,7 @@ public class PowerManager {
         return motorTelemetry;
     }
 
-    public void reset()
-    {
+    public void reset() {
         pidAlgo.reset();
     }
 }
