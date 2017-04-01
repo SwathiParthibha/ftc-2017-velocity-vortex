@@ -27,7 +27,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
     private FtcDcMotor rightRearMotor;
     private TrcDriveBase driveBase = null;
     private SWGamePad gamepad;
-    private boolean fixedOnTarget = true;
+    private boolean fixedOnTarget = false;
     private SWMRGyro gyro = null;
     private HalDashboard dashboard = null;
     private final int LABEL_WIDTH = 200;
@@ -127,7 +127,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         //DbgLog.msg("> INIT" + "FINISHED DISABLING GYRO ASSIST");
 
         DbgLog.msg("> INIT" + "ENABLING GYRO ASSIST");
-        driveBase.enableGyroAssist(0.00001, 0.05);
+        //driveBase.enableGyroAssist(0.00001, 0.05);
         DbgLog.msg("> INIT" + "FINISHED ENABLING GYRO ASSIST");
 
         DbgLog.msg("> INIT" + "FINISHED INIT");
@@ -143,6 +143,14 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
             setXInverted = false;
         if(gamepad1.dpad_right)
             setXInverted = true;
+        if(gamepad1.a)
+            driveBase.enableGyroAssist(0.00001, 0.05);
+        if(gamepad1.b)
+            driveBase.disableGyroAssist();
+        if(gamepad1.x)
+            fixedOnTarget = true;
+        if(gamepad1.y)
+            fixedOnTarget = false;
 
         double x = 0;
         double y = 0;
@@ -150,7 +158,8 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         y = gamepad.getLeftStickY(false);
 
         gamepad.setYInverted(setYInverted);
-        if(gyro.getRawZData(TrcGyro.DataType.HEADING).value > 90 && gyro.getRawZData(TrcGyro.DataType.HEADING).value < 270){
+        if(gyro.getRawZData(TrcGyro.DataType.HEADING).value > 97
+                && gyro.getRawZData(TrcGyro.DataType.HEADING).value < 278){
             y = y * -1;
             x = x * -1;
         }
@@ -159,18 +168,23 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         TrcSensor.SensorData<Double> sensorData = gyro.getZHeading();
         driveBase.mecanumDrive_Cartesian(x, y, rotation, false,
                 fixedOnTarget? sensorData.value: 0.0);
-        dashboard.displayPrintf(1, LABEL_WIDTH, "x: ", "%.2f", x);
-        dashboard.displayPrintf(2, LABEL_WIDTH, "y: ", "%.2f", y);
-        dashboard.displayPrintf(3, LABEL_WIDTH, "rotation: ", "%.2f", rotation);
-        dashboard.displayPrintf(4, LABEL_WIDTH, "gyro trc: ", "%.2f", gyro.getRawZData(TrcGyro.DataType.HEADING).value);
-        dashboard.displayPrintf(5, LABEL_WIDTH, "gyro trc rate: ", "%.2f", gyro.getRawZData(TrcGyro.DataType.ROTATION_RATE).value);
-        dashboard.displayPrintf(6, LABEL_WIDTH, "gamepad left stick direction: ", "%.2f", gamepad.getLeftStickDirectionDegrees(true));
-        dashboard.displayPrintf(7, LABEL_WIDTH, "gamepad left stick " +
+        dashboard.displayPrintf(0, LABEL_WIDTH, "x: ", "%.2f", x);
+        dashboard.displayPrintf(1, LABEL_WIDTH, "y: ", "%.2f", y);
+        dashboard.displayPrintf(2, LABEL_WIDTH, "rotation: ", "%.2f", rotation);
+        dashboard.displayPrintf(3, LABEL_WIDTH, "gyro trc: ", "%.2f", gyro.getRawZData(TrcGyro.DataType.HEADING).value);
+        dashboard.displayPrintf(4, LABEL_WIDTH, "gyro trc rate: ", "%.2f", gyro.getRawZData(TrcGyro.DataType.ROTATION_RATE).value);
+        dashboard.displayPrintf(5, LABEL_WIDTH, "gamepad left stick direction: ", "%.2f", gamepad.getLeftStickDirectionDegrees(true));
+        dashboard.displayPrintf(6, LABEL_WIDTH, "gamepad left stick " +
                 "magnitude: ", "%.2f", gamepad.getLeftStickMagnitude());
-        dashboard.displayPrintf(8, LABEL_WIDTH, "gamepad right stick x: ", "%.2f", gamepad.getRightStickX());
-        dashboard.displayPrintf(9, LABEL_WIDTH, "gamepad right stick x * -1: ", "%.2f", gamepad.getRightStickX()*-1);
-        dashboard.displayPrintf(10, LABEL_WIDTH, "y inverted: ", "%b", setYInverted);
-        dashboard.displayPrintf(11, LABEL_WIDTH, "x inverted: ", "%b", setXInverted);
+        dashboard.displayPrintf(7, LABEL_WIDTH, "gamepad right stick x: ", "%.2f", gamepad.getRightStickX());
+        dashboard.displayPrintf(8, LABEL_WIDTH, "gamepad right stick x * -1: ", "%.2f", gamepad.getRightStickX()*-1);
+        dashboard.displayPrintf(9, LABEL_WIDTH, "y inverted: ", "%b", setYInverted);
+        dashboard.displayPrintf(10, LABEL_WIDTH, "x inverted: ", "%b", setXInverted);
+        dashboard.displayPrintf(11, LABEL_WIDTH, "fixedOnTarget: ", "%b", fixedOnTarget);
+        dashboard.displayPrintf(12, LABEL_WIDTH, "front left motor power: ", "%.2f", leftFrontMotor.getPower());
+        dashboard.displayPrintf(13, LABEL_WIDTH, "front right motor power: ", "%.2f", rightFrontMotor.getPower());
+        dashboard.displayPrintf(14, LABEL_WIDTH, "back lwft motor power: ", "%.2f", leftRearMotor.getPower());
+        dashboard.displayPrintf(15, LABEL_WIDTH, "back right motor power: ", "%.2f", rightRearMotor.getPower());
     }
 
     @Override
