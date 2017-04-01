@@ -1,8 +1,14 @@
-package org.firstinspires.ftc.teamcode.Pranav.oldMecanumCode;
+package org.firstinspires.ftc.teamcode.Pranav;
 
+import com.qualcomm.ftccommon.DbgLog;
+import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsAnalogOpticalDistanceSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,6 +17,13 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+import static java.lang.Thread.sleep;
 
 
 /**
@@ -28,46 +41,57 @@ Please do not edit any of the functions as it will affect other programs in the 
 
 If you have accomplished something please tell us so we can implement into the class.
 */
-
-public class MecanumHardware extends LinearOpMode
+class MecanumHardware
 {
     /* Public OpMode members. */
 
     //Currently there are two motors defined. As the season progresses we may add additional motors
-    public DcMotor frontRight = null;
-    public DcMotor backRight = null;
-    public DcMotor frontLeft = null;
-    public DcMotor backLeft = null;
+    public DcMotor frontRight;
+    public DcMotor backRight;
+    public DcMotor frontLeft;
+    public DcMotor backLeft;
 
     //Where all Sensors are defined
-    public ModernRoboticsI2cGyro sensorGyro = null;
-    public LightSensor sensorLine = null;
-    public UltrasonicSensor sensorUltra = null;
-    //public ModernRoboticsI2cRangeSensor sensorRange = null;
-    public ColorSensor sensorColorRight = null;
-    public ColorSensor sensorColorLeft = null;
+    public ModernRoboticsI2cGyro sensorGyro;
+    public LightSensor sensorLine;
+    public UltrasonicSensor sensorUltra;
+    public ModernRoboticsI2cRangeSensor sensorRange;
+    public ModernRoboticsAnalogOpticalDistanceSensor sensorODS;
+    public ColorSensor sensorColorRight;
+    public ColorSensor sensorColorLeft;
+    public BNO055IMU imu;
+
+    public OpMode opMode;
 
     //1000 Milliseconds
     public int SECOND = 1000;
 
-    //ShooterMotor Variables
+    //Endoder Motor Variables
     public int ROTATION = 1220; // # of ticks
     public int MOTOR_POWER = 1;
 
-    //Line Sensor Thresholds
-    double WHITE_THRESHOLD = 0.5;
-
     //Z-Axis of the Modern Robotics Gyro Sensor
-    int heading = 0;
+    public int heading = 0;
+
+    //Light Sensor Threshold Value
+    //Make sure to add one.
+    public double LINE_THRESHOLD_VALUE = 0.28;
+
+    /*
+    Heading for the IMU;
+    Orientation angles = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
+    int IMUHeading = Math.round(angles.firstAngle);
+    */
 
     /* local OpMode members. */
-    HardwareMap hwMap;
+    HardwareMap hardwareMap;
     private ElapsedTime period = new ElapsedTime();
 
     /* Constructor *///Empty Constructor
-    public MecanumHardware()
+    public MecanumHardware(OpMode opMode)
     {
-
+        this.opMode = opMode;
+        hardwareMap = opMode.hardwareMap;
     }
 
     /***
@@ -85,7 +109,7 @@ public class MecanumHardware extends LinearOpMode
         if (remaining > 0)
         {
             try {
-                Thread.sleep(remaining);
+                sleep(remaining);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -98,21 +122,24 @@ public class MecanumHardware extends LinearOpMode
     //This function defines the motors so that the robot controller looks for
     public void defineMotors()
     {
-        frontRight = hwMap.dcMotor.get("motor_2");
-        backRight = hwMap.dcMotor.get("motor_4");
-        frontLeft = hwMap.dcMotor.get("motor_3");
-        backLeft = hwMap.dcMotor.get("motor_1");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        backRight = hardwareMap.dcMotor.get("backRight");
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        backLeft = hardwareMap.dcMotor.get("backLeft");
     }
 
     //This function defines the sensors so that the robot controller looks for
     public void defineSensors()
     {
-        sensorGyro = hwMap.get(ModernRoboticsI2cGyro.class, "gyro");
-        sensorLine = hwMap.lightSensor.get("line");
-        sensorUltra = hwMap.ultrasonicSensor.get("ultra");
-        //sensorRange = hwMap.get(ModernRoboticsI2cRangeSensor.class, "range");
-        sensorColorLeft = hwMap.get(ModernRoboticsI2cColorSensor.class, "colorLeft");
-        sensorColorRight = hwMap.get(ModernRoboticsI2cColorSensor.class, "colorRight");
+        sensorGyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
+        //sensorLine = hardwareMap.lightSensor.get("line");
+        //sensorUltra = hardwareMap.ultrasonicSensor.get("ultra");
+        //sensorRange = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
+        //sensorColorLeft = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorLeft");
+        //sensorColorRight = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorRight");
+        sensorODS = hardwareMap.get(ModernRoboticsAnalogOpticalDistanceSensor.class, "sensorODS");
+        //imu = hardwareMap.get(BNO055IMU.class, "imu");
+
     }
 
     //Configure the Direction of the Motors
@@ -140,6 +167,15 @@ public class MecanumHardware extends LinearOpMode
         //Turn off the LED on the Modern Robotics Color Sensor
         sensorColorLeft.enableLed(false);
         sensorColorRight.enableLed(false);
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu.initialize(parameters);
     }
 
     //Set the all the motors to a set power
@@ -199,8 +235,8 @@ public class MecanumHardware extends LinearOpMode
     //A basic go straight function that uses encoders to track its distance
     public void drive(int distance, double speed)
     {
-        telemetry.addData("Starting to Drive", frontRight.getCurrentPosition() / ROTATION);
-        telemetry.update();
+        opMode.telemetry.addData("Starting to Drive", frontRight.getCurrentPosition() / ROTATION);
+        opMode.telemetry.update();
 
         runUsingEncoder();
 
@@ -215,7 +251,7 @@ public class MecanumHardware extends LinearOpMode
 
         runToPosition();
 
-        while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy() && opModeIsActive())
+        while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
         {
 
         }
@@ -224,8 +260,8 @@ public class MecanumHardware extends LinearOpMode
 
         runUsingEncoder();
 
-        telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
-        telemetry.update();
+        opMode.telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
+        opMode.telemetry.update();
     }
 
     //Runs an individual motor to a set distance using encoders
@@ -321,6 +357,175 @@ public class MecanumHardware extends LinearOpMode
 
     }
 
+    public void driveDiagonal(String direction, int distance, double speed)
+    {
+        if (direction == "NW")
+        {
+            runUsingEncoder();
+
+            stopAndResetEncoder();
+
+            frontRight.setPower(speed);
+            backLeft.setPower(speed);
+
+            frontRight.setTargetPosition(distance);
+            backLeft.setTargetPosition(distance);
+
+            runToPosition();
+
+            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            {
+
+            }
+
+            stopRobot();
+
+            runUsingEncoder();
+
+            opMode.telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
+            opMode.telemetry.update();
+        }
+
+        if(direction == "NE")
+        {
+            runUsingEncoder();
+            stopAndResetEncoder();
+
+            frontLeft.setPower(speed);
+            backRight.setPower(speed);
+
+            backRight.setTargetPosition(distance);
+            frontLeft.setTargetPosition(distance);
+
+            runToPosition();
+
+            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            {
+
+            }
+
+            stopRobot();
+
+            runUsingEncoder();
+
+            opMode.telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
+            opMode.telemetry.update();
+        }
+
+        if (direction == "SW")
+        {
+            runUsingEncoder();
+
+            stopAndResetEncoder();
+
+            frontRight.setPower(speed);
+            backLeft.setPower(speed);
+
+            frontRight.setTargetPosition(-distance);
+            backLeft.setTargetPosition(-distance);
+
+            runToPosition();
+
+            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            {
+
+            }
+
+            stopRobot();
+
+            runUsingEncoder();
+
+            opMode.telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
+            opMode.telemetry.update();
+        }
+
+        if (direction == "SE")
+        {
+            runUsingEncoder();
+            stopAndResetEncoder();
+
+            frontLeft.setPower(speed);
+            backRight.setPower(speed);
+
+            backRight.setTargetPosition(-distance);
+            frontLeft.setTargetPosition(-distance);
+
+            runToPosition();
+
+            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            {
+
+            }
+
+            stopRobot();
+
+            runUsingEncoder();
+
+            opMode.telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
+            opMode.telemetry.update();
+        }
+    }
+
+    public void driveSideways(String direction, int distance, double speed)
+    {
+        if (direction == "right")
+        {
+            runUsingEncoder();
+
+            stopAndResetEncoder();
+
+            setMotorPower(speed);
+
+            frontLeft.setTargetPosition(distance);
+            frontRight.setTargetPosition(-distance);
+            backLeft.setTargetPosition(-distance);
+            backRight.setTargetPosition(distance);
+
+            runToPosition();
+
+            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            {
+
+            }
+
+            stopRobot();
+
+            runUsingEncoder();
+
+            opMode.telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
+            opMode.telemetry.update();
+        }
+
+        if (direction == "left")
+        {
+            runUsingEncoder();
+
+            stopAndResetEncoder();
+
+            setMotorPower(speed);
+
+            frontLeft.setTargetPosition(-distance);
+            frontRight.setTargetPosition(distance);
+            backLeft.setTargetPosition(distance);
+            backRight.setTargetPosition(-distance);
+
+            runToPosition();
+
+            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            {
+
+            }
+
+            stopRobot();
+
+            runUsingEncoder();
+
+            opMode.telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
+            opMode.telemetry.update();
+        }
+    }
+
+
     //Reverses the configuration of the motor directions
     public void reverseDirectionMotors()
     {
@@ -331,6 +536,54 @@ public class MecanumHardware extends LinearOpMode
         backLeft.setDirection(DcMotor.Direction.REVERSE);
     }
 
+    public void mecanumDriveCartesian(double xPosition, double yPosition, double rotation, double gyroAngle)
+    {
+        double GYRO_ASSIST_KP = 0.01;
+        double GYRO_RATE_SCALE = 0.01;
+
+        double speedFrontLeftMotor;
+        double speedFrontRightMotor;
+        double speedBackLeftMotor;
+        double speedBackRightMotor;
+
+        xPosition = Range.clip(xPosition,-1,1);
+        yPosition = Range.clip(yPosition,-1,1);
+        rotation = Range.clip(rotation,-1,1);
+
+        double cosA = Math.cos(Math.toRadians(gyroAngle));
+        double sinA = Math.sin(Math.toRadians(gyroAngle));
+
+        xPosition = (xPosition * cosA) - (yPosition * sinA);
+        yPosition = (xPosition * sinA) + (yPosition * cosA);
+
+        rotation += Range.clip(GYRO_ASSIST_KP * (rotation - GYRO_RATE_SCALE * heading), -1, 1);
+
+        speedFrontLeftMotor = xPosition + yPosition + rotation;
+        speedFrontRightMotor = (-xPosition) + yPosition - rotation;
+        speedBackLeftMotor = (-xPosition) + yPosition + rotation;
+        speedBackRightMotor = xPosition + yPosition - rotation;
+
+        speedFrontLeftMotor = Range.clip(speedFrontLeftMotor,-1,1);
+        speedFrontRightMotor = Range.clip(speedFrontRightMotor,-1,1);
+        speedBackLeftMotor = Range.clip(speedBackLeftMotor,-1,1);
+        speedBackRightMotor = Range.clip(speedBackRightMotor,-1,1);
+
+        frontLeft.setPower(speedFrontLeftMotor);
+        frontRight.setPower(speedFrontRightMotor);
+        backLeft.setPower(speedBackLeftMotor);
+        backRight.setPower(speedBackRightMotor);
+
+
+        opMode.telemetry.addData("Motor Powers ", null);
+        opMode.telemetry.addData("Front Left:", frontLeft.getPower());
+        opMode.telemetry.addData("Front Right:", frontRight.getPower());
+        opMode.telemetry.addData("Back Left:", backLeft.getPower());
+        opMode.telemetry.addData("back Right:", backRight.getPower());
+
+        opMode.telemetry.addData("Gyro Angle:", heading);
+
+    }
+
     //A go straight program that utilizes PID using the gyro sensor to stay accurate
     public void drivePID(int distance, double speed, double angle)
     {
@@ -338,7 +591,7 @@ public class MecanumHardware extends LinearOpMode
         double DRIVE_KP =0.05; //This value relates the degree of error to percentage of motor speed
         double correction, steeringSpeedRight, steeringSpeedLeft;
 
-        telemetry.addData("Starting to Drive Straight", frontRight.getCurrentPosition() / ROTATION);
+        opMode.telemetry.addData("Starting to Drive Straight", frontRight.getCurrentPosition() / ROTATION);
 
         runUsingEncoder();
 
@@ -353,7 +606,7 @@ public class MecanumHardware extends LinearOpMode
 
         runToPosition();
 
-        while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy() && opModeIsActive())
+        while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy() )
         {
             currentHeading = sensorGyro.getHeading();
             headingError = currentHeading - angle;
@@ -376,33 +629,66 @@ public class MecanumHardware extends LinearOpMode
 
             runToPosition();
 
-            sleep(100);
+            try {
+                sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             if ((frontRight.getCurrentPosition() > distance)) break;
             if ((frontLeft.getCurrentPosition() > distance)) break;
             if ((backRight.getCurrentPosition() > distance)) break;
             if ((backLeft.getCurrentPosition() > distance)) break;
 
-            telemetry.addData("PID Values", null);
-            telemetry.addData("Current Heading:", currentHeading);
-            telemetry.addData("Heading Error:", headingError);
-            telemetry.addData("Correction:", correction);
+            opMode.telemetry.addData("PID Values", null);
+            opMode.telemetry.addData("Current Heading:", currentHeading);
+            opMode.telemetry.addData("Heading Error:", headingError);
+            opMode.telemetry.addData("Correction:", correction);
 
-            telemetry.addData("ShooterMotor Power Values", null);
-            telemetry.addData("Steering Speed Right:", steeringSpeedRight);
-            telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
-            telemetry.addData("Front Right Power:", frontRight.getPower());
-            telemetry.addData("Front Left Power:", frontLeft.getPower());
-            telemetry.addData("Back Right Power:", backRight.getPower());
-            telemetry.update();
+            opMode.telemetry.addData("ShooterMotor Power Values", null);
+            opMode.telemetry.addData("Steering Speed Right:", steeringSpeedRight);
+            opMode.telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
+            opMode.telemetry.addData("Front Right Power:", frontRight.getPower());
+            opMode.telemetry.addData("Front Left Power:", frontLeft.getPower());
+            opMode.telemetry.addData("Back Right Power:", backRight.getPower());
+            opMode.telemetry.update();
         }
 
         stopRobot();
 
         runUsingEncoder();
 
-        telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
+        opMode.telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
 
+    }
+
+    public void detectWhiteLine(int distance, double speed) throws InterruptedException
+    {
+        opMode.telemetry.addData("Starting to Drive", frontRight.getCurrentPosition() / ROTATION);
+        opMode.telemetry.update();
+
+        runUsingEncoder();
+
+        stopAndResetEncoder();
+
+        setMotorPower(speed);
+
+        frontRight.setTargetPosition(distance);
+        backRight.setTargetPosition(distance);
+        frontLeft.setTargetPosition(distance);
+        backLeft.setTargetPosition(distance);
+
+        runToPosition();
+
+        while(frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy() )
+        {
+            if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE)
+            {
+                stopRobot();
+
+                runWithoutEncoder();
+            }
+        }
     }
 
     //Pushes a button on the beacon to a color
@@ -413,9 +699,10 @@ public class MecanumHardware extends LinearOpMode
         boolean atBeacon = false;
         int THRESHOLD_COLOR = 3;
 
-        while(opModeIsActive())
+        while(sensorColorLeft.red() > THRESHOLD_COLOR && sensorColorRight.red() > THRESHOLD_COLOR
+                || sensorColorLeft.blue() > THRESHOLD_COLOR && sensorColorRight.blue() > THRESHOLD_COLOR)
         {
-            while (!atBeacon && opModeIsActive())
+            while (!atBeacon )
             {
                 if (sensorColorLeft.red() >= THRESHOLD_COLOR || sensorColorLeft.blue() >= THRESHOLD_COLOR || sensorColorRight.red() >= THRESHOLD_COLOR || sensorColorRight.blue() >= THRESHOLD_COLOR)
                 {
@@ -428,7 +715,7 @@ public class MecanumHardware extends LinearOpMode
                 stopRobot();
             }
 
-            while(atBeacon && opModeIsActive())
+            while(atBeacon )
             {
                 if (color == "red")
                 {
@@ -462,48 +749,17 @@ public class MecanumHardware extends LinearOpMode
             }
 
 
-            telemetry.addData("Right Color Sensor Values", null);
-            telemetry.addData("Right Red:", sensorColorRight.red());
-            telemetry.addData("Right Blue:", sensorColorRight.blue());
+            opMode.telemetry.addData("Right Color Sensor Values", null);
+            opMode.telemetry.addData("Right Red:", sensorColorRight.red());
+            opMode.telemetry.addData("Right Blue:", sensorColorRight.blue());
 
-            telemetry.addData("Left Color Sensor Values", null);
-            telemetry.addData("Left Red:", sensorColorLeft.red());
-            telemetry.addData("Left Blue:", sensorColorLeft.blue());
-            telemetry.update();
+            opMode.telemetry.addData("Left Color Sensor Values", null);
+            opMode.telemetry.addData("Left Red:", sensorColorLeft.red());
+            opMode.telemetry.addData("Left Blue:", sensorColorLeft.blue());
+            opMode.telemetry.update();
         }
 
     }
-
-    public void detectWhiteLine(int distance, double speed)
-    {
-        telemetry.addData("Starting to Drive", frontRight.getCurrentPosition() / ROTATION);
-        telemetry.update();
-
-        runUsingEncoder();
-
-        stopAndResetEncoder();
-
-        setMotorPower(speed);
-
-        //Robot is turned around and has to drive the opposite direction
-        frontRight.setTargetPosition(distance);
-        backRight.setTargetPosition(distance);
-        frontLeft.setTargetPosition(distance);
-        backLeft.setTargetPosition(distance);
-
-        runToPosition();
-
-        while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy() && opModeIsActive())
-        {
-                /*if(sensorLine.getLightDetected() < WHITE_THRESHOLD)
-                    break;*/
-        }
-
-        stopRobot();
-
-        runUsingEncoder();
-    }
-
 
     //A basic Turn function that uses the Modern Robotics Gyro Sensor to calculate the angle
     public void turnGyro(String direction, int angle, double speed) throws InterruptedException
@@ -522,7 +778,7 @@ public class MecanumHardware extends LinearOpMode
             motorDirectionChange = -1;
         }
 
-        while ((heading > angle + 5 || heading < angle - 2 && opModeIsActive()))
+        while ((heading > angle + 5 || heading < angle - 2 ))
         {
             frontRight.setPower(MOTOR_POWER * speed * motorDirectionChange);
             backRight.setPower(MOTOR_POWER * speed * motorDirectionChange);
@@ -532,22 +788,18 @@ public class MecanumHardware extends LinearOpMode
 
             heading = sensorGyro.getHeading();
 
-            telemetry.addData("We Are Turning", heading);
-            telemetry.addData("Gyro Value", sensorGyro.getHeading());
-            telemetry.update();
+            opMode.telemetry.addData("We Are Turning", heading);
+            opMode.telemetry.addData("Gyro Value", sensorGyro.getHeading());
+            opMode.telemetry.update();
         }
 
         stopRobot();
 
-        telemetry.addData("We Are Done Turning", heading);
+        opMode.telemetry.addData("We Are Done Turning", heading);
     }
 
-    //The init cycle of the robot
-    public boolean init(HardwareMap ahwMap)
+    public boolean init(HardwareMap hardwareMap)
     {
-        //Save reference to Hardware Map
-        hwMap = ahwMap;
-
         defineMotors();
 
         defineSensors();
@@ -561,10 +813,6 @@ public class MecanumHardware extends LinearOpMode
         initializeSensors();
         return false;
     }
-    @Override
-    public void runOpMode() throws InterruptedException
-    {
 
-    }
 }
 
