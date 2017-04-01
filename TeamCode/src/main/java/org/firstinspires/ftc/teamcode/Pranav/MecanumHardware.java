@@ -137,7 +137,7 @@ class MecanumHardware
         //sensorRange = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
         //sensorColorLeft = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorLeft");
         //sensorColorRight = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorRight");
-        //sensorODS = hardwareMap.get(ModernRoboticsAnalogOpticalDistanceSensor.class, "sensorODS");
+        sensorODS = hardwareMap.get(ModernRoboticsAnalogOpticalDistanceSensor.class, "sensorODS");
         //imu = hardwareMap.get(BNO055IMU.class, "imu");
 
     }
@@ -359,8 +359,12 @@ class MecanumHardware
 
     }
 
-    public void driveDiagonal(String direction, int distance, double speed)
+    public void driveDiagonal(String direction, int distance, double speed, int angle) throws InterruptedException
     {
+        double currentHeading, headingError;
+        double DRIVE_KP =0.05; //This value relates the degree of error to percentage of motor speed
+        double correction, steeringSpeedRight, steeringSpeedLeft;
+
         if (direction == "NW")
         {
             runUsingEncoder();
@@ -375,9 +379,54 @@ class MecanumHardware
 
             runToPosition();
 
-            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            while (frontRight.isBusy() && backLeft.isBusy())
             {
+                currentHeading = sensorGyro.getHeading();
+                headingError = currentHeading - angle;
+                correction = headingError * DRIVE_KP;
 
+                // We will correct the direction by changing the motor speeds while the robot drives
+                steeringSpeedLeft = (speed * MOTOR_POWER) - correction;
+                steeringSpeedRight = (speed * MOTOR_POWER) + correction;
+
+                //Making sure that the Motors are not commanded to go greater than the maximum speed
+                steeringSpeedLeft = Range.clip(steeringSpeedLeft,-1,1);
+                steeringSpeedRight = Range.clip(steeringSpeedRight,-1,1);
+
+                runUsingEncoder();
+
+                frontRight.setPower(steeringSpeedRight);
+                backLeft.setPower(steeringSpeedLeft);
+
+                runToPosition();
+
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if ((frontRight.getCurrentPosition() > distance)) break;
+                if ((frontLeft.getCurrentPosition() > distance)) break;
+                if ((backRight.getCurrentPosition() > distance)) break;
+                if ((backLeft.getCurrentPosition() > distance)) break;
+
+                opMode.telemetry.addData("PID Values", null);
+                opMode.telemetry.addData("Current Heading:", currentHeading);
+                opMode.telemetry.addData("Heading Error:", headingError);
+                opMode.telemetry.addData("Correction:", correction);
+
+                opMode.telemetry.addData("ShooterMotor Power Values", null);
+                opMode.telemetry.addData("Steering Speed Right:", steeringSpeedRight);
+                opMode.telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
+                opMode.telemetry.addData("Front Right Power:", frontRight.getPower());
+                opMode.telemetry.addData("Front Left Power:", frontLeft.getPower());
+                opMode.telemetry.addData("Back Right Power:", backRight.getPower());
+                opMode.telemetry.update();
+
+
+
+                if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE) break;
             }
 
             stopRobot();
@@ -401,8 +450,52 @@ class MecanumHardware
 
             runToPosition();
 
-            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            while (backRight.isBusy() && frontLeft.isBusy())
             {
+                currentHeading = sensorGyro.getHeading();
+                headingError = currentHeading - angle;
+                correction = headingError * DRIVE_KP;
+
+                // We will correct the direction by changing the motor speeds while the robot drives
+                steeringSpeedLeft = (speed * MOTOR_POWER) - correction;
+                steeringSpeedRight = (speed * MOTOR_POWER) + correction;
+
+                //Making sure that the Motors are not commanded to go greater than the maximum speed
+                steeringSpeedLeft = Range.clip(steeringSpeedLeft,-1,1);
+                steeringSpeedRight = Range.clip(steeringSpeedRight,-1,1);
+
+                runUsingEncoder();
+
+                backRight.setPower(steeringSpeedRight);
+                frontLeft.setPower(steeringSpeedLeft);
+
+                runToPosition();
+
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if ((frontRight.getCurrentPosition() > distance)) break;
+                if ((frontLeft.getCurrentPosition() > distance)) break;
+                if ((backRight.getCurrentPosition() > distance)) break;
+                if ((backLeft.getCurrentPosition() > distance)) break;
+
+                opMode.telemetry.addData("PID Values", null);
+                opMode.telemetry.addData("Current Heading:", currentHeading);
+                opMode.telemetry.addData("Heading Error:", headingError);
+                opMode.telemetry.addData("Correction:", correction);
+
+                opMode.telemetry.addData("ShooterMotor Power Values", null);
+                opMode.telemetry.addData("Steering Speed Right:", steeringSpeedRight);
+                opMode.telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
+                opMode.telemetry.addData("Front Right Power:", frontRight.getPower());
+                opMode.telemetry.addData("Front Left Power:", frontLeft.getPower());
+                opMode.telemetry.addData("Back Right Power:", backRight.getPower());
+                opMode.telemetry.update();
+
+                if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE) break;
 
             }
 
@@ -428,8 +521,54 @@ class MecanumHardware
 
             runToPosition();
 
-            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            while (frontRight.isBusy() && backLeft.isBusy())
             {
+                currentHeading = sensorGyro.getHeading();
+                headingError = currentHeading - angle;
+                correction = headingError * DRIVE_KP;
+
+                // We will correct the direction by changing the motor speeds while the robot drives
+                steeringSpeedLeft = (speed * MOTOR_POWER) - correction;
+                steeringSpeedRight = (speed * MOTOR_POWER) + correction;
+
+                //Making sure that the Motors are not commanded to go greater than the maximum speed
+                steeringSpeedLeft = Range.clip(steeringSpeedLeft,-1,1);
+                steeringSpeedRight = Range.clip(steeringSpeedRight,-1,1);
+
+                runUsingEncoder();
+
+                frontRight.setPower(steeringSpeedRight);
+                backLeft.setPower(steeringSpeedLeft);
+
+                runToPosition();
+
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if ((frontRight.getCurrentPosition() > distance)) break;
+                if ((frontLeft.getCurrentPosition() > distance)) break;
+                if ((backRight.getCurrentPosition() > distance)) break;
+                if ((backLeft.getCurrentPosition() > distance)) break;
+
+                opMode.telemetry.addData("PID Values", null);
+                opMode.telemetry.addData("Current Heading:", currentHeading);
+                opMode.telemetry.addData("Heading Error:", headingError);
+                opMode.telemetry.addData("Correction:", correction);
+
+                opMode.telemetry.addData("ShooterMotor Power Values", null);
+                opMode.telemetry.addData("Steering Speed Right:", steeringSpeedRight);
+                opMode.telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
+                opMode.telemetry.addData("Front Right Power:", frontRight.getPower());
+                opMode.telemetry.addData("Front Left Power:", frontLeft.getPower());
+                opMode.telemetry.addData("Back Right Power:", backRight.getPower());
+                opMode.telemetry.update();
+
+
+
+                if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE) break;
 
             }
 
@@ -454,10 +593,52 @@ class MecanumHardware
 
             runToPosition();
 
-            while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
+            while (backRight.isBusy() && frontLeft.isBusy())
             {
+                currentHeading = sensorGyro.getHeading();
+                headingError = currentHeading - angle;
+                correction = headingError * DRIVE_KP;
 
-            }
+                // We will correct the direction by changing the motor speeds while the robot drives
+                steeringSpeedLeft = (speed * MOTOR_POWER) - correction;
+                steeringSpeedRight = (speed * MOTOR_POWER) + correction;
+
+                //Making sure that the Motors are not commanded to go greater than the maximum speed
+                steeringSpeedLeft = Range.clip(steeringSpeedLeft,-1,1);
+                steeringSpeedRight = Range.clip(steeringSpeedRight,-1,1);
+
+                runUsingEncoder();
+
+                backRight.setPower(steeringSpeedRight);
+                frontLeft.setPower(steeringSpeedLeft);
+
+                runToPosition();
+
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if ((frontRight.getCurrentPosition() > distance)) break;
+                if ((frontLeft.getCurrentPosition() > distance)) break;
+                if ((backRight.getCurrentPosition() > distance)) break;
+                if ((backLeft.getCurrentPosition() > distance)) break;
+
+                opMode.telemetry.addData("PID Values", null);
+                opMode.telemetry.addData("Current Heading:", currentHeading);
+                opMode.telemetry.addData("Heading Error:", headingError);
+                opMode.telemetry.addData("Correction:", correction);
+
+                opMode.telemetry.addData("ShooterMotor Power Values", null);
+                opMode.telemetry.addData("Steering Speed Right:", steeringSpeedRight);
+                opMode.telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
+                opMode.telemetry.addData("Front Right Power:", frontRight.getPower());
+                opMode.telemetry.addData("Front Left Power:", frontLeft.getPower());
+                opMode.telemetry.addData("Back Right Power:", backRight.getPower());
+                opMode.telemetry.update();
+
+                if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE) break;            }
 
             stopRobot();
 
@@ -468,8 +649,12 @@ class MecanumHardware
         }
     }
 
-    public void driveSideways(String direction, int distance, double speed)
+    public void driveSideways(String direction, int distance, double speed, int angle)
     {
+        double currentHeading, headingError;
+        double DRIVE_KP =0.05; //This value relates the degree of error to percentage of motor speed
+        double correction, steeringSpeedRight, steeringSpeedLeft;
+
         if (direction == "right")
         {
             runUsingEncoder();
@@ -487,7 +672,52 @@ class MecanumHardware
 
             while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
             {
+                currentHeading = sensorGyro.getHeading();
+                headingError = currentHeading - angle;
+                correction = headingError * DRIVE_KP;
 
+                // We will correct the direction by changing the motor speeds while the robot drives
+                steeringSpeedLeft = (speed * MOTOR_POWER) - correction;
+                steeringSpeedRight = (speed * MOTOR_POWER) + correction;
+
+                //Making sure that the Motors are not commanded to go greater than the maximum speed
+                steeringSpeedLeft = Range.clip(steeringSpeedLeft,-1,1);
+                steeringSpeedRight = Range.clip(steeringSpeedRight,-1,1);
+
+                runUsingEncoder();
+
+                frontRight.setPower(steeringSpeedRight);
+                backRight.setPower(steeringSpeedRight);
+                frontLeft.setPower(steeringSpeedLeft);
+                backLeft.setPower(steeringSpeedLeft);
+
+                runToPosition();
+
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if ((frontRight.getCurrentPosition() > distance)) break;
+                if ((frontLeft.getCurrentPosition() > distance)) break;
+                if ((backRight.getCurrentPosition() > distance)) break;
+                if ((backLeft.getCurrentPosition() > distance)) break;
+
+                opMode.telemetry.addData("PID Values", null);
+                opMode.telemetry.addData("Current Heading:", currentHeading);
+                opMode.telemetry.addData("Heading Error:", headingError);
+                opMode.telemetry.addData("Correction:", correction);
+
+                opMode.telemetry.addData("ShooterMotor Power Values", null);
+                opMode.telemetry.addData("Steering Speed Right:", steeringSpeedRight);
+                opMode.telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
+                opMode.telemetry.addData("Front Right Power:", frontRight.getPower());
+                opMode.telemetry.addData("Front Left Power:", frontLeft.getPower());
+                opMode.telemetry.addData("Back Right Power:", backRight.getPower());
+                opMode.telemetry.update();
+
+                if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE) break;
             }
 
             stopRobot();
@@ -515,7 +745,52 @@ class MecanumHardware
 
             while (frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy())
             {
+                currentHeading = sensorGyro.getHeading();
+                headingError = currentHeading - angle;
+                correction = headingError * DRIVE_KP;
 
+                // We will correct the direction by changing the motor speeds while the robot drives
+                steeringSpeedLeft = (speed * MOTOR_POWER) - correction;
+                steeringSpeedRight = (speed * MOTOR_POWER) + correction;
+
+                //Making sure that the Motors are not commanded to go greater than the maximum speed
+                steeringSpeedLeft = Range.clip(steeringSpeedLeft,-1,1);
+                steeringSpeedRight = Range.clip(steeringSpeedRight,-1,1);
+
+                runUsingEncoder();
+
+                frontRight.setPower(steeringSpeedRight);
+                backRight.setPower(steeringSpeedRight);
+                frontLeft.setPower(steeringSpeedLeft);
+                backLeft.setPower(steeringSpeedLeft);
+
+                runToPosition();
+
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if ((frontRight.getCurrentPosition() > distance)) break;
+                if ((frontLeft.getCurrentPosition() > distance)) break;
+                if ((backRight.getCurrentPosition() > distance)) break;
+                if ((backLeft.getCurrentPosition() > distance)) break;
+
+                opMode.telemetry.addData("PID Values", null);
+                opMode.telemetry.addData("Current Heading:", currentHeading);
+                opMode.telemetry.addData("Heading Error:", headingError);
+                opMode.telemetry.addData("Correction:", correction);
+
+                opMode.telemetry.addData("ShooterMotor Power Values", null);
+                opMode.telemetry.addData("Steering Speed Right:", steeringSpeedRight);
+                opMode.telemetry.addData("Steering Speed Left:", steeringSpeedLeft);
+                opMode.telemetry.addData("Front Right Power:", frontRight.getPower());
+                opMode.telemetry.addData("Front Left Power:", frontLeft.getPower());
+                opMode.telemetry.addData("Back Right Power:", backRight.getPower());
+                opMode.telemetry.update();
+
+                if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE) break;
             }
 
             stopRobot();
@@ -662,35 +937,6 @@ class MecanumHardware
 
         opMode.telemetry.addData("Finished Driving", frontRight.getCurrentPosition() / ROTATION);
 
-    }
-
-    public void detectWhiteLine(int distance, double speed) throws InterruptedException
-    {
-        opMode.telemetry.addData("Starting to Drive", frontRight.getCurrentPosition() / ROTATION);
-        opMode.telemetry.update();
-
-        runUsingEncoder();
-
-        stopAndResetEncoder();
-
-        setMotorPower(speed);
-
-        frontRight.setTargetPosition(distance);
-        backRight.setTargetPosition(distance);
-        frontLeft.setTargetPosition(distance);
-        backLeft.setTargetPosition(distance);
-
-        runToPosition();
-
-        while(frontRight.isBusy() && backRight.isBusy() && frontLeft.isBusy() && backLeft.isBusy() )
-        {
-            if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE)
-            {
-                stopRobot();
-
-                runWithoutEncoder();
-            }
-        }
     }
 
     //Pushes a button on the beacon to a color
