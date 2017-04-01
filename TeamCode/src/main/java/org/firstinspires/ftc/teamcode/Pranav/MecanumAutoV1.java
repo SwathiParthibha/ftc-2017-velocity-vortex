@@ -72,6 +72,8 @@ public class MecanumAutoV1 extends LinearOpMode {
     {
         mecanum.init(hardwareMap);
 
+        waitForStart();
+
         mecanum.drive(mecanum.ROTATION, 1);
         //mecanum.detectWhiteLine(mecanum.ROTATION, 0.5);
 

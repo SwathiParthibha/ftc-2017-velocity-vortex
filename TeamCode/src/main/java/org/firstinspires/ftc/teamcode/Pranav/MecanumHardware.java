@@ -91,7 +91,7 @@ class MecanumHardware
     public MecanumHardware(OpMode opMode)
     {
         this.opMode = opMode;
-        hardwareMap = opMode.hardwareMap;
+        this.hardwareMap = opMode.hardwareMap;
     }
 
     /***
@@ -137,7 +137,7 @@ class MecanumHardware
         //sensorRange = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
         //sensorColorLeft = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorLeft");
         //sensorColorRight = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorRight");
-        sensorODS = hardwareMap.get(ModernRoboticsAnalogOpticalDistanceSensor.class, "sensorODS");
+        //sensorODS = hardwareMap.get(ModernRoboticsAnalogOpticalDistanceSensor.class, "sensorODS");
         //imu = hardwareMap.get(BNO055IMU.class, "imu");
 
     }
@@ -157,6 +157,7 @@ class MecanumHardware
         //Calibrate the Modern Robotics Gyro Sensor
         sensorGyro.calibrate();
 
+        /*
         //Turn on the LED of the Lego Line Sensor
         sensorLine.enableLed(true);
 
@@ -176,6 +177,7 @@ class MecanumHardware
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
+        */
     }
 
     //Set the all the motors to a set power
@@ -800,6 +802,8 @@ class MecanumHardware
 
     public boolean init(HardwareMap hardwareMap)
     {
+        this.hardwareMap = hardwareMap;
+
         defineMotors();
 
         defineSensors();
