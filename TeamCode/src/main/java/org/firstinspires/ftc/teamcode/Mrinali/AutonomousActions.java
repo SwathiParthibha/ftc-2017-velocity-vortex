@@ -741,23 +741,26 @@ public class AutonomousActions {
         else if (color == AllianceColor.RED)
             expectedAngle = 90;
 
-
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11.5) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
             telemetry.addData("Light", lightSensor.getLightDetected());
             telemetry.addData("Angle", IMUheading());
 
             if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+                /*
                 if (color == AllianceColor.BLUE) {
                     telemetry.addLine("Moving right");
                     leftMotor.setPower(0.2);
                     rightMotor.setPower(0);
-                }
-                else if (color == AllianceColor.RED) {
+                } else if (color == AllianceColor.RED) {
                     telemetry.addLine("Moving left");
                     leftMotor.setPower(0);
                     rightMotor.setPower(0.2);
                 }
+                */
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(0);
             } else {
                 if (IMUheading() < expectedAngle) {
                     leftMotor.setPower(0);

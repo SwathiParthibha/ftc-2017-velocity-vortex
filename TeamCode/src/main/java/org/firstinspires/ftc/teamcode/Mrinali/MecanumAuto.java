@@ -182,8 +182,19 @@ public class MecanumAuto {
 
     public void toWhiteLine() throws InterruptedException {
 
-        driveBase.mecanumDrive_Polar(.5, 90, 0, false);
         while (opMode.opModeIsActive() && odsLight.getLightDetected() < WHITE_THRESHOLD) {
+
+            if (getcmUltrasonic(rangeSensor) < 12) { // to close
+                while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) < 12) {
+                    driveBase.mecanumDrive_Polar(.2, 0, 0); // move back
+                }
+            } else if (getcmUltrasonic(rangeSensor) > 24) {
+                while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 24) {
+                    driveBase.mecanumDrive_Polar(.2, 180, 0); // move back
+                }
+            } else {
+                driveBase.mecanumDrive_Polar(.5, 90, 0, false);
+            }
 
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", odsLight.getLightDetected());
