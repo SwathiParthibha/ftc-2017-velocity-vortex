@@ -113,7 +113,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
         if (!IMUreInit) {
             auto.turn(0); //and turns parallel to the beacon using the IMU
             sleep(200);
-            if (Math.abs(auto.IMUheading()) > 5)
+            if (Math.abs(auto.IMUheading()) > 7)
                 auto.turn(0);
         } else
             auto.turn(90);
