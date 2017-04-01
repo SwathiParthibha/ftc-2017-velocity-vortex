@@ -98,7 +98,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDrive(0.3, 3, 3, 3);
+        auto.encoderDrive(0.2, 4, 4, 3);
         auto.turn(45); //The robot uses the IMU to turn to 45 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor

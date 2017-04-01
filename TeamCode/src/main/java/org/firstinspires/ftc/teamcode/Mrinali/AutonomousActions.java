@@ -247,6 +247,8 @@ public class AutonomousActions {
         rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x2a), false);
         rangeA = hardwareMap.i2cDevice.get("r side range");// Primary LEGO Light Sensor
         sideRangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x28), false);
+        rangeSensor.engage();
+        sideRangeSensor.engage();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -259,9 +261,6 @@ public class AutonomousActions {
         imu.initialize(parameters);
 
         initialTilt = frontTilt();
-
-        rangeSensor.engage();
-        sideRangeSensor.engage();
 
         //angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         //origAngle = angles.firstAngle;
@@ -617,6 +616,46 @@ public class AutonomousActions {
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
+    public void followLineBlueSide1() throws InterruptedException {
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        telemetry.addLine("Following Line");
+        leftMotor.setPower(.2);
+        rightMotor.setPower(-.2);
+        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            opMode.idle();
+        }
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
+            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(0);
+            } else {
+                telemetry.addLine("Moving left");
+                if (IMUheading() < -90) {        // to the right of line, expected
+                    leftMotor.setPower(0);
+                    rightMotor.setPower(0.2);
+                } else {
+                    leftMotor.setPower(0.2);
+                    rightMotor.setPower(0);
+                }
+            }
+            telemetry.update();
+
+            opMode.idle();
+        }
+        stopRobot();
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
     public void followLineRedSide() throws InterruptedException {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -695,30 +734,38 @@ public class AutonomousActions {
         leftMotor.setPower(.1);
         rightMotor.setPower(.1);
 
+        int expectedAngle = 0;
+        if (color == AllianceColor.BLUE) {
+            expectedAngle = -90;
+        }
+        else if (color == AllianceColor.RED)
+            expectedAngle = 90;
+
+
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11.5) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
             telemetry.addData("Light", lightSensor.getLightDetected());
             telemetry.addData("Angle", IMUheading());
 
-            int expectedAngle = 0;
-            if (color == AllianceColor.BLUE) {
-                expectedAngle = -90;
-            }
-            else if (color == AllianceColor.RED)
-                expectedAngle = 90;
-
-            if (lightSensor.getLightDetected() < WHITE_THRESHOLD) {
-                if (IMUheading() < expectedAngle) {
-                    leftMotor.setPower(-.1);
-                    rightMotor.setPower(.2);
-                } else if (IMUheading() > expectedAngle) {
-                    leftMotor.setPower(.2);
-                    rightMotor.setPower(-.1);
+            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+                if (color == AllianceColor.BLUE) {
+                    telemetry.addLine("Moving right");
+                    leftMotor.setPower(0.2);
+                    rightMotor.setPower(0);
                 }
-            }
-            else {
-                leftMotor.setPower(.1);
-                rightMotor.setPower(.1);
+                else if (color == AllianceColor.RED) {
+                    telemetry.addLine("Moving left");
+                    leftMotor.setPower(0);
+                    rightMotor.setPower(0.2);
+                }
+            } else {
+                if (IMUheading() < expectedAngle) {
+                    leftMotor.setPower(0);
+                    rightMotor.setPower(0.2);
+                } else if (IMUheading() > expectedAngle) {
+                    leftMotor.setPower(0.2);
+                    rightMotor.setPower(0);
+                }
             }
             telemetry.update();
 
