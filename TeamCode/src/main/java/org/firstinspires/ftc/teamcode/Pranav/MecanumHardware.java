@@ -41,7 +41,7 @@ Please do not edit any of the functions as it will affect other programs in the 
 
 If you have accomplished something please tell us so we can implement into the class.
 */
-public class MecanumHardware
+class MecanumHardware
 {
     /* Public OpMode members. */
 
@@ -616,7 +616,6 @@ public class MecanumHardware
         opMode.telemetry.addData("We Are Done Turning", heading);
     }
 
-    //The init cycle of the robot
     public boolean init(HardwareMap ahwMap)
     {
         //Save reference to Hardware Map
@@ -634,7 +633,7 @@ public class MecanumHardware
 
         initializeSensors();
         return false;
-
     }
+
 }
 
