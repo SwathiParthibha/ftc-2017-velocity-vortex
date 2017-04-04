@@ -98,7 +98,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDrive(0.2, 4, 4, 3);
+        auto.encoderDrive(0.3, 4, 4, 3);
         auto.turn(45); //The robot uses the IMU to turn to 45 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
@@ -120,8 +120,6 @@ public class DriveToBeaconsRed extends LinearOpMode {
         } else
             auto.turn(-90);
         auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
-        if (!IMUreInit)
-            auto.turn(0);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
@@ -130,6 +128,6 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.pushButton(); //It uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(-155);
-        auto.encoderDrive(FASTER_SPEED, 20, 20, 5);
+        auto.encoderDrive(FASTER_SPEED, 8, 8, 5);
     }
 }
