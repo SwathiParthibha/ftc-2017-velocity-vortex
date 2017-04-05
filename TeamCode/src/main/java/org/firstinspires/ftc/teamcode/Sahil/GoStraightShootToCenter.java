@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.Mrinali.OldAutonomous.HardwarePushbot;
 
 @Autonomous(name="GoStraightShootToCenter", group="Pushbot")
 @Disabled
+
 public class GoStraightShootToCenter extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor

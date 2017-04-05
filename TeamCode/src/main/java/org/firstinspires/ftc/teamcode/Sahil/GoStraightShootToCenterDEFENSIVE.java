@@ -43,7 +43,6 @@ public class GoStraightShootToCenterDEFENSIVE extends LinearOpMode {
 
     // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
     double angleZ = 0;
-
     static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
     static final double APPROACH_SPEED = 0.5;
     double WHEEL_SIZE_IN = 4;
