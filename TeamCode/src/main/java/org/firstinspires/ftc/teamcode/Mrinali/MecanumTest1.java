@@ -53,6 +53,7 @@ public class MecanumTest1 extends FtcOpMode {
         auto.toWhiteLine();
         auto.pushButton();
         auto.backup();
+        auto.turn(0);
         auto.toWhiteLine();
         auto.pushButton();
     }

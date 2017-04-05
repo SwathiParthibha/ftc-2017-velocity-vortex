@@ -105,8 +105,9 @@ public class MecanumAuto {
     I2cDevice rangeA;
     OpticalDistanceSensor odsLight;
 
-    static final double WHITE_THRESHOLD = 0.9;
+    static final double WHITE_THRESHOLD = 0.3;
     double DIST = 18;
+    int whiteLineCount = 0;
 
     public MecanumAuto(FtcOpMode anOpMode) {
         opMode = anOpMode;
@@ -182,18 +183,21 @@ public class MecanumAuto {
 
     public void toWhiteLine() throws InterruptedException {
 
+        whiteLineCount++;
+
+        if (whiteLineCount == 2) {
+            driveBase.mecanumDrive_Polar(0.5, 90, 0);
+            opMode.sleep(1000);
+        }
+
         while (opMode.opModeIsActive() && odsLight.getLightDetected() < WHITE_THRESHOLD) {
 
-            if (getcmUltrasonic(rangeSensor) < 12) { // to close
-                while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) < 12) {
-                    driveBase.mecanumDrive_Polar(.2, 0, 0); // move back
-                }
-            } else if (getcmUltrasonic(rangeSensor) > 24) {
-                while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 24) {
-                    driveBase.mecanumDrive_Polar(.2, 180, 0); // move back
-                }
+            if (getcmUltrasonic(rangeSensor) < 8) { // too close
+                driveBase.mecanumDrive_Polar(.2, 0, 0); // move back
+            } else if (getcmUltrasonic(rangeSensor) > 44) {
+                driveBase.mecanumDrive_Polar(.2, 180, 0); // move forward
             } else {
-                driveBase.mecanumDrive_Polar(.5, 90, 0, false);
+                driveBase.mecanumDrive_Polar(.3, 90, 0); // drive sideways
             }
 
             // Display the light level while we are looking for the line
@@ -235,13 +239,10 @@ public class MecanumAuto {
         time.reset();
 
         boolean wrongColor;
-        if (getcmUltrasonic(rangeSensor) > 14) {
+        if (getcmUltrasonic(rangeSensor) > 16) {
             telemetry.log().add("too far");
-            while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 14) {
-                frontLeftMotor.setPower(-0.2);
-                backLeftMotor.setPower(-0.2);
-                frontRightMotor.setPower(-0.2);
-                backRightMotor.setPower(-0.2);
+            while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 16) {
+                driveBase.mecanumDrive_Polar(.2, 180, 0);
             }
         }
 

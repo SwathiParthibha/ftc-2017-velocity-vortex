@@ -1027,15 +1027,12 @@ public class AutonomousActions {
     }
 
     boolean encoderCheck(int leftTarget, int rightTarget, double direction) {
-        if (direction == 1 &&
-                leftMotor.getCurrentPosition() < leftTarget &&
-                rightMotor.getCurrentPosition() < rightTarget)
-                return true;
-        else if (direction == -1 &&
-            leftMotor.getCurrentPosition() > leftTarget &&
-            rightMotor.getCurrentPosition() > rightTarget)
-            return true;
-        else return false;
+        return (direction == 1 &&
+                    leftMotor.getCurrentPosition() < leftTarget &&
+                    rightMotor.getCurrentPosition() < rightTarget) ||
+                (direction == -1 &&
+                    leftMotor.getCurrentPosition() > leftTarget &&
+                    rightMotor.getCurrentPosition() > rightTarget);
     }
 
     public void encoderDriveCheckTilt(double speed,
@@ -1102,7 +1099,7 @@ public class AutonomousActions {
         //  opMode.sleep(250);   // optional pause after each move
     }
 
-    public void shoot(double distance, double spinupTime, int balls) {
+    public void shoot(double distance, double spinupTime, int balls) throws InterruptedException {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(40);
 
@@ -1124,50 +1121,7 @@ public class AutonomousActions {
         double speed = 0.3;
         double timeBetweenBalls = 2;
 
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        int newLeftTarget;
-        int newRightTarget;
-
-        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        // Determine new target position, and pass to motor controller
-        newLeftTarget = leftMotor.getCurrentPosition() + (int) (distance * COUNTS_PER_INCH);
-        newRightTarget = rightMotor.getCurrentPosition() + (int) (distance * COUNTS_PER_INCH);
-        leftMotor.setTargetPosition(newLeftTarget);
-        rightMotor.setTargetPosition(newRightTarget);
-
-        // Turn On RUN_TO_POSITION
-        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftMotor.setPower(Math.abs(speed));
-        rightMotor.setPower(Math.abs(speed));
-        while (opMode.opModeIsActive() &&
-                (leftMotor.isBusy() && rightMotor.isBusy())) {
-
-            // Display it for the driver.
-            telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
-            telemetry.addData("Path2", "Running at %7d :%7d",
-                    leftMotor.getCurrentPosition(),
-                    rightMotor.getCurrentPosition());
-            telemetry.update();
-
-            opMode.idle();
-        }
-        // Stop all motion;
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-
-        // Turn off RUN_TO_POSITION
-        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
+        encoderDrive(speed, distance, distance, distance + 3);
         //finished running forward, spin up shooters
         ElapsedTime shootTime = new ElapsedTime();
         while (opMode.opModeIsActive() && shootTime.seconds() < spinupTime);
@@ -1195,6 +1149,7 @@ public class AutonomousActions {
             }
         }
 
+        opMode.sleep(1000);
         //end the threads
         executorService.shutdown();
         scheduledExecutorService.shutdown();

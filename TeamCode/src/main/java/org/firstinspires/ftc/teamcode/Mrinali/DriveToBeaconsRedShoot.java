@@ -107,6 +107,7 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         boolean IMUreInit = false;
         if (auto.IMUheading() == 0) {
+            telemetry.log().add("IMU crashed");
             auto.imu.initialize();
             IMUreInit = true;
         }
@@ -114,10 +115,10 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
             auto.turn(0); //and turns parallel to the beacon using the IMU
             sleep(200);
             if (Math.abs(auto.IMUheading()) > 7)
-                auto.turn(0);
+                auto.turn(-3);
         } else
             auto.turn(-90);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
+        auto.encoderDrive(FASTER_SPEED, 13, 13, 4);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
