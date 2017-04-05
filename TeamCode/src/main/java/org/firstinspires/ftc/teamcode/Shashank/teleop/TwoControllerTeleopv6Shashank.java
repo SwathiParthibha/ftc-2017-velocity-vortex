@@ -224,12 +224,14 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             shooter1.setPower(SHOOTER_POWER);
             shooter2.setPower(SHOOTER_POWER);
         } else if(gamepad2.y) {
-            Constants.REQUESTED_ETPS = 83160;//35150;//1855;//1590;//1750 good for close shots
-            Constants.DEFAULT_POWER = 0.45;//0.51;//0.455;//0.42
+            shooter1.setPower(-SHOOTER_POWER/4);
+            shooter2.setPower(-SHOOTER_POWER/4);
+            //Constants.REQUESTED_ETPS = 83160;//35150;//1855;//1590;//1750 good for close shots
+            //Constants.DEFAULT_POWER = 0.45;//0.51;//0.455;//0.42
             leftShooterPowerMgr.reset();
         } else if(gamepad2.x){
-            Constants.REQUESTED_ETPS = 77616;//1855;//1590;//1750 good for close shots
-            Constants.DEFAULT_POWER = 0.42;//0.455;//0.42
+            //Constants.REQUESTED_ETPS = 77616;//1855;//1590;//1750 good for close shots
+            //Constants.DEFAULT_POWER = 0.42;//0.455;//0.42
             leftShooterPowerMgr.reset();
         }else{
                 shooter1.setPower(0);
@@ -241,6 +243,15 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             alreadyScheduled = false;
         }
 
+        if(gamepad2.left_stick_y > 0.5){
+            SHOOTER_POWER = SHOOTER_POWER + 0.05;
+            SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
+        }
+
+        if(gamepad2.left_stick_y < -0.5){
+            SHOOTER_POWER = SHOOTER_POWER - 0.05;
+            SHOOTER_POWER = Range.clip(SHOOTER_POWER, 0, 1);
+        }
 
         if(gamepad2.left_stick_y > 0.3) {
             //SHOOTER_POWER = SHOOTER_POWER + 0.03;
