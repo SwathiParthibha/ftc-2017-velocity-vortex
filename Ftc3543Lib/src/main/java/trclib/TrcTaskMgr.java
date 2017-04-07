@@ -22,8 +22,6 @@
 
 package trclib;
 
-import com.qualcomm.ftccommon.DbgLog;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -34,7 +32,7 @@ import java.util.HashSet;
 public class TrcTaskMgr
 {
     private static final String moduleName = "TrcTaskMgr";
-    private static final boolean debugEnabled = true;
+    private static final boolean debugEnabled = false;
     private static final boolean tracingEnabled = false;
     private static final TrcDbgTrace.TraceLevel traceLevel = TrcDbgTrace.TraceLevel.API;
     private static final TrcDbgTrace.MsgLevel msgLevel = TrcDbgTrace.MsgLevel.INFO;
@@ -281,7 +279,6 @@ public class TrcTaskMgr
 
         if (debugEnabled)
         {
-            DbgLog.msg(funcName);
             dbgTrace.traceEnter(funcName, TrcDbgTrace.TraceLevel.API, "task=%s,type=%s", taskName, type.toString());
             dbgTrace.traceExit(funcName, TrcDbgTrace.TraceLevel.API);
         }
@@ -315,7 +312,6 @@ public class TrcTaskMgr
 
         if (debugEnabled)
         {
-            DbgLog.msg(funcName + ": task=%s,type=%s", taskObj != null ? taskObj.toString() : "unknown", type.toString());
             dbgTrace.traceEnter(funcName, TrcDbgTrace.TraceLevel.API,
                                 "task=%s,type=%s", taskObj != null ? taskObj.toString() : "unknown", type.toString());
         }
@@ -335,7 +331,6 @@ public class TrcTaskMgr
 
         if (debugEnabled)
         {
-            DbgLog.msg(funcName);
             dbgTrace.traceExit(funcName, TrcDbgTrace.TraceLevel.API);
         }
     }   //unregisterTask
@@ -361,7 +356,6 @@ public class TrcTaskMgr
                     case START_TASK:
                         if (debugEnabled)
                         {
-                            DbgLog.msg(funcName + " Executing StartTask %s", taskObj.toString());
                             dbgTrace.traceInfo(funcName, "Executing StartTask %s", taskObj.toString());
                         }
                         task.startTask(mode);
@@ -370,7 +364,6 @@ public class TrcTaskMgr
                     case STOP_TASK:
                         if (debugEnabled)
                         {
-                            DbgLog.msg(funcName+ "Executing StopTask %s", taskObj.toString());
                             dbgTrace.traceInfo(funcName, "Executing StopTask %s", taskObj.toString());
                         }
                         task.stopTask(mode);
@@ -379,7 +372,6 @@ public class TrcTaskMgr
                     case PREPERIODIC_TASK:
                         if (debugEnabled)
                         {
-                            DbgLog.msg(funcName + " Executing StartTask %s", taskObj.toString());
                             dbgTrace.traceInfo(funcName, "Executing PrePeriodicTask %s", taskObj.toString());
                         }
                         task.prePeriodicTask(mode);
@@ -388,7 +380,6 @@ public class TrcTaskMgr
                     case POSTPERIODIC_TASK:
                         if (debugEnabled)
                         {
-                            DbgLog.msg(funcName + " Executing StartTask %s", taskObj.toString());
                             dbgTrace.traceInfo(funcName, "Executing PostPeriodicTask %s", taskObj.toString());
                         }
                         task.postPeriodicTask(mode);
@@ -397,7 +388,6 @@ public class TrcTaskMgr
                     case PRECONTINUOUS_TASK:
                         if (debugEnabled)
                         {
-                            DbgLog.msg(funcName + " Executing StartTask %s", taskObj.toString());
                             dbgTrace.traceInfo(funcName, "Executing PreContinuousTask %s", taskObj.toString());
                         }
                         task.preContinuousTask(mode);
@@ -406,7 +396,6 @@ public class TrcTaskMgr
                     case POSTCONTINUOUS_TASK:
                         if (debugEnabled)
                         {
-                            DbgLog.msg(funcName + " Executing StartTask %s", taskObj.toString());
                             dbgTrace.traceInfo(funcName, "Executing PostContinuousTask %s", taskObj.toString());
                         }
                         task.postContinuousTask(mode);
