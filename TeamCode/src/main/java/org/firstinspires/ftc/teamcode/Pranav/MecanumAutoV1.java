@@ -60,7 +60,8 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 @Autonomous(name="MecanumAutoV1", group="Pushbot")
 //@Disabled
-public class MecanumAutoV1 extends LinearOpMode {
+public class MecanumAutoV1 extends LinearOpMode
+{
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
@@ -72,10 +73,19 @@ public class MecanumAutoV1 extends LinearOpMode {
     {
         mecanum.init(hardwareMap);
 
+        while (mecanum.sensorGyro.isCalibrating())
+        {
+            sleep(50);
+            idle();
+        }
+
         waitForStart();
 
-        mecanum.drive(mecanum.ROTATION, 1);
-        //mecanum.detectWhiteLine(mecanum.ROTATION, 0.5);
+        mecanum.driveDiagonal("NW", mecanum.ROTATION * 10, 0.6, 0);
+
+        mecanum.turnGyro("right", 85, 0.3);
+
+        mecanum.driveSideways("left", mecanum.ROTATION * 10, 0.6, 90);
 
         //mecanum.turnGyro("right", 90, 0.5);
 
