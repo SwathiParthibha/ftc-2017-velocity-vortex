@@ -85,7 +85,8 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
         while (!isStarted()) {
 
             // Display the light level while we are waiting to start
-            telemetry.addData("Light Level", auto.lightSensor.getLightDetected());
+            telemetry.addData("Light Level 1", auto.lightSensor.getLightDetected());
+            telemetry.addData("Light Level 2", auto.lightSensor2.getLightDetected());
             telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
             auto.angleZ = auto.IMUheading();
             telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
@@ -102,7 +103,7 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
 
         sleep(100);
-        auto.followLine();
+        auto.twoSensorLineFollow();
         auto.pushButton(); //The robot then uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         boolean IMUreInit = false;
@@ -123,11 +124,11 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
         sleep(100);
-        auto.followLine();
+        auto.twoSensorLineFollow();
         auto.pushButton(); //It uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(-155);
-        auto.shoot(5, 2, 1);
-        auto.encoderDrive(FASTER_SPEED, 8, 8, 5);
+        auto.shoot(0, 2, 1);
+        auto.encoderDrive(FASTER_SPEED, 10, 10, 5);
     }
 }

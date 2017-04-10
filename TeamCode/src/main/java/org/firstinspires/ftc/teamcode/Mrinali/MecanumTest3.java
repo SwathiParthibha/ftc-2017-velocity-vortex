@@ -39,6 +39,9 @@ public class MecanumTest3 extends FtcOpMode {
         }
 
         auto.toWhiteLine();
+        auto.driveBase.mecanumDrive_Polar(0.5, -90, 0);
+        sleep(1200);
+        auto.toWhiteLine();
         while (opModeIsActive());
     }
 
