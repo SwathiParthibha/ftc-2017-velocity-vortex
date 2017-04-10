@@ -5,6 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.Shashank.autonomous.GoStraightAutoDelayed;
+
+import java.net.UnknownServiceException;
+
 import ftclib.FtcDcMotor;
 import hallib.HalDashboard;
 import swlib.SWMRGyro;
@@ -18,8 +22,8 @@ import trclib.TrcUtil;
 /**
  * Created by spmeg on 3/31/2017.
  */
-@Autonomous(name = "MecanumGoStraight", group = "Autonomous")
-public class MecanumGoStraight extends OpMode {
+@Autonomous(name = "MecanumTest", group = "Autonomous")
+public class MecanumTest extends OpMode {
     private FtcDcMotor leftFrontMotor;
     private FtcDcMotor leftRearMotor;
     private FtcDcMotor rightFrontMotor;
@@ -36,6 +40,11 @@ public class MecanumGoStraight extends OpMode {
 
     private enum State{
         GO_STRAIGHT,
+        GO_RIGHT,
+        GO_STRAIGHT2,
+        GO_RIGHT2,
+        GO_LEFT,
+        GO_BACKWARDS,
         STOP
     }
 
@@ -144,11 +153,55 @@ public class MecanumGoStraight extends OpMode {
 
         switch (state){
             case GO_STRAIGHT:
-                if(getRuntime() - startTime > 2.5)
-                    state = State.STOP;
+                if(getRuntime() - startTime > 0.1) {
+                    state = State.GO_RIGHT;
+                    startTime = getRuntime();
+                }
+
                 x = 0;
-                y = 1;
+                y = -1;
                 break;
+
+            case GO_RIGHT:
+                if(getRuntime() - startTime > 0.5){
+                    state = State.GO_STRAIGHT2;
+                      startTime = getRuntime();
+                }
+                x = -1;
+                y = 0;
+                break;
+
+            case GO_STRAIGHT2:
+                if(getRuntime() - startTime > 0.5) {
+                    state = State.STOP;
+                    startTime = getRuntime();
+                }
+                x = 0;
+                y = -1;
+                break;
+
+     //      // case GO_RIGHT2:
+  //   //      //   if(getRuntime() - startTime > 0.25)
+//      //      //     state = State.STOP;
+//      //        // x = -1;
+/////////     // y = 0;
+  ////           // break;
+  ////
+  ////          //case GO_LEFT:
+  ////            //  if(getRuntime() - startTime > 0.25)
+  ////                //  state = State.STOP;
+/////////             //x = 1;
+//     //          // y = 0;
+//     //         // break;
+ //   //
+  // //        // case GO_BACKWARDS:
+    //         //   if(getRuntime() - startTime > 0.25)
+               //     state = State.STOP;
+              //  x = 0;
+              //  y = 1;
+               // break;
+
+
             case STOP:
                 x = 0;
                 y = 0;
