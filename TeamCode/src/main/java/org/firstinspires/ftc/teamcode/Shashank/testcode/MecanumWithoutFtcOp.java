@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import java.util.HashMap;
 
@@ -119,6 +120,8 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         gamepad.enableDebug(true);
         DbgLog.msg("> INIT" + "FINISHED CREATING GAMEPAD");
 
+        driveBase.enableGyroAssist(0.0001, 0.05);
+
         DbgLog.msg("> INIT" + "FINISHED INIT");
     }
 
@@ -131,8 +134,11 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
 
         gamepad.setYInverted(setYInverted);
         double rotation = gamepad.getRightStickX();
-        double magnitude = gamepad.getRightTrigger();
+        double magnitude = Range.clip(gamepad.getLeftStickMagnitude(), 0, 1);
         double direction = ((gamepad.getLeftStickDirectionDegrees(true) + 360) % 360) - gyro.getRawZData(TrcGyro.DataType.HEADING).value;
+
+        if(gamepad.getLeftStickX() == 0 && gamepad.getLeftStickY() == 0)
+            magnitude = 0;
 
         driveBase.mecanumDrive_Polar(magnitude, direction, rotation);
 

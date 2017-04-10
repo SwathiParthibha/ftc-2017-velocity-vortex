@@ -98,6 +98,7 @@ public class TestTeleop extends OpMode implements SWGamePad.ButtonHandler{
         dashboard.displayPrintf(0, LABEL_WIDTH, "x: ", "%.2f", x);
         dashboard.displayPrintf(1, LABEL_WIDTH, "y: ", "%.2f", y);
         dashboard.displayPrintf(2, LABEL_WIDTH, "rotation: ", "%.2f", rotation);
+        dashboard.displayPrintf(3, LABEL_WIDTH, "gamepad left stick magnitude: ", "%.2f", gamepad.getLeftStickMagnitude());
         dashboard.displayPrintf(5, LABEL_WIDTH, "gamepad left stick direction true: ", "%.2f", gamepad.getLeftStickDirectionDegrees(true));
         dashboard.displayPrintf(6, LABEL_WIDTH, "gamepad left stick direction false: ", "%.2f", gamepad.getLeftStickDirectionDegrees(false));
         dashboard.displayPrintf(7, LABEL_WIDTH, "gamepad right stick x: ", "%1.2f", gamepad.getRightStickX());

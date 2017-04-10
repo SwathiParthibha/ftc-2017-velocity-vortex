@@ -19,7 +19,7 @@ import trclib.TrcUtil;
 /**
  * Created by spmeg on 3/31/2017.
  */
-@Autonomous(name = "MecanumGoStraight", group = "Autonomous")
+@Autonomous(name = "MecanumGoStraight Shashank", group = "Autonomous")
 public class MecanumGoStraight extends OpMode {
     private FtcDcMotor leftFrontMotor;
     private FtcDcMotor leftRearMotor;
