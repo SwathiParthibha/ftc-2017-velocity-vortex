@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Sahil;
 
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -20,9 +21,10 @@ import trclib.TrcTaskMgr;
 import trclib.TrcUtil;
 
 /**
- * Created by spmeg on 3/31/2017.
+ * Created by Sahil Doshi on 4/9/2017.
  */
 @Autonomous(name = "MecanumTest", group = "Autonomous")
+@Disabled
 public class MecanumTest extends OpMode {
     private FtcDcMotor leftFrontMotor;
     private FtcDcMotor leftRearMotor;
@@ -180,22 +182,22 @@ public class MecanumTest extends OpMode {
                 y = -1;
                 break;
 
-     //      // case GO_RIGHT2:
-  //   //      //   if(getRuntime() - startTime > 0.25)
-//      //      //     state = State.STOP;
-//      //        // x = -1;
-/////////     // y = 0;
-  ////           // break;
-  ////
-  ////          //case GO_LEFT:
-  ////            //  if(getRuntime() - startTime > 0.25)
-  ////                //  state = State.STOP;
-/////////             //x = 1;
-//     //          // y = 0;
-//     //         // break;
- //   //
-  // //        // case GO_BACKWARDS:
-    //         //   if(getRuntime() - startTime > 0.25)
+        // case GO_RIGHT2:
+        //   if(getRuntime() - startTime > 0.25)
+      //     state = State.STOP;
+        // x = -1;
+     // y = 0;
+           // break;
+
+            //case GO_LEFT:
+             //  if(getRuntime() - startTime > 0.25)
+                  //  state = State.STOP;
+             //x = 1;
+          // y = 0;
+         // break;
+
+         // case GO_BACKWARDS:
+           //   if(getRuntime() - startTime > 0.25)
                //     state = State.STOP;
               //  x = 0;
               //  y = 1;
