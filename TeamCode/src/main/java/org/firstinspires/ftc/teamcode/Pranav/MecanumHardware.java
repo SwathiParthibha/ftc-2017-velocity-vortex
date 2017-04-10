@@ -77,11 +77,10 @@ class MecanumHardware
     //Make sure to add one.
     public double LINE_THRESHOLD_VALUE = 0.28;
 
-    /*
-    Heading for the IMU;
-    Orientation angles = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
-    int IMUHeading = Math.round(angles.firstAngle);
-    */
+
+    //Heading for the IMU;
+    double angles;
+
 
     /* local OpMode members. */
     HardwareMap hardwareMap;
@@ -131,15 +130,13 @@ class MecanumHardware
     //This function defines the sensors so that the robot controller looks for
     public void defineSensors()
     {
-        sensorGyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
+        //sensorGyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
         //sensorLine = hardwareMap.lightSensor.get("line");
         //sensorUltra = hardwareMap.ultrasonicSensor.get("ultra");
         //sensorRange = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
         //sensorColorLeft = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorLeft");
         //sensorColorRight = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorRight");
-        sensorODS = hardwareMap.get(ModernRoboticsAnalogOpticalDistanceSensor.class, "sensorODS");
-        //imu = hardwareMap.get(BNO055IMU.class, "imu");
-
+        //sensorODS = hardwareMap.get(ModernRoboticsAnalogOpticalDistanceSensor.class, "sensorODS");
     }
 
     //Configure the Direction of the Motors
@@ -155,7 +152,7 @@ class MecanumHardware
     public void initializeSensors()
     {
         //Calibrate the Modern Robotics Gyro Sensor
-        sensorGyro.calibrate();
+        //sensorGyro.calibrate();
 
         /*
         //Turn on the LED of the Lego Line Sensor
@@ -169,6 +166,8 @@ class MecanumHardware
         sensorColorLeft.enableLed(false);
         sensorColorRight.enableLed(false);
 
+        */
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -177,7 +176,7 @@ class MecanumHardware
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
-        */
+
     }
 
     //Set the all the motors to a set power
@@ -232,6 +231,12 @@ class MecanumHardware
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public double IMUHeading()
+    {
+        angles = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX).firstAngle;
+        return angles * -1;
     }
 
     //A basic go straight function that uses encoders to track its distance
@@ -1045,6 +1050,42 @@ class MecanumHardware
 
         opMode.telemetry.addData("We Are Done Turning", heading);
     }
+
+    //A basic Turn function that uses the Modern Robotics Gyro Sensor to calculate the angle
+    public void turnIMU(String direction, int angle, double speed) throws InterruptedException
+    {
+        int motorDirectionChange = 0;
+
+        runWithoutEncoder();
+
+        if (direction.equals("left"))
+        {
+            motorDirectionChange = 1;
+        }
+        else
+        if (direction.equals("right"))
+        {
+            motorDirectionChange = -1;
+        }
+
+        while ((IMUHeading() > angle + 5 || IMUHeading() < angle - 2 ))
+        {
+            frontRight.setPower(MOTOR_POWER * speed * motorDirectionChange);
+            backRight.setPower(MOTOR_POWER * speed * motorDirectionChange);
+
+            frontLeft.setPower(-MOTOR_POWER * speed * motorDirectionChange);
+            backLeft.setPower(-MOTOR_POWER * speed * motorDirectionChange);
+
+            opMode.telemetry.addData("We Are Turning", null);
+            opMode.telemetry.addData("Gyro Value", IMUHeading());
+            opMode.telemetry.update();
+        }
+
+        stopRobot();
+
+        opMode.telemetry.addData("We Are Done Turning", IMUHeading());
+    }
+
 
     public boolean init(HardwareMap hardwareMap)
     {

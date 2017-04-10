@@ -73,21 +73,21 @@ public class MecanumAutoV1 extends LinearOpMode
     {
         mecanum.init(hardwareMap);
 
-        while (mecanum.sensorGyro.isCalibrating())
-        {
-            sleep(50);
-            idle();
-        }
-
         waitForStart();
+
+        /*
 
         mecanum.driveDiagonal("NW", mecanum.ROTATION * 10, 0.6, 0);
 
         mecanum.turnGyro("right", 85, 0.3);
 
-        mecanum.driveSideways("left", mecanum.ROTATION * 10, 0.6, 90);
+        mecanum.driveSideways("left", mecanum.ROTATION * 10, 0.6, 85);
 
         //mecanum.turnGyro("right", 90, 0.5);
+
+        */
+
+        mecanum.turnIMU("left", 270, 0.5);
 
     }
 }
