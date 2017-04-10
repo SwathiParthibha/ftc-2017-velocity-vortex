@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Shashank.autonomous;
 
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -19,7 +20,8 @@ import trclib.TrcUtil;
 /**
  * Created by spmeg on 3/31/2017.
  */
-@Autonomous(name = "MecanumGoStraight", group = "Autonomous")
+@Autonomous(name = "MecanumTest", group = "Autonomous")
+@Disabled
 public class MecanumGoStraight extends OpMode {
     private FtcDcMotor leftFrontMotor;
     private FtcDcMotor leftRearMotor;
