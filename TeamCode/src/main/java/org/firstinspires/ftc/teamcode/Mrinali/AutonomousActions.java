@@ -1036,8 +1036,12 @@ public class AutonomousActions {
         // reset the timeout time and start motion.
         runtime.reset();
 
-        leftMotor.setPower(Math.signum(leftInches)*Math.abs(speed));
-        rightMotor.setPower(Math.signum(rightInches)*Math.abs(speed));
+        while (opMode.opModeIsActive() &&    // this loop ensures power is set to both motors
+                (leftMotor.getPower() != Math.signum(leftInches)*Math.abs(speed)
+                || rightMotor.getPower() != Math.signum(rightInches)*Math.abs(speed))) {
+            leftMotor.setPower(Math.signum(leftInches) * Math.abs(speed));
+            rightMotor.setPower(Math.signum(rightInches) * Math.abs(speed));
+        }
 
         boolean motorSide = false;
         while (opMode.opModeIsActive() &&
