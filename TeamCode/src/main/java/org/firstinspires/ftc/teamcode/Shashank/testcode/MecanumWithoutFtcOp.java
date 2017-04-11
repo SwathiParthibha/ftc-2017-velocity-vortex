@@ -13,6 +13,7 @@ import java.util.HashMap;
 import ftclib.FtcDcMotor;
 import hallib.HalDashboard;
 import swlib.SWGamePad;
+import swlib.SWIMUGyro;
 import swlib.SWMRGyro;
 import trclib.TrcDriveBase;
 import trclib.TrcGyro;
@@ -30,7 +31,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
     private FtcDcMotor rightFrontMotor;
     private FtcDcMotor rightRearMotor;
     private TrcDriveBase driveBase = null;
-    private SWMRGyro gyro = null;
+    private SWIMUGyro gyro = null;
     private SWGamePad gamepad;
     private boolean fixedOnTarget = false;
     private HalDashboard dashboard = null;
@@ -81,7 +82,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         DbgLog.msg("> INIT" + "STARTED INIT");
 
         DbgLog.msg("> INIT" + "STARTED OBJECT CREATION OF GYRO");
-        gyro = new SWMRGyro(hardwareMap, "gyro", null);
+        gyro = new SWIMUGyro(hardwareMap, "gyro", null);
         gyro.calibrate();
         DbgLog.msg("> INIT" + "FINISHED OBJECT CREATION OF GYRO");
 
