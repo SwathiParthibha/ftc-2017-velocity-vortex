@@ -49,13 +49,15 @@ public class MecanumTest1 extends FtcOpMode {
             telemetry.update();
         }
 
-        auto.toWall();
+        // auto.toWall();
         auto.toWhiteLine();
         auto.pushButton();
         auto.backup();
         auto.turn(0);
         auto.toWhiteLine();
         auto.pushButton();
+        auto.driveBase.mecanumDrive_Polar(.5, 20, 0);
+        while (opModeIsActive());
     }
 
     public double IMUheading360() {

@@ -113,6 +113,7 @@ public class AutonomousActions {
     private boolean state;
     public DcMotor scooper;
     public LightSensor lightSensor;      // Primary LEGO Light sensor,
+    public LightSensor lightSensor2;
     public I2cDeviceSynchImpl rangeSensor;
     public I2cDeviceSynchImpl sideRangeSensor;
     double sideRange;
@@ -144,7 +145,7 @@ public class AutonomousActions {
             (WHEEL_SIZE_IN * Math.PI) * (40 / GEAR_RATIO);
     double DIST = 18;
     double SIDE_DIST = 30;
-    public double backup = -2;
+    public double backup = -2.5;
     double overLine1 = 2;
     double overLine2 = 2;
     private double lightDetected = 0.0;
@@ -243,6 +244,7 @@ public class AutonomousActions {
 
         // get a reference to our Light Sensor object.
         lightSensor = hardwareMap.lightSensor.get("light sensor");
+        lightSensor2 = hardwareMap.lightSensor.get("light sensor 2");
         rangeA = hardwareMap.i2cDevice.get("range sensor");// Primary LEGO Light Sensor
         rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x2a), false);
         rangeA = hardwareMap.i2cDevice.get("r side range");// Primary LEGO Light Sensor
@@ -272,6 +274,7 @@ public class AutonomousActions {
         rightColorSensor.setI2cAddress(i2cAddr);
 
         lightSensor.enableLed(true);
+        lightSensor2.enableLed(true);
     }
 
     public void init(HardwareMap hardwareMap, Telemetry telem) throws InterruptedException {
@@ -365,21 +368,19 @@ public class AutonomousActions {
             telemetry.update();
             opMode.idle();
 
-            /*
-            if (imu.getLinearAcceleration().zAccel < 0.2) {
+            if (imu.getLinearAcceleration().zAccel < 0.1) {
                 leftMotor.setPower(APPROACH_SPEED * .4);
                 rightMotor.setPower(APPROACH_SPEED * .4);
             }
-            */
         }
 
         // Stop all motors
         stopRobot();
 
         if (!wall) {
-            encoderDrive(APPROACH_SPEED * .4, .75, .75, 1);
+            encoderDrive(APPROACH_SPEED * .4, 1.5, 1.5, 1);
         } else
-            encoderDrive(APPROACH_SPEED * .4, 1, 1, 2);
+            encoderDrive(APPROACH_SPEED * .4, 2, 2, 2);
     }
 
     public void toWhiteLineCheckTilt(boolean wall, String color) throws InterruptedException {
@@ -782,6 +783,53 @@ public class AutonomousActions {
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
+    public void twoSensorLineFollow() {
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        if (color == AllianceColor.BLUE) {
+            leftMotor.setPower(.2);
+            rightMotor.setPower(-.2);
+            while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+                telemetry.addData("Light", lightSensor.getLightDetected());
+                opMode.idle();
+            }
+        }
+        else if (color == AllianceColor.RED){
+            leftMotor.setPower(-.2);
+            rightMotor.setPower(.2);
+            while (opMode.opModeIsActive() && lightSensor2.getLightDetected() < WHITE_THRESHOLD) {
+                telemetry.addData("Light", lightSensor.getLightDetected());
+                opMode.idle();
+            }
+        }
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 10) {
+            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) { // right sensor
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.1);
+                rightMotor.setPower(0);
+            } else if (lightSensor2.getLightDetected() > WHITE_THRESHOLD) { // left sensor
+                telemetry.addLine("Moving left");
+                leftMotor.setPower(0);
+                rightMotor.setPower(0.1);
+            } else {
+                telemetry.addLine("Moving ahead");
+                leftMotor.setPower(0.1);
+                rightMotor.setPower(0.1);
+            }
+            telemetry.update();
+        }
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
     }
 
     public void pushButton() throws InterruptedException {
