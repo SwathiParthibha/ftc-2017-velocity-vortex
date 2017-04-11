@@ -57,9 +57,9 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Blue Shoot", group="Pushbot")
+@Autonomous(name="Beacons Blue Shoot End", group="Pushbot")
 //@Disabled
-public class DriveToBeaconsBlueShoot extends LinearOpMode {
+public class DriveToBeaconsBlueShoot1 extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
@@ -97,8 +97,7 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
             idle();
         }
 
-        //auto.encoderDrive(0.3, 4, 4, 3);
-        auto.shoot(2, 2, 1);
+        auto.encoderDrive(0.3, 4, 4, 3);
         auto.turn(-45); //The robot uses the IMU to turn to 40 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
@@ -131,7 +130,7 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
         auto.pushButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(155);
-        //auto.shoot(5, 2, 1);
+        auto.shoot(0, 2, 1);
         auto.encoderDrive(FASTER_SPEED, 10, 10, 5);
     }
 }

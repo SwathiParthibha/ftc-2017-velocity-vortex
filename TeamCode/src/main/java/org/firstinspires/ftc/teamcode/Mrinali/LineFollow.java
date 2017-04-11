@@ -57,9 +57,9 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Blue Shoot", group="Pushbot")
+@Autonomous(name="Line Follow Red", group="Pushbot")
 //@Disabled
-public class DriveToBeaconsBlueShoot extends LinearOpMode {
+public class LineFollow extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
@@ -73,7 +73,7 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
         /* Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        auto.init(hardwareMap, telemetry, AllianceColor.BLUE);
+        auto.init(hardwareMap, telemetry, AllianceColor.RED);
 
         telemetry.addData("verify", auto.verify()); //checks color sensors
 
@@ -97,41 +97,7 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
             idle();
         }
 
-        //auto.encoderDrive(0.3, 4, 4, 3);
-        auto.shoot(2, 2, 1);
-        auto.turn(-45); //The robot uses the IMU to turn to 40 degrees
-        auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
-        auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
-
-        sleep(100);
         auto.twoSensorLineFollow();
-        auto.pushButton(); //The robot then uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
-        boolean IMUreInit = false;
-        if (auto.IMUheading() == 0) {
-            telemetry.log().add("IMU crashed");
-            auto.imu.initialize();
-            IMUreInit = true;
-        }
-        if (!IMUreInit) {
-            auto.turn(0); //and turns parallel to the beacon using the IMU
-            sleep(200);
-            if (Math.abs(auto.IMUheading()) > 7)
-                auto.turn(3);
-        } else
-            auto.turn(90);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
-        // if (!IMUreInit)
-            // auto.turn(0);
-        //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
-        //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
-        auto.toWhiteLine(true); //It advances to the next white line
-        sleep(100);
-        auto.twoSensorLineFollow();
-        auto.pushButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
-        auto.turn(155);
-        //auto.shoot(5, 2, 1);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 5);
+        while (opModeIsActive());
     }
 }

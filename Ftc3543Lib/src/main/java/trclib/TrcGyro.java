@@ -22,6 +22,8 @@
 
 package trclib;
 
+import com.qualcomm.ftccommon.DbgLog;
+
 /**
  * This class implements a platform independent gyro. Typically, this class is extended by a platform dependent
  * gyro class. The platform dependent gyro class must implement the abstract methods required by this class. The
