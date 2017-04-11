@@ -49,7 +49,7 @@ public class MecanumTest1 extends FtcOpMode {
             telemetry.update();
         }
 
-        auto.toWall();
+        // auto.toWall();
         auto.toWhiteLine();
         auto.pushButton();
         auto.backup();
