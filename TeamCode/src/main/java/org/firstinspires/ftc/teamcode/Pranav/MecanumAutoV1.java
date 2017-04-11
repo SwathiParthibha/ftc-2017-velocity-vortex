@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.Pranav;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions;
@@ -59,7 +60,7 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  */
 
 @Autonomous(name="MecanumAutoV1", group="Pushbot")
-//@Disabled
+@Disabled
 public class MecanumAutoV1 extends LinearOpMode
 {
 
@@ -73,21 +74,37 @@ public class MecanumAutoV1 extends LinearOpMode
     {
         mecanum.init(hardwareMap);
 
-        while (mecanum.sensorGyro.isCalibrating())
-        {
-            sleep(50);
-            idle();
-        }
-
         waitForStart();
+
+        /*
 
         mecanum.driveDiagonal("NW", mecanum.ROTATION * 10, 0.6, 0);
 
         mecanum.turnGyro("right", 85, 0.3);
 
-        mecanum.driveSideways("left", mecanum.ROTATION * 10, 0.6, 90);
+        mecanum.driveSideways("left", mecanum.ROTATION * 10, 0.6, 85);
 
         //mecanum.turnGyro("right", 90, 0.5);
+
+        */
+
+
+
+        mecanum.driveDiagonalGyro("NW", mecanum.ROTATION * 10, 0.6, 0);
+
+        sleep(100);
+
+        mecanum.driveSideways("left", mecanum.ROTATION * 3, 0.6, 0);
+
+        sleep(100);
+
+ //       mecanum.pushButton("red");
+
+
+        while(!isStarted())
+        {
+            telemetry.addData("IMU Heading", mecanum.IMUHeading());
+        }
 
     }
 }
