@@ -230,9 +230,11 @@ public class TwoControllerTeleopv6Shashank extends OpMode {
             //Constants.DEFAULT_POWER = 0.45;//0.51;//0.455;//0.42
             leftShooterPowerMgr.reset();
         } else if(gamepad2.x){
-            //Constants.REQUESTED_ETPS = 77616;//1855;//1590;//1750 good for close shots
-            //Constants.DEFAULT_POWER = 0.42;//0.455;//0.42
-            leftShooterPowerMgr.reset();
+            shooter1.setPower(-SHOOTER_POWER);
+            shooter2.setPower(-SHOOTER_POWER);
+            // Constants.REQUESTED_ETPS = 77616;//1855;//1590;//1750 good for close shots
+            // Constants.DEFAULT_POWER = 0.42;//0.455;//0.42
+            // leftShooterPowerMgr.reset();
         }else{
                 shooter1.setPower(0);
                 shooter2.setPower(0);

@@ -78,7 +78,7 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
         telemetry.addData("verify", auto.verify()); //checks color sensors
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to runIMU");    //
+        telemetry.addData("Status", "Ready to runIMU");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
@@ -96,21 +96,32 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
             idle();
         }
 
-        auto.shoot(8, 2, 1);
-        auto.encoderDrive(auto.APPROACH_SPEED, -3.5, -3.5, 3);
-        auto.turn(-45); //The robot uses the IMU to turn to 45 degrees
+        //auto.encoderDrive(0.3, 4, 4, 3);
+        auto.shoot(4, 2, 1);
+        auto.turn(-45); //The robot uses the IMU to turn to 40 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
 
         sleep(100);
         auto.followLine();
         auto.pushButton(); //The robot then uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 1, auto.backup - 1, 3); //The robot then moves backward using encoders
-        auto.turn(0); //and turns parallel to the beacon using the IMU
-        if (Math.abs(auto.IMUheading()) > 5)
-            auto.turn(0);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
-        auto.turn(0);
+        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
+        boolean IMUreInit = false;
+        if (auto.IMUheading() == 0) {
+            telemetry.log().add("IMU crashed");
+            auto.imu.initialize();
+            IMUreInit = true;
+        }
+        if (!IMUreInit) {
+            auto.turn(0); //and turns parallel to the beacon using the IMU
+            sleep(200);
+            if (Math.abs(auto.IMUheading()) > 7)
+                auto.turn(3);
+        } else
+            auto.turn(90);
+        auto.encoderDrive(FASTER_SPEED, 13, 13, 4);
+        // if (!IMUreInit)
+            // auto.turn(0);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
@@ -119,6 +130,7 @@ public class DriveToBeaconsBlueShoot extends LinearOpMode {
         auto.pushButton(); //It uses two color sensors to push the blue side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(155);
-        auto.encoderDrive(FASTER_SPEED, 20, 20, 5);
+        //auto.shoot(5, 2, 1);
+        auto.encoderDrive(FASTER_SPEED, 8, 8, 5);
     }
 }

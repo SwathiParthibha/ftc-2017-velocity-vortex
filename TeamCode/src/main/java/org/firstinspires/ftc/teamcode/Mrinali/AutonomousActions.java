@@ -247,6 +247,8 @@ public class AutonomousActions {
         rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x2a), false);
         rangeA = hardwareMap.i2cDevice.get("r side range");// Primary LEGO Light Sensor
         sideRangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x28), false);
+        rangeSensor.engage();
+        sideRangeSensor.engage();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -259,9 +261,6 @@ public class AutonomousActions {
         imu.initialize(parameters);
 
         initialTilt = frontTilt();
-
-        rangeSensor.engage();
-        sideRangeSensor.engage();
 
         //angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         //origAngle = angles.firstAngle;
@@ -366,10 +365,12 @@ public class AutonomousActions {
             telemetry.update();
             opMode.idle();
 
+            /*
             if (imu.getLinearAcceleration().zAccel < 0.2) {
                 leftMotor.setPower(APPROACH_SPEED * .4);
                 rightMotor.setPower(APPROACH_SPEED * .4);
             }
+            */
         }
 
         // Stop all motors
@@ -617,6 +618,46 @@ public class AutonomousActions {
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
+    public void followLineBlueSide1() throws InterruptedException {
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        telemetry.addLine("Following Line");
+        leftMotor.setPower(.2);
+        rightMotor.setPower(-.2);
+        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            opMode.idle();
+        }
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
+            telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Light", lightSensor.getLightDetected());
+            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(0);
+            } else {
+                telemetry.addLine("Moving left");
+                if (IMUheading() < -90) {        // to the right of line, expected
+                    leftMotor.setPower(0);
+                    rightMotor.setPower(0.2);
+                } else {
+                    leftMotor.setPower(0.2);
+                    rightMotor.setPower(0);
+                }
+            }
+            telemetry.update();
+
+            opMode.idle();
+        }
+        stopRobot();
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
     public void followLineRedSide() throws InterruptedException {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -695,30 +736,41 @@ public class AutonomousActions {
         leftMotor.setPower(.1);
         rightMotor.setPower(.1);
 
+        int expectedAngle = 0;
+        if (color == AllianceColor.BLUE) {
+            expectedAngle = -90;
+        }
+        else if (color == AllianceColor.RED)
+            expectedAngle = 90;
+
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11.5) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
             telemetry.addData("Light", lightSensor.getLightDetected());
             telemetry.addData("Angle", IMUheading());
 
-            int expectedAngle = 0;
-            if (color == AllianceColor.BLUE) {
-                expectedAngle = -90;
-            }
-            else if (color == AllianceColor.RED)
-                expectedAngle = 90;
-
-            if (lightSensor.getLightDetected() < WHITE_THRESHOLD) {
-                if (IMUheading() < expectedAngle) {
-                    leftMotor.setPower(-.1);
-                    rightMotor.setPower(.2);
-                } else if (IMUheading() > expectedAngle) {
-                    leftMotor.setPower(.2);
-                    rightMotor.setPower(-.1);
+            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+                /*
+                if (color == AllianceColor.BLUE) {
+                    telemetry.addLine("Moving right");
+                    leftMotor.setPower(0.2);
+                    rightMotor.setPower(0);
+                } else if (color == AllianceColor.RED) {
+                    telemetry.addLine("Moving left");
+                    leftMotor.setPower(0);
+                    rightMotor.setPower(0.2);
                 }
-            }
-            else {
-                leftMotor.setPower(.1);
-                rightMotor.setPower(.1);
+                */
+                telemetry.addLine("Moving right");
+                leftMotor.setPower(0.2);
+                rightMotor.setPower(0);
+            } else {
+                if (IMUheading() < expectedAngle) {
+                    leftMotor.setPower(0);
+                    rightMotor.setPower(0.2);
+                } else if (IMUheading() > expectedAngle) {
+                    leftMotor.setPower(0.2);
+                    rightMotor.setPower(0);
+                }
             }
             telemetry.update();
 
@@ -746,6 +798,7 @@ public class AutonomousActions {
         time.reset();
 
         boolean wrongColor;
+        int wrongColorCount = 0;
 
         do {
             telemetry.addData("Time", time.seconds());
@@ -778,11 +831,14 @@ public class AutonomousActions {
                     telemetry.log().add("beacon is red");
                     telemetry.update();
 
+                    wrongColor = true;
+                    wrongColorCount++;
+                    if (wrongColorCount == 1)
+                        opMode.sleep(4000);
                     //opMode.sleep(4000); // wait 5 seconds total
                     leftMotor.setPower(APPROACH_SPEED * .6);
                     rightMotor.setPower(APPROACH_SPEED * .6);
 
-                    wrongColor = true;
                 } else if (getcmUltrasonic(rangeSensor) > 8) {
                     telemetry.log().add("too far");
                     encoderDrive(APPROACH_SPEED * .6, 1, 1, 1);
@@ -815,11 +871,13 @@ public class AutonomousActions {
                     telemetry.log().add("beacon is blue");
                     telemetry.update();
 
+                    wrongColor = true;
+                    wrongColorCount++;
+                    if (wrongColorCount == 1)
+                        opMode.sleep(4000);
                     //opMode.sleep(4000); // wait 5 seconds total
                     leftMotor.setPower(APPROACH_SPEED * .6);
                     rightMotor.setPower(APPROACH_SPEED * .6);
-
-                    wrongColor = true;
                 } else if (getcmUltrasonic(rangeSensor) > 8) {
                     encoderDrive(APPROACH_SPEED * .6, 1, 1, 1);
                 } else {
@@ -899,60 +957,82 @@ public class AutonomousActions {
         int newLeftTarget;
         int newRightTarget;
 
-        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Ensure that the opmode is still active
 
         // Determine new target position, and pass to motor controller
         newLeftTarget = leftMotor.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
         newRightTarget = rightMotor.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
-        leftMotor.setTargetPosition(newLeftTarget);
-        rightMotor.setTargetPosition(newRightTarget);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //leftMotor.setTargetPosition(newLeftTarget);
+        //rightMotor.setTargetPosition(newRightTarget);
 
         // Turn On RUN_TO_POSITION
-        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // reset the timeout time and start motion.
         runtime.reset();
 
-        leftMotor.setPower(Math.abs(speed));
-        rightMotor.setPower(Math.abs(speed));
+        leftMotor.setPower(Math.signum(leftInches)*Math.abs(speed));
+        rightMotor.setPower(Math.signum(rightInches)*Math.abs(speed));
 
+        boolean motorSide = false;
         while (opMode.opModeIsActive() &&
                 (runtime.seconds() < timeoutS) &&
-                (leftMotor.isBusy() && rightMotor.isBusy())) {
+                //(leftMotor.isBusy() && rightMotor.isBusy())
+                encoderCheck(newLeftTarget, newRightTarget, Math.signum(leftInches))) {
 
             // Display it for the driver.
             telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
             telemetry.addData("Path2", "Running at %7d :%7d",
                     leftMotor.getCurrentPosition(),
                     rightMotor.getCurrentPosition());
-            telemetry.addData("Left motor busy", leftMotor.isBusy());
-            telemetry.addData("Right motor busy", rightMotor.isBusy());
+            telemetry.addData("Left motor busy", leftMotor.getZeroPowerBehavior());
+            telemetry.addData("Right motor busy", rightMotor.getZeroPowerBehavior());
             telemetry.update();
 
             /*
             if (speed >= .5
-                    && Math.abs(newLeftTarget - leftMotor.getCurrentPosition()) < 3*ROTATION
-                    && Math.abs(newRightTarget - rightMotor.getCurrentPosition()) < 3*ROTATION) {
-                rightMotor.setPower(rightMotor.getPower() - 0.05*speed);
-                leftMotor.setPower(leftMotor.getPower() - 0.05*speed);
+                    && Math.abs(newLeftTarget - leftMotor.getCurrentPosition()) < 4*ROTATION
+                    && Math.abs(newRightTarget - rightMotor.getCurrentPosition()) < 4*ROTATION) {
+                if (motorSide) {
+                    rightMotor.setPower(rightMotor.getPower() - 0.1 * speed);
+                    leftMotor.setPower(leftMotor.getPower() - 0.1 * speed);
+                } else {
+                    leftMotor.setPower(leftMotor.getPower() - 0.1 * speed);
+                    rightMotor.setPower(rightMotor.getPower() - 0.1 * speed);
+                }
+                leftMotor.setPower(leftMotor.getPower() - 0.1 * speed);
+                rightMotor.setPower(rightMotor.getPower() - 0.1 * speed);
+                motorSide = !motorSide;
+                opMode.sleep(200);
             }
             */
 
             opMode.idle();
         }
         // Stop all motion;
-        leftMotor.setPower(0);
         rightMotor.setPower(0);
+        leftMotor.setPower(0);
 
         // Turn off RUN_TO_POSITION
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //  opMode.sleep(250);   // optional pause after each move
+    }
+
+    boolean encoderCheck(int leftTarget, int rightTarget, double direction) {
+        return (direction == 1 &&
+                    leftMotor.getCurrentPosition() < leftTarget &&
+                    rightMotor.getCurrentPosition() < rightTarget) ||
+                (direction == -1 &&
+                    leftMotor.getCurrentPosition() > leftTarget &&
+                    rightMotor.getCurrentPosition() > rightTarget);
     }
 
     public void encoderDriveCheckTilt(double speed,
@@ -1019,7 +1099,7 @@ public class AutonomousActions {
         //  opMode.sleep(250);   // optional pause after each move
     }
 
-    public void shoot(double distance, double spinupTime, int balls) {
+    public void shoot(double distance, double spinupTime, int balls) throws InterruptedException {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(40);
 
@@ -1041,50 +1121,7 @@ public class AutonomousActions {
         double speed = 0.3;
         double timeBetweenBalls = 2;
 
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        int newLeftTarget;
-        int newRightTarget;
-
-        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        // Determine new target position, and pass to motor controller
-        newLeftTarget = leftMotor.getCurrentPosition() + (int) (distance * COUNTS_PER_INCH);
-        newRightTarget = rightMotor.getCurrentPosition() + (int) (distance * COUNTS_PER_INCH);
-        leftMotor.setTargetPosition(newLeftTarget);
-        rightMotor.setTargetPosition(newRightTarget);
-
-        // Turn On RUN_TO_POSITION
-        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftMotor.setPower(Math.abs(speed));
-        rightMotor.setPower(Math.abs(speed));
-        while (opMode.opModeIsActive() &&
-                (leftMotor.isBusy() && rightMotor.isBusy())) {
-
-            // Display it for the driver.
-            telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
-            telemetry.addData("Path2", "Running at %7d :%7d",
-                    leftMotor.getCurrentPosition(),
-                    rightMotor.getCurrentPosition());
-            telemetry.update();
-
-            opMode.idle();
-        }
-        // Stop all motion;
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-
-        // Turn off RUN_TO_POSITION
-        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
+        encoderDrive(speed, distance, distance, distance + 3);
         //finished running forward, spin up shooters
         ElapsedTime shootTime = new ElapsedTime();
         while (opMode.opModeIsActive() && shootTime.seconds() < spinupTime);
@@ -1112,6 +1149,7 @@ public class AutonomousActions {
             }
         }
 
+        opMode.sleep(1000);
         //end the threads
         executorService.shutdown();
         scheduledExecutorService.shutdown();

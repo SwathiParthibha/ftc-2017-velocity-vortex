@@ -98,7 +98,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDrive(0.3, 3, 3, 3);
+        auto.encoderDrive(0.3, 4, 4, 3);
         auto.turn(45); //The robot uses the IMU to turn to 45 degrees
         auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
         auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
@@ -107,11 +107,19 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.followLine();
         auto.pushButton(); //The robot then uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
-        auto.turn(0); //and turns parallel to the beacon using the IMU
-        if (Math.abs(auto.IMUheading()) > 5)
-            auto.turn(0);
+        boolean IMUreInit = false;
+        if (auto.IMUheading() == 0) {
+            auto.imu.initialize();
+            IMUreInit = true;
+        }
+        if (!IMUreInit) {
+            auto.turn(0); //and turns parallel to the beacon using the IMU
+            sleep(200);
+            if (Math.abs(auto.IMUheading()) > 7)
+                auto.turn(0);
+        } else
+            auto.turn(-90);
         auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
-        auto.turn(0);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
@@ -120,6 +128,6 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.pushButton(); //It uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(-155);
-        auto.encoderDrive(FASTER_SPEED, 20, 20, 5);
+        auto.encoderDrive(FASTER_SPEED, 8, 8, 5);
     }
 }
