@@ -245,7 +245,7 @@ public class SWIMUGyro extends TrcGyro
         //
         if (dataType == DataType.ROTATION_RATE)
         {
-            xRateData = gyro.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX).secondAngle;
+            xRateData = gyro.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX).thirdAngle;
         }
         SensorData<Double> data = new SensorData<>(TrcUtil.getCurrentTime(), xRateData);
 

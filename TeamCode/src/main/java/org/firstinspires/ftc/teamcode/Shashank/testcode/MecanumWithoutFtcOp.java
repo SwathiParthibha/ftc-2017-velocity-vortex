@@ -6,13 +6,13 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import java.util.HashMap;
 
 import ftclib.FtcDcMotor;
 import hallib.HalDashboard;
 import swlib.SWGamePad;
-import swlib.SWIMUGyro;
 import swlib.SWMRGyro;
 import trclib.TrcDriveBase;
 import trclib.TrcGyro;
@@ -30,9 +30,9 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
     private FtcDcMotor rightFrontMotor;
     private FtcDcMotor rightRearMotor;
     private TrcDriveBase driveBase = null;
+    private SWMRGyro gyro = null;
     private SWGamePad gamepad;
     private boolean fixedOnTarget = false;
-    private SWIMUGyro swimuGyro = null;
     private HalDashboard dashboard = null;
     private final int LABEL_WIDTH = 200;
     private boolean setYInverted = true;
@@ -81,8 +81,8 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         DbgLog.msg("> INIT" + "STARTED INIT");
 
         DbgLog.msg("> INIT" + "STARTED OBJECT CREATION OF GYRO");
-        swimuGyro = new SWIMUGyro(hardwareMap, "gyro", null);
-        swimuGyro.calibrate();
+        gyro = new SWMRGyro(hardwareMap, "gyro", null);
+        gyro.calibrate();
         DbgLog.msg("> INIT" + "FINISHED OBJECT CREATION OF GYRO");
 
         DbgLog.msg("> INIT" + "GENERATING MOTORS");
@@ -106,74 +106,50 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
 
         DbgLog.msg("> INIT" + "INITING TRCDRIVEBASE");
         driveBase = new TrcDriveBase(
-                leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, swimuGyro);
+                leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, gyro);
         /*driveBase = new TrcDriveBase(
                 leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);*/
         DbgLog.msg("> INIT" + "FINISHED INITING TRCDRIVEBASE");
 
+        DbgLog.msg("> INIT" + "ENABLING GYRO");
+        gyro.setEnabled(true);
+        DbgLog.msg("> INIT" + "FINISHED ENABLING GYRO");
+
         DbgLog.msg("> INIT" + "CREATING GAMEPAD");
-        gamepad = new SWGamePad("driver gamepad", gamepad1, this);
-        gamepad1.setJoystickDeadzone(0.05F);
+        gamepad = new SWGamePad("driver gamepad", gamepad1, 0.05F, this);
         gamepad.enableDebug(true);
         DbgLog.msg("> INIT" + "FINISHED CREATING GAMEPAD");
 
-        DbgLog.msg("> INIT" + "WAITING FOR GYRO TO CALIBRATE");
-        // make sure the gyro is calibrated.
-        /*while (gyro.isCalibrating())  {
-            sleep(50);
-        }*/
-        DbgLog.msg("> INIT" + "FINISHED WAITING FOR GYRO TO CALIBRATE");
-
-        DbgLog.msg("> INIT" + "ENABLING GYRO");
-        swimuGyro.setEnabled(true);
-        DbgLog.msg("> INIT" + "FINISHED ENABLING GYRO");
-
-        //DbgLog.msg("> INIT" + "DISABLING GYRO ASSIST");
-        //driveBase.disableGyroAssist();
-        //DbgLog.msg("> INIT" + "FINISHED DISABLING GYRO ASSIST");
-
-        DbgLog.msg("> INIT" + "ENABLING GYRO ASSIST");
-        //driveBase.enableGyroAssist(0.00001, 0.05);
-        DbgLog.msg("> INIT" + "FINISHED ENABLING GYRO ASSIST");
+        driveBase.enableGyroAssist(0.0001, 0.05);
 
         DbgLog.msg("> INIT" + "FINISHED INIT");
     }
 
     @Override
     public void loop() {
-        double x = 0;
-        double y = 0;
-        x = gamepad.getLeftStickX(false) * (setXInverted ? -1:1);;
-        y = gamepad.getLeftStickY(false);
+        taskMgr.executeTaskType(TrcTaskMgr.TaskType.PREPERIODIC_TASK, TrcRobot.RunMode.TELEOP_MODE);
+        taskMgr.executeTaskType(TrcTaskMgr.TaskType.PRECONTINUOUS_TASK, TrcRobot.RunMode.TELEOP_MODE);
+        taskMgr.executeTaskType(TrcTaskMgr.TaskType.PREPERIODIC_TASK, TrcRobot.RunMode.AUTO_MODE);
+        taskMgr.executeTaskType(TrcTaskMgr.TaskType.PRECONTINUOUS_TASK, TrcRobot.RunMode.AUTO_MODE);
 
         gamepad.setYInverted(setYInverted);
-        if(swimuGyro.getRawZData(TrcGyro.DataType.HEADING).value > 97
-                && swimuGyro.getRawZData(TrcGyro.DataType.HEADING).value < 278){
-            y = y * -1;
-            x = x * -1;
-        }
-
         double rotation = gamepad.getRightStickX();
-        TrcSensor.SensorData<Double> sensorData = swimuGyro.getZHeading();
-        driveBase.mecanumDrive_Cartesian(x, y, rotation, false,
-                fixedOnTarget? sensorData.value: 0.0);
-        dashboard.displayPrintf(0, LABEL_WIDTH, "x: ", "%.2f", x);
-        dashboard.displayPrintf(1, LABEL_WIDTH, "y: ", "%.2f", y);
+        double magnitude = Range.clip(gamepad.getLeftStickMagnitude(), 0, 1);
+        double direction = ((gamepad.getLeftStickDirectionDegrees(true) + 360) % 360) - gyro.getRawZData(TrcGyro.DataType.HEADING).value;
+
+        if(gamepad.getLeftStickX() == 0 && gamepad.getLeftStickY() == 0)
+            magnitude = 0;
+
+        driveBase.mecanumDrive_Polar(magnitude, direction, rotation);
+
         dashboard.displayPrintf(2, LABEL_WIDTH, "rotation: ", "%.2f", rotation);
-        dashboard.displayPrintf(3, LABEL_WIDTH, "gyro trc: ", "%.2f", swimuGyro.getRawZData(TrcGyro.DataType.HEADING).value);
-        dashboard.displayPrintf(4, LABEL_WIDTH, "gyro trc rate: ", "%.2f", swimuGyro.getRawZData(TrcGyro.DataType.ROTATION_RATE).value);
-        dashboard.displayPrintf(5, LABEL_WIDTH, "gamepad left stick direction: ", "%.2f", gamepad.getLeftStickDirectionDegrees(true));
-        dashboard.displayPrintf(6, LABEL_WIDTH, "gamepad left stick " +
-                "magnitude: ", "%.2f", gamepad.getLeftStickMagnitude());
-        dashboard.displayPrintf(7, LABEL_WIDTH, "gamepad right stick x: ", "%.2f", gamepad.getRightStickX());
-        dashboard.displayPrintf(8, LABEL_WIDTH, "gamepad right stick x * -1: ", "%.2f", gamepad.getRightStickX()*-1);
+        dashboard.displayPrintf(5, LABEL_WIDTH, "gamepad left stick direction true: ", "%.2f", gamepad.getLeftStickDirectionDegrees(true));
+        dashboard.displayPrintf(6, LABEL_WIDTH, "gamepad left stick direction false: ", "%.2f", gamepad.getLeftStickDirectionDegrees(false));
+        dashboard.displayPrintf(7, LABEL_WIDTH, "gamepad right stick x: ", "%1.2f", gamepad.getRightStickX());
+        dashboard.displayPrintf(8, LABEL_WIDTH, "gamepad right stick y: ", "%1.2f", gamepad.getRightStickY());
         dashboard.displayPrintf(9, LABEL_WIDTH, "y inverted: ", "%b", setYInverted);
         dashboard.displayPrintf(10, LABEL_WIDTH, "x inverted: ", "%b", setXInverted);
         dashboard.displayPrintf(11, LABEL_WIDTH, "fixedOnTarget: ", "%b", fixedOnTarget);
-        dashboard.displayPrintf(12, LABEL_WIDTH, "front left motor power: ", "%.2f", leftFrontMotor.getPower());
-        dashboard.displayPrintf(13, LABEL_WIDTH, "front right motor power: ", "%.2f", rightFrontMotor.getPower());
-        dashboard.displayPrintf(14, LABEL_WIDTH, "back lwft motor power: ", "%.2f", leftRearMotor.getPower());
-        dashboard.displayPrintf(15, LABEL_WIDTH, "back right motor power: ", "%.2f", rightRearMotor.getPower());
     }
 
     private ElapsedTime getButtonElapsedTime(int button){
@@ -193,12 +169,16 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
             switch (button)
             {
                 case SWGamePad.GAMEPAD_A:
-                    driveBase.enableGyroAssist(0.00001, 0.05);
+                    //driveBase.enableGyroAssist(0.00001, 0.05);
                     break;
 
                 case SWGamePad.GAMEPAD_Y:
+                    DbgLog.msg("PRESSED VALUE IS value %b", pressed);
+                    DbgLog.msg("PRESSED VALUE IS value %0.2f", getButtonElapsedTime(button).seconds());
                     if(pressed && getButtonElapsedTime(button).seconds() > 1){
-                        toggleBoolean(button, fixedOnTarget);
+                        DbgLog.msg("inverting value");
+                        fixedOnTarget = !fixedOnTarget;
+                        getButtonElapsedTime(button).reset();
                     }
                     break;
 
@@ -206,7 +186,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
                     break;
 
                 case SWGamePad.GAMEPAD_B:
-                    driveBase.disableGyroAssist();
+                    //driveBase.disableGyroAssist();
                     break;
 
                 case SWGamePad.GAMEPAD_RBUMPER:
@@ -217,7 +197,11 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
 
                 case SWGamePad.GAMEPAD_DPAD_UP:
                     if(pressed && getButtonElapsedTime(button).seconds() > 1){
-                        toggleBoolean(button, setYInverted);
+                        if(!checkToggleTime(button))
+                            break;
+
+                        setYInverted = !setYInverted;
+                        getButtonElapsedTime(button).reset();
                     }
                     break;
 
@@ -226,16 +210,19 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
 
                 case SWGamePad.GAMEPAD_DPAD_RIGHT:
                     if(pressed && getButtonElapsedTime(button).seconds() > 1){
-                        toggleBoolean(button, setXInverted);
+                        if(!checkToggleTime(button))
+                            break;
+
+                        setXInverted = !setXInverted;
+                        getButtonElapsedTime(button).reset();
                     }
                     break;
             }
         }
     }
 
-    private void toggleBoolean(int button, boolean value){
-        value = !value;
-        getButtonElapsedTime(button).reset();
+    private boolean checkToggleTime(int button){
+        return (getButtonElapsedTime(button).seconds() > 0.75);
     }
 
 }
