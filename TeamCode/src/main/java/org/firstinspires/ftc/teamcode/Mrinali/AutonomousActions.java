@@ -361,6 +361,11 @@ public class AutonomousActions {
         }
         */
 
+        int leftPos = leftMotor.getCurrentPosition();
+        int rightPos = rightMotor.getCurrentPosition();
+        ElapsedTime searchTime = new ElapsedTime();
+        searchTime.reset();
+
         while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
 
             // Display the light level while we are looking for the line
@@ -368,9 +373,15 @@ public class AutonomousActions {
             telemetry.update();
             opMode.idle();
 
-            if (imu.getLinearAcceleration().zAccel < 0.1) {
-                leftMotor.setPower(APPROACH_SPEED * .4);
-                rightMotor.setPower(APPROACH_SPEED * .4);
+            if (searchTime.seconds() > .2) {
+                if (leftPos == leftMotor.getCurrentPosition()
+                        && rightPos == rightMotor.getCurrentPosition()) {
+                    leftMotor.setPower(APPROACH_SPEED * .4);
+                    rightMotor.setPower(APPROACH_SPEED * .4);
+                }
+                leftPos = leftMotor.getCurrentPosition();
+                rightPos = rightMotor.getCurrentPosition();
+                searchTime.reset();
             }
         }
 
@@ -539,8 +550,8 @@ public class AutonomousActions {
         } else if (Math.abs(difference) < 45) {
             return 0.1;
         } else if (Math.abs(difference) < 90) {
-            return 0.3;
-        } else return 0.5;
+            return 0.2;
+        } else return 0.4;
     }
 
     void resetIMuandPos(int left, int right) throws InterruptedException { //resets IMU to 0 at starting position of turn
