@@ -65,7 +65,7 @@ public class DriveToBeaconsBlue extends LinearOpMode {
 
     /* Declare OpMode members. */
     AutonomousActions auto = new AutonomousActions(this);
-    double FASTER_SPEED = .75;
+    double FASTER_SPEED = .7;
 
     @Override
     public void runOpMode() throws InterruptedException {

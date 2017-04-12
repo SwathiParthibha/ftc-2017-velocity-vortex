@@ -205,7 +205,7 @@ public class MecanumAuto {
             } else if (getcmUltrasonic(rangeSensor) > 44) {
                 driveBase.mecanumDrive_Polar(.3, 90, 0); // move left
             } else {
-                driveBase.mecanumDrive_Polar(.2, 0, 0); // drive forward
+                driveBase.mecanumDrive_Polar(.15, 0, 0); // drive forward
             }
 
             // Display the light level while we are looking for the line
