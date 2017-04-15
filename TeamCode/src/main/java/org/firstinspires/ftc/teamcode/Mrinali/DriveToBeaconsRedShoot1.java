@@ -57,11 +57,11 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Red", group="Pushbot")
+@Autonomous(name="Beacons Red Shoot End", group="Pushbot")
 //@Disabled
-public class DriveToBeaconsRed extends LinearOpMode {
+public class DriveToBeaconsRedShoot1 extends LinearOpMode {
 
-    //To change red to blue: negative angles, color sensors sense blue, right side range sensor
+    //To change blue to red: positive angles, red line follow and button push
 
     /* Declare OpMode members. */
     AutonomousActions auto = new AutonomousActions(this);
@@ -76,11 +76,9 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.init(hardwareMap, telemetry, AllianceColor.RED);
 
         telemetry.addData("verify", auto.verify()); //checks color sensors
-        telemetry.addData("leftColorSensor", auto.leftColorSensor.argb());
-        telemetry.addData("rightColorSensor", auto.rightColorSensor.argb());
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to runIMU");
+        telemetry.addData("Status", "Ready to runIMU");    //
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
@@ -110,6 +108,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
         boolean IMUreInit = false;
         if (auto.IMUheading() == 0) {
+            telemetry.log().add("IMU crashed");
             auto.imu.initialize();
             IMUreInit = true;
         }
@@ -117,10 +116,10 @@ public class DriveToBeaconsRed extends LinearOpMode {
             auto.turn(0); //and turns parallel to the beacon using the IMU
             sleep(200);
             if (Math.abs(auto.IMUheading()) > 7)
-                auto.turn(0);
+                auto.turn(-3);
         } else
             auto.turn(-90);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
+        auto.encoderDrive(FASTER_SPEED, 13, 13, 4);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
@@ -129,6 +128,7 @@ public class DriveToBeaconsRed extends LinearOpMode {
         auto.pushButton(); //It uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(-155);
+        auto.shoot(0, 2, 1);
         auto.encoderDrive(FASTER_SPEED, 10, 10, 5);
     }
 }

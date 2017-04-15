@@ -57,15 +57,14 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Beacons Red", group="Pushbot")
+@Autonomous(name="Turn Test", group="Pushbot")
 //@Disabled
-public class DriveToBeaconsRed extends LinearOpMode {
+public class TurnTest extends LinearOpMode {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
     AutonomousActions auto = new AutonomousActions(this);
-    double FASTER_SPEED = .7;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -73,20 +72,15 @@ public class DriveToBeaconsRed extends LinearOpMode {
         /* Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        auto.init(hardwareMap, telemetry, AllianceColor.RED);
-
-        telemetry.addData("verify", auto.verify()); //checks color sensors
-        telemetry.addData("leftColorSensor", auto.leftColorSensor.argb());
-        telemetry.addData("rightColorSensor", auto.rightColorSensor.argb());
+        auto.init(hardwareMap, telemetry, AllianceColor.BLUE);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to runIMU");
+        telemetry.addData("Status", "Ready to Run");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         while (!isStarted()) {
 
-            // Display the light level while we are waiting to start
             telemetry.addData("Light Level 1", auto.lightSensor.getLightDetected());
             telemetry.addData("Light Level 2", auto.lightSensor2.getLightDetected());
             telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
@@ -99,36 +93,22 @@ public class DriveToBeaconsRed extends LinearOpMode {
             idle();
         }
 
-        auto.encoderDrive(0.3, 4, 4, 3);
-        auto.turn(45); //The robot uses the IMU to turn to 45 degrees
-        auto.encoderDrive(FASTER_SPEED, 14, 14, 7);
-        auto.toWhiteLine(false); //and then proceeds to the white line using encoders and a NXT light sensor
-
-        sleep(100);
-        auto.twoSensorLineFollow();
-        auto.pushButton(); //The robot then uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again.
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup, auto.backup, 3); //The robot then moves backward using encoders
-        boolean IMUreInit = false;
-        if (auto.IMUheading() == 0) {
-            auto.imu.initialize();
-            IMUreInit = true;
+        auto.turn(0);
+        while (opModeIsActive()) {
+            telemetry.addData("Angle", auto.IMUheading());
+            telemetry.addData("X Velocity", auto.imu.getVelocity().xVeloc);
+            telemetry.addData("Y Velocity", auto.imu.getVelocity().yVeloc);
+            telemetry.addData("Z Velocity", auto.imu.getVelocity().zVeloc);
+            telemetry.addData("X Acceleration", auto.imu.getAcceleration().xAccel);
+            telemetry.addData("Y Acceleration", auto.imu.getAcceleration().yAccel);
+            telemetry.addData("Z Acceleration", auto.imu.getAcceleration().zAccel);
+            telemetry.addData("X Linear Acceleration", auto.imu.getLinearAcceleration().xAccel);
+            telemetry.addData("Y Linear Acceleration", auto.imu.getLinearAcceleration().yAccel);
+            telemetry.addData("Z Linear Acceleration", auto.imu.getLinearAcceleration().zAccel);
+            telemetry.addData("X Overall Acceleration", auto.imu.getOverallAcceleration().xAccel);
+            telemetry.addData("Y Overall Acceleration", auto.imu.getOverallAcceleration().yAccel);
+            telemetry.addData("Z Overall Acceleration", auto.imu.getOverallAcceleration().zAccel);
+            telemetry.update();
         }
-        if (!IMUreInit) {
-            auto.turn(0); //and turns parallel to the beacon using the IMU
-            sleep(200);
-            if (Math.abs(auto.IMUheading()) > 7)
-                auto.turn(0);
-        } else
-            auto.turn(-90);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
-        //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
-        //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
-        auto.toWhiteLine(true); //It advances to the next white line
-        sleep(100);
-        auto.twoSensorLineFollow();
-        auto.pushButton(); //It uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
-        auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
-        auto.turn(-155);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 5);
     }
 }

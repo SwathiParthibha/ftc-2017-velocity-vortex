@@ -33,11 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.Pranav;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -59,9 +55,9 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="MecanumAutoV1", group="Pushbot")
-@Disabled
-public class MecanumAutoV1 extends LinearOpMode
+@Autonomous(name="MecanumAutoV3", group="Pushbot")
+//@Disabled
+public class MecanumAutoV3 extends LinearOpMode
 {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
@@ -69,12 +65,15 @@ public class MecanumAutoV1 extends LinearOpMode
     /* Declare OpMode members. */
     MecanumHardware mecanum = new MecanumHardware(this);
 
+
     @Override
     public void runOpMode() throws InterruptedException
     {
         mecanum.init(hardwareMap);
 
+
         waitForStart();
+
 
         /*
 
@@ -90,21 +89,11 @@ public class MecanumAutoV1 extends LinearOpMode
 
 
 
-        mecanum.driveDiagonalGyro("NW", mecanum.ROTATION * 10, 0.6, 0);
-
-        sleep(100);
-
-        mecanum.driveSideways("left", mecanum.ROTATION * 3, 0.6);
-
-        sleep(100);
-
- //       mecanum.pushButton("red");
+        //mecanum.driveDiagonalIMU("NW", mecanum.ROTATION * 10, 0.9, 0);
 
 
-        while(!isStarted())
-        {
-            telemetry.addData("IMU Heading", mecanum.IMUHeading());
-        }
+        mecanum.pushButton("red");
 
+        //mecanum.stopRobot();
     }
 }
