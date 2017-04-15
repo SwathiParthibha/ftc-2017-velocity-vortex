@@ -19,7 +19,7 @@ public class MecanumRobotShooter extends OpMode implements Runnable{
     private final double LOADED_POSITION_TRIGGER = 0.557;
     private final double SHOOT_POSITION_TRIGGER = 0.428;
     private final double START_POSITION_ANGULAR = 0.3;
-    private final double START_POSITION_TURRET = 0.457;
+    private final double START_POSITION_TURRET = 0.50;
     private final double SHOOTER_POWER = 1.0;
     private final double REVERSE_SHOOTER_POWER = -0.5;
 
