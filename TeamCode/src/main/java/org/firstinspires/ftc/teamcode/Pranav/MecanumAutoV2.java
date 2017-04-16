@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.Pranav;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
@@ -58,7 +59,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  */
 
 @Autonomous(name="MecanumAutoV2", group="Pushbot")
-//@Disabled
+@Disabled
 public class MecanumAutoV2 extends LinearOpMode
 {
 

@@ -29,8 +29,6 @@ public class ShooterCode extends OpMode
 
     final double AZIMUTH_STOP = 0.455;
 
-
-
     @Override
     public void init()
     {
@@ -46,18 +44,13 @@ public class ShooterCode extends OpMode
 
         shooterServo.setPosition(PARTICLE_HOLDER_ARMED_POSITION);
         angularServo.setPosition(0.2);
-        turretServo.setPosition(0.455);
+        turretServo.setPosition(AZIMUTH_STOP);
 
     }
 
     @Override
     public void loop()
     {
-        if (gamepad1.a)
-        {
-            shooterServo.setPosition(PARTICLE_HOLDER_ARMED_POSITION);
-        }
-
         if (gamepad1.b)
         {
             shooterServo.setPosition(PARTICLE_HOLDER_SHOOT_POSITION);

@@ -1,21 +1,17 @@
-package org.firstinspires.ftc.teamcode.Shashank.testcode;
+package org.firstinspires.ftc.teamcode.Shashank.statemachine.opmodes;
 
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.MecanumStateMachineBuilder;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.states.endconditions.TimerEndConditions;
-
-import java.util.HashMap;
 
 import ftc.electronvolts.statemachine.StateMachine;
 import ftc.electronvolts.statemachine.StateName;
 import ftclib.FtcDcMotor;
 import hallib.HalDashboard;
-import swlib.SWGamePad;
 import swlib.SWIMUGyro;
 import trclib.TrcDriveBase;
 import trclib.TrcTaskMgr;
@@ -23,8 +19,8 @@ import trclib.TrcTaskMgr;
 /**
  * Created by spmeg on 4/14/2017.
  */
-@Autonomous(name = "TestStateMachineOp", group = "group")
-public class TestStateMachineOp extends OpMode {
+@Autonomous(name = "GoSraightStateMachineOp", group = "auto")
+public class GoSraightStateMachineOp extends OpMode {
     private StateMachine stateMachine = null;
     private FtcDcMotor leftFrontMotor;
     private FtcDcMotor leftRearMotor;

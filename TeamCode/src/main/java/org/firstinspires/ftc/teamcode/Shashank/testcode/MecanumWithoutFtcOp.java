@@ -134,7 +134,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         taskMgr.executeTaskType(TrcTaskMgr.TaskType.PRECONTINUOUS_TASK, TrcRobot.RunMode.AUTO_MODE);
 
         gamepad.setYInverted(setYInverted);
-        double rotation = gamepad.getRightStickX();
+        double rotation = gamepad.getRightStickX()*-1;
         double magnitude = Range.clip(gamepad.getLeftStickMagnitude(), 0, 1);
         double direction = ((gamepad.getLeftStickDirectionDegrees(true) + 360) % 360) - gyro.getRawZData(TrcGyro.DataType.HEADING).value;
 

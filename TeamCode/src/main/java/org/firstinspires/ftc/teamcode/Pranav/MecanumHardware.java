@@ -394,6 +394,8 @@ class MecanumHardware
 
             while (frontRight.isBusy() && backLeft.isBusy())
             {
+                if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE) break;
+
                 currentHeading = IMUHeading();
                 headingError = currentHeading - targetAngle;
                 correction = headingError * DRIVE_KP;
@@ -419,6 +421,8 @@ class MecanumHardware
                     e.printStackTrace();
                 }
 
+
+
                 if ((frontRight.getCurrentPosition() > distance)) break;
                 if ((frontLeft.getCurrentPosition() > distance)) break;
                 if ((backRight.getCurrentPosition() > distance)) break;
@@ -439,7 +443,7 @@ class MecanumHardware
 
 
 
-                if (sensorODS.getLightDetected() > LINE_THRESHOLD_VALUE) break;
+
             }
 
             stopRobot();
@@ -1278,15 +1282,21 @@ class MecanumHardware
             {
                 if (sensorColorLeft.blue() >= THRESHOLD_COLOR)
                 {
-                    drive(-ROTATION/2, 0.3);
-                    driveSideways("left", ROTATION / 4, 0.3);
+                    drive(-ROTATION / 6, 0.3);
+                    driveSideways("left", ROTATION / 12, 0.3);
+                    driveSideways("right", ROTATION / 8, 0.3);
+                    drive(ROTATION /6, 0.3);
+                    break;
 
                 }
 
                 if (sensorColorRight.blue() >= THRESHOLD_COLOR)
                 {
-                    drive(ROTATION/2, 0.3);
-                    driveSideways("left", ROTATION / 4, 0.3);
+                    drive(ROTATION / 6, 0.3);
+                    driveSideways("left", ROTATION / 8, 0.3);
+                    driveSideways("right", ROTATION / 8, 0.3);
+                    drive(-ROTATION / 6, 0.3);
+                    break;
                 }
             }
         }
@@ -1410,7 +1420,7 @@ class MecanumHardware
     {
         this.hardwareMap = hardwareMap;
 
-        /*
+
         defineMotors();
 
         defineSensors();
@@ -1422,7 +1432,7 @@ class MecanumHardware
         runUsingEncoder();
 
         initializeSensors();
-        */
+
 
 
         return false;

@@ -34,6 +34,12 @@ package org.firstinspires.ftc.teamcode.Pranav;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+import ftclib.FtcDcMotor;
+import swlib.SWGamePad;
+import swlib.SWIMUGyro;
+import trclib.TrcDriveBase;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -57,43 +63,29 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name="MecanumAutoV3", group="Pushbot")
 //@Disabled
-public class MecanumAutoV3 extends LinearOpMode
+public class MecanumAutoV3 extends OpMode implements SWGamePad.ButtonHandler
 {
 
-    //To change red to blue: negative angles, color sensors sense blue, right side range sensor
-
-    /* Declare OpMode members. */
-    MecanumHardware mecanum = new MecanumHardware(this);
+    private FtcDcMotor leftFrontMotor;
+    private FtcDcMotor leftRearMotor;
+    private FtcDcMotor rightFrontMotor;
+    private FtcDcMotor rightRearMotor;
+    private TrcDriveBase driveBase = null;
+    private SWIMUGyro gyro = null;
 
 
     @Override
-    public void runOpMode() throws InterruptedException
-    {
-        mecanum.init(hardwareMap);
+    public void init() {
 
+    }
 
-        waitForStart();
+    @Override
+    public void loop() {
 
+    }
 
-        /*
+    @Override
+    public void gamepadButtonEvent(SWGamePad gamepad, int button, boolean pressed) {
 
-        mecanum.driveDiagonal("NW", mecanum.ROTATION * 10, 0.6, 0);
-
-        mecanum.turnGyro("right", 85, 0.3);
-
-        mecanum.driveSideways("left", mecanum.ROTATION * 10, 0.6, 85);
-
-        //mecanum.turnGyro("right", 90, 0.5);
-
-        */
-
-
-
-        //mecanum.driveDiagonalIMU("NW", mecanum.ROTATION * 10, 0.9, 0);
-
-
-        mecanum.pushButton("red");
-
-        //mecanum.stopRobot();
     }
 }
