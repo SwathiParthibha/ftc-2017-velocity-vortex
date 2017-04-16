@@ -1162,6 +1162,18 @@ public class SwDriveBase implements TrcTaskMgr.Task
         mecanumDrive_Polar(magnitude, direction, rotation, false);
     }   //mecanumDrive_Polar
 
+    public void mecanumDrive_PolarFieldCentric(double magnitude, double direction, double rotation)
+    {
+        double directionToGo = ((direction + 360) % 360) - gyro.getRawZData(TrcGyro.DataType.HEADING).value;
+        mecanumDrive_Polar(magnitude, directionToGo, rotation, false);
+    }   //mecanumDrive_Polar
+
+    public void mecanumDrive_PolarFieldCentricAdaptiveControl(double magnitude, double direction, double rotation)
+    {
+        double directionToGo = ((direction + 360) % 360) - gyro.getRawZData(TrcGyro.DataType.HEADING).value;
+        mecanumDrive_PolarAdaptiveControl(magnitude, directionToGo, rotation, false);
+    }   //mecanumDrive_Polar
+
     /**
      * This method normalizes the power to the four wheels for mecanum drive.
      *

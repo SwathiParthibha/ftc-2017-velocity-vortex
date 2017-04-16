@@ -5,4 +5,5 @@ package org.firstinspires.ftc.teamcode.Shashank.utils;
  */
 
 public class TestAuotInit {
+    //AutoInit autoInit = new AutoInit(this);
 }

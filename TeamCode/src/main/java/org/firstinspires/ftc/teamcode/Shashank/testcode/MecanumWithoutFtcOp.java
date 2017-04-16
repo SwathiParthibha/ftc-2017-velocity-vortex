@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Shashank.testcode;
 
 import com.qualcomm.ftccommon.DbgLog;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,11 +13,9 @@ import ftclib.FtcDcMotor;
 import hallib.HalDashboard;
 import swlib.SWGamePad;
 import swlib.SWIMUGyro;
-import swlib.SWMRGyro;
+import swlib.SwDriveBase;
 import trclib.TrcDriveBase;
-import trclib.TrcGyro;
 import trclib.TrcRobot;
-import trclib.TrcSensor;
 import trclib.TrcTaskMgr;
 
 /**
@@ -30,7 +27,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
     private FtcDcMotor leftRearMotor;
     private FtcDcMotor rightFrontMotor;
     private FtcDcMotor rightRearMotor;
-    private TrcDriveBase driveBase = null;
+    private SwDriveBase driveBase = null;
     private SWIMUGyro gyro = null;
     private SWGamePad gamepad;
     private boolean fixedOnTarget = false;
@@ -106,7 +103,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         DbgLog.msg("> INIT" + "FINISHED CHANGING MODE OF MOTORS");
 
         DbgLog.msg("> INIT" + "INITING TRCDRIVEBASE");
-        driveBase = new TrcDriveBase(
+        driveBase = new SwDriveBase(
                 leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, gyro);
         /*driveBase = new TrcDriveBase(
                 leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);*/
@@ -136,12 +133,12 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         gamepad.setYInverted(setYInverted);
         double rotation = gamepad.getRightStickX()*-1;
         double magnitude = Range.clip(gamepad.getLeftStickMagnitude(), 0, 1);
-        double direction = ((gamepad.getLeftStickDirectionDegrees(true) + 360) % 360) - gyro.getRawZData(TrcGyro.DataType.HEADING).value;
+        double direction = gamepad.getLeftStickDirectionDegrees(true);
 
         if(gamepad.getLeftStickX() == 0 && gamepad.getLeftStickY() == 0)
             magnitude = 0;
 
-        driveBase.mecanumDrive_Polar(magnitude, direction, rotation);
+        driveBase.mecanumDrive_PolarFieldCentric(magnitude, direction, rotation);
 
         dashboard.displayPrintf(2, LABEL_WIDTH, "rotation: ", "%.2f", rotation);
         dashboard.displayPrintf(5, LABEL_WIDTH, "gamepad left stick direction true: ", "%.2f", gamepad.getLeftStickDirectionDegrees(true));
