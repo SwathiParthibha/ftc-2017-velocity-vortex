@@ -108,7 +108,11 @@ public class PowerManager {
 
     public void reset() {
         pidAlgo.reset();
+        defaultPower=Constants.DEFAULT_POWER;
+        currentPower=defaultPower;
     }
+
+
 }
 
 

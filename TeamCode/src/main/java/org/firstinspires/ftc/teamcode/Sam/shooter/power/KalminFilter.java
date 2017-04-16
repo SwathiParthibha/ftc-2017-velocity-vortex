@@ -15,7 +15,7 @@ public class KalminFilter {
     private double prevValue= Constants.REQUESTED_ETPS;
     private double prevError = 1D;
     private double trustVal;
-    private volatile double filteredRPM = 0.0;
+    private volatile double filteredRPM = 0;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public KalminFilter(final ShooterMotor shooterMotor, final OpMode opMode) {
@@ -23,7 +23,7 @@ public class KalminFilter {
             @Override
             public void run() {
                 while(!executorService.isShutdown()){
-                    if(opMode.gamepad2.a)
+                    if(opMode.gamepad2.a || opMode.gamepad2.y)
                         filteredRPM = applyFilter(shooterMotor.getRpm());
                 }
             }
@@ -44,6 +44,11 @@ public class KalminFilter {
 
     public double applyFilter(double rpm){
         trustVal = prevError / (prevError + STD_DEVIATION);
+        if(trustVal<0.05)
+        {
+            trustVal=0.05;
+        }
+
         double filteredData = prevValue + trustVal * (rpm - prevValue);
 
         prevError = (1 - trustVal) * prevError;
