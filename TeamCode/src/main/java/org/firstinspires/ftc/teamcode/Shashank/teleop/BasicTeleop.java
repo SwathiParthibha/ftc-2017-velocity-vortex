@@ -11,7 +11,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
  */
 @TeleOp(name = "BasicTeleop", group = "Teleop")
 @Disabled
-public class BasicTeleop extends OpMode {
+public class BasicTeleop extends OpMode
+{
     private DcMotor leftMotor;
     private DcMotor rightMotor;
 

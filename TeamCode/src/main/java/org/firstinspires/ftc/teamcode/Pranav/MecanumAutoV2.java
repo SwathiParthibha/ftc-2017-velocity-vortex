@@ -35,9 +35,8 @@ package org.firstinspires.ftc.teamcode.Pranav;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import org.firstinspires.ftc.teamcode.Mrinali.AutonomousActions;
-import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -59,22 +58,31 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="MecanumAutoV1", group="Pushbot")
+@Autonomous(name="MecanumAutoV2", group="Pushbot")
 @Disabled
-public class MecanumAutoV1 extends LinearOpMode
+public class MecanumAutoV2 extends LinearOpMode
 {
 
     //To change red to blue: negative angles, color sensors sense blue, right side range sensor
 
     /* Declare OpMode members. */
-    MecanumHardware mecanum = new MecanumHardware(this);
+    //MecanumHardware mecanum = new MecanumHardware(this);
+    DigitalChannelController digitalChannelController;
+
 
     @Override
     public void runOpMode() throws InterruptedException
     {
-        mecanum.init(hardwareMap);
+        //mecanum.init(hardwareMap);
+
+        digitalChannelController.setDigitalChannelMode(7, DigitalChannelController.Mode.INPUT);
 
         waitForStart();
+
+        while(isStarted())
+        {
+            telemetry.addData("INPUT:", digitalChannelController.getDigitalChannelState(7));
+        }
 
         /*
 
@@ -90,21 +98,11 @@ public class MecanumAutoV1 extends LinearOpMode
 
 
 
-        mecanum.driveDiagonalGyro("NW", mecanum.ROTATION * 10, 0.6, 0);
-
-        sleep(100);
-
-        mecanum.driveSideways("left", mecanum.ROTATION * 3, 0.6);
-
-        sleep(100);
-
- //       mecanum.pushButton("red");
+        //mecanum.driveDiagonalIMU("NW", mecanum.ROTATION * 10, 0.9, 0);
 
 
-        while(!isStarted())
-        {
-            telemetry.addData("IMU Heading", mecanum.IMUHeading());
-        }
+      //  mecanum.pushButton("red");
 
+        //mecanum.stopRobot();
     }
 }
