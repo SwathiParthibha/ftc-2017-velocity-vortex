@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.wattnxt.refactored;
 
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
@@ -109,5 +110,6 @@ public class PixyOpMode extends OpMode {
         }
 
         scheduledExecutorService.shutdownNow();
+        DbgLog.msg("PIXY OPMODE STOPPED");
     }
 }

@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.wattnxt.refactored;
 
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -18,6 +21,7 @@ public class PixyCam implements Runnable {
 
     private List<Byte> rawData;
     private List<PixyObject> pixyObjects;
+    private static Integer COUNTER = 0;
 
     public PixyCam(int port, int address, DeviceInterfaceModule dim) {
         this.port = port;
@@ -37,14 +41,22 @@ public class PixyCam implements Runnable {
 
     @Override
     public void run() {
-
-        /*this updates the cache giiven from the controller
+        PixyCam.COUNTER++;
+        DbgLog.msg("> PIXY THREAD: THREAD IS ON ITS " + COUNTER + "nth TIME");
+        /*this updates the cache given from the controller
         The method dim.writeI2cCacheToController(port) updates the cache, by writing to the dim
+
+        The port action is flag is used to tell the controller to execute the transaction
+        in it's buffer. The controller clears the flag when the transaction is complete,
+        which lets software know that it can write another transaction and set the
+        port action flag again.
          */
-        if(dim.isI2cPortActionFlagSet(port))
-            dim.clearI2cPortActionFlag(port);
+        DbgLog.msg("> PIXY THREAD: PORT ACTION FLAG IS " + dim.isI2cPortActionFlagSet(port));
+        if(!dim.isI2cPortActionFlagSet(port))
+            return;
 
         dim.setI2cPortActionFlag(port);
+
         dim.writeI2cCacheToController(port);
 
         /*by telling to enable read mode, we are
@@ -52,11 +64,16 @@ public class PixyCam implements Runnable {
          to read from a specific spot
           */
         dim.enableI2cReadMode(port, this.address, 0, 16);
+        //updates the read cache
         dim.readI2cCacheFromController(port);
+
         try {
             readLock.lock();
+            DbgLog.msg("> PIXY THREAD: SIZE OF READ CHACHE IS: " + readCache.length);
+            DbgLog.msg("> PIXY THREAD: READCACHE IS: " + Arrays.toString(readCache));
             // Value 0..3 is Mode, Address, Location, Length.
             // The data bytes we want come after.
+            //First four bytes are metadata
             for (int i = 4; i < 4+16; i++) {
                 rawData.add(readCache[i]);
             }
