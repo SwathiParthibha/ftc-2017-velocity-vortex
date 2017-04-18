@@ -42,7 +42,7 @@ public class PixyDemo extends OpMode {
             pixyObjectsString += pixyObject.toString() + "\n";
         }
 
-        telemetry.addData("Pixy Cam size", "");
+        telemetry.addData("Pixy Cam size", pixyCam.newObjectCount());
         telemetry.addData("New PixyObjects", pixyObjectsString);
         telemetry.update();
     }
