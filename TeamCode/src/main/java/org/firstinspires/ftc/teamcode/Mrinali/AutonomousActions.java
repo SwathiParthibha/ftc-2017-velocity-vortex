@@ -46,7 +46,6 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -59,12 +58,9 @@ import org.firstinspires.ftc.teamcode.Sam.shooter.RPMThreadMilliseconds;
 import org.firstinspires.ftc.teamcode.Sam.shooter.beans.ShooterMotor;
 import org.firstinspires.ftc.teamcode.Sam.shooter.power.PowerManager;
 import org.firstinspires.ftc.teamcode.Sam.shooter.util.Constants;
-import org.firstinspires.ftc.teamcode.Sam.util.Util;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AutoStateMachineBuilder;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -112,11 +108,9 @@ public class AutonomousActions {
     private Servo capArm;
     private boolean state;
     public DcMotor scooper;
-    public LightSensor lightSensor;      // Primary LEGO Light sensor,
+    public LightSensor lightSensor1;      // Primary LEGO Light sensor,
     public LightSensor lightSensor2;
     public I2cDeviceSynchImpl rangeSensor;
-    public I2cDeviceSynchImpl sideRangeSensor;
-    double sideRange;
     //ModernRoboticsI2cGyro gyro;   // Hardware Device Object
     public ColorSensor leftColorSensor;
     public ColorSensor rightColorSensor;
@@ -130,13 +124,11 @@ public class AutonomousActions {
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
     private ScheduledFuture scheduledFuture = null;
 
-    // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
+    // OpticalDistanceSensor   lightSensor1;   // Alternative MR ODS sensor
     public double angleZ = 0;
 
     static final double WHITE_THRESHOLD = 0.3;  // spans between 0.1 - 0.5 from dark to light
     public static final double APPROACH_SPEED = 0.5;
-    double TURN_POWER_1 = .2;
-    double TURN_POWER_2 = .05;
     double WHEEL_SIZE_IN = 4;
     public int ROTATION = 1220; // # of ticks for 40-1 gear ratio
     static final double DRIVE_GEAR_REDUCTION = 1.5;     // This is < 1.0 if geared UP
@@ -144,10 +136,11 @@ public class AutonomousActions {
     double COUNTS_PER_INCH = (ROTATION * DRIVE_GEAR_REDUCTION) /
             (WHEEL_SIZE_IN * Math.PI) * (40 / GEAR_RATIO);
     double DIST = 18;
-    double SIDE_DIST = 30;
     public double backup = -2.5;
     double overLine1 = 2;
     double overLine2 = 2;
+    double distanceBetweenBeacons = 10;
+    double capBallDistance = 12;
     private double lightDetected = 0.0;
     private final double LEFT_IN_VAL = 0.56;
     private final double RIGHT_IN_VAL = 0.34;
@@ -161,9 +154,7 @@ public class AutonomousActions {
     double rightServoPos = 1.0;
     double capServoPos = 1.0;
     byte[] rangeSensorCache;
-    byte[] sideRangeSensorCache;
     I2cDevice rangeA;
-    I2cDevice rangeB;
     double initialTilt;
 
     private boolean USE_TELEMETRY = false;
@@ -243,14 +234,11 @@ public class AutonomousActions {
         telemetry = telem;
 
         // get a reference to our Light Sensor object.
-        lightSensor = hardwareMap.lightSensor.get("light sensor");
+        lightSensor1 = hardwareMap.lightSensor.get("light sensor");
         lightSensor2 = hardwareMap.lightSensor.get("light sensor 2");
         rangeA = hardwareMap.i2cDevice.get("range sensor");// Primary LEGO Light Sensor
         rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x2a), false);
-        rangeA = hardwareMap.i2cDevice.get("r side range");// Primary LEGO Light Sensor
-        sideRangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x28), false);
         rangeSensor.engage();
-        sideRangeSensor.engage();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -273,7 +261,7 @@ public class AutonomousActions {
         I2cAddr i2cAddr = I2cAddr.create8bit(0x4c);
         rightColorSensor.setI2cAddress(i2cAddr);
 
-        lightSensor.enableLed(true);
+        lightSensor1.enableLed(true);
         lightSensor2.enableLed(true);
     }
 
@@ -366,10 +354,10 @@ public class AutonomousActions {
         ElapsedTime searchTime = new ElapsedTime();
         searchTime.reset();
 
-        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD && lightSensor2.getLightDetected() < WHITE_THRESHOLD) {
+        while (opMode.opModeIsActive() && lightSensor1.getLightDetected() < WHITE_THRESHOLD && lightSensor2.getLightDetected() < WHITE_THRESHOLD) {
 
             // Display the light level while we are looking for the line
-            telemetry.addData("Light Level", lightSensor.getLightDetected());
+            telemetry.addData("Light Level", lightSensor1.getLightDetected());
             telemetry.update();
 
             if (searchTime.seconds() > .2) {
@@ -404,10 +392,10 @@ public class AutonomousActions {
         }
         */
 
-        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+        while (opMode.opModeIsActive() && lightSensor1.getLightDetected() < WHITE_THRESHOLD) {
 
             // Display the light level while we are looking for the line
-            telemetry.addData("Light Level", lightSensor.getLightDetected());
+            telemetry.addData("Light Level", lightSensor1.getLightDetected());
             telemetry.update();
             opMode.idle();
 
@@ -604,16 +592,16 @@ public class AutonomousActions {
         telemetry.addLine("Following Line");
         leftMotor.setPower(.2);
         rightMotor.setPower(-.2);
-        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
-            telemetry.addData("Light", lightSensor.getLightDetected());
+        while (opMode.opModeIsActive() && lightSensor1.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor1.getLightDetected());
             opMode.idle();
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
-            telemetry.addData("Light", lightSensor.getLightDetected());
-            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor1.getLightDetected());
+            if (lightSensor1.getLightDetected() > WHITE_THRESHOLD) {
                 telemetry.addLine("Moving right");
                 leftMotor.setPower(0.2);
                 rightMotor.setPower(0);
@@ -639,16 +627,16 @@ public class AutonomousActions {
         telemetry.addLine("Following Line");
         leftMotor.setPower(.2);
         rightMotor.setPower(-.2);
-        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
-            telemetry.addData("Light", lightSensor.getLightDetected());
+        while (opMode.opModeIsActive() && lightSensor1.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor1.getLightDetected());
             opMode.idle();
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
-            telemetry.addData("Light", lightSensor.getLightDetected());
-            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor1.getLightDetected());
+            if (lightSensor1.getLightDetected() > WHITE_THRESHOLD) {
                 telemetry.addLine("Moving right");
                 leftMotor.setPower(0.2);
                 rightMotor.setPower(0);
@@ -679,16 +667,16 @@ public class AutonomousActions {
         telemetry.addLine("Following Line");
         leftMotor.setPower(-.2);
         rightMotor.setPower(.2);
-        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
-            telemetry.addData("Light", lightSensor.getLightDetected());
+        while (opMode.opModeIsActive() && lightSensor1.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor1.getLightDetected());
             opMode.idle();
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
-            telemetry.addData("Light", lightSensor.getLightDetected());
-            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor1.getLightDetected());
+            if (lightSensor1.getLightDetected() > WHITE_THRESHOLD) {
                 telemetry.addLine("Moving left");
                 leftMotor.setPower(0);
                 rightMotor.setPower(0.2);
@@ -708,7 +696,7 @@ public class AutonomousActions {
 
     public void followLineStateMachineBlue(){
         AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.FOLLOW_LINE);
-        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_LINE, S.STOP, leftMotor, rightMotor, lightSensor, rangeSensor, AllianceColor.BLUE);
+        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_LINE, S.STOP, leftMotor, rightMotor, lightSensor1, rangeSensor, AllianceColor.BLUE);
         autoStateMachineBuilder.addStop(S.STOP);
         StateMachine stateMachine = autoStateMachineBuilder.build();
         while(stateMachine.getCurrentStateName() != S.STOP){
@@ -718,7 +706,7 @@ public class AutonomousActions {
 
     public void followLineStateMachineRed(){
         AutoStateMachineBuilder autoStateMachineBuilder = new AutoStateMachineBuilder(S.FOLLOW_LINE);
-        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_LINE, S.STOP, leftMotor, rightMotor, lightSensor, rangeSensor, AllianceColor.RED);
+        autoStateMachineBuilder.addLineFollow(telemetry, S.FOLLOW_LINE, S.STOP, leftMotor, rightMotor, lightSensor1, rangeSensor, AllianceColor.RED);
         autoStateMachineBuilder.addStop(S.STOP);
         StateMachine stateMachine = autoStateMachineBuilder.build();
         while(stateMachine.getCurrentStateName() != S.STOP){
@@ -739,8 +727,8 @@ public class AutonomousActions {
             leftMotor.setPower(-.2);
             rightMotor.setPower(.2);
         }
-        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
-            telemetry.addData("Light", lightSensor.getLightDetected());
+        while (opMode.opModeIsActive() && lightSensor1.getLightDetected() < WHITE_THRESHOLD) {
+            telemetry.addData("Light", lightSensor1.getLightDetected());
             opMode.idle();
         }
         leftMotor.setPower(0);
@@ -758,10 +746,10 @@ public class AutonomousActions {
 
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 11.5) {
             telemetry.addData("Front range", getcmUltrasonic(rangeSensor));
-            telemetry.addData("Light", lightSensor.getLightDetected());
+            telemetry.addData("Light", lightSensor1.getLightDetected());
             telemetry.addData("Angle", IMUheading());
 
-            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) {
+            if (lightSensor1.getLightDetected() > WHITE_THRESHOLD) {
                 /*
                 if (color == AllianceColor.BLUE) {
                     telemetry.addLine("Moving right");
@@ -804,8 +792,8 @@ public class AutonomousActions {
         if (color == AllianceColor.BLUE) {
             leftMotor.setPower(.2);
             rightMotor.setPower(-.2);
-            while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
-                telemetry.addData("Light", lightSensor.getLightDetected());
+            while (opMode.opModeIsActive() && lightSensor1.getLightDetected() < WHITE_THRESHOLD) {
+                telemetry.addData("Light", lightSensor1.getLightDetected());
                 opMode.idle();
             }
         }
@@ -813,7 +801,7 @@ public class AutonomousActions {
             leftMotor.setPower(-.2);
             rightMotor.setPower(.2);
             while (opMode.opModeIsActive() && lightSensor2.getLightDetected() < WHITE_THRESHOLD) {
-                telemetry.addData("Light", lightSensor.getLightDetected());
+                telemetry.addData("Light", lightSensor1.getLightDetected());
                 opMode.idle();
             }
         }
@@ -821,7 +809,7 @@ public class AutonomousActions {
         rightMotor.setPower(0);
 
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 10) {
-            if (lightSensor.getLightDetected() > WHITE_THRESHOLD) { // right sensor
+            if (lightSensor1.getLightDetected() > WHITE_THRESHOLD) { // right sensor
                 telemetry.addLine("Moving right");
                 leftMotor.setPower(0.1);
                 rightMotor.setPower(0);

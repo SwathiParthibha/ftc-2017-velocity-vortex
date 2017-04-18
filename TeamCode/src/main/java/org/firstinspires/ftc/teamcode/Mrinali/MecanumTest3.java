@@ -30,7 +30,7 @@ public class MecanumTest3 extends FtcOpMode {
             telemetry.addData("ODS Light", auto.odsLight.getLightDetected());
             telemetry.addData("ODS Light Raw", auto.odsLight.getRawLightDetected());
             telemetry.addData("Angle", auto.IMUheading());
-            telemetry.addData("Distance", auto.getcmUltrasonic(auto.rangeSensor));
+            telemetry.addData("Distance", auto.getcmUltrasonic(auto.rangeSensorRight));
             telemetry.addData("Front left", auto.frontLeftMotor.getPosition());
             telemetry.addData("Front right", auto.frontRightMotor.getPosition());
             telemetry.addData("Back left", auto.backLeftMotor.getPosition());
