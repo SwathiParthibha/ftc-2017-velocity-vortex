@@ -1110,6 +1110,7 @@ public class SwDriveBase implements TrcTaskMgr.Task
             sinSpeed = 0;
 
         double addedValue = sinSpeed + tanSpeed;
+        addedValue = addedValue * magnitude;
 
         double wheelSpeeds[] = new double[4];
         wheelSpeeds[MotorType.LEFT_FRONT.value] = ((sinD*magnitude + rotation) * SPEED_LIMITER) + addedValue;
