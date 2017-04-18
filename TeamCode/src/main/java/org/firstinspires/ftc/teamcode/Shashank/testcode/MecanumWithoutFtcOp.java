@@ -118,7 +118,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         gamepad.enableDebug(true);
         DbgLog.msg("> INIT" + "FINISHED CREATING GAMEPAD");
 
-        driveBase.enableGyroAssist(0.0001, 0.05);
+        //driveBase.enableGyroAssist(0.0001, 0.05);
 
         DbgLog.msg("> INIT" + "FINISHED INIT");
     }
@@ -138,9 +138,10 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         if(gamepad.getLeftStickX() == 0 && gamepad.getLeftStickY() == 0)
             magnitude = 0;
 
-        driveBase.mecanumDrive_PolarFieldCentric(magnitude, direction, rotation);
+        driveBase.mecanumDrive_PolarFieldCentricAdaptiveControl(magnitude, direction, rotation);
 
-        dashboard.displayPrintf(2, LABEL_WIDTH, "rotation: ", "%.2f", rotation);
+        dashboard.displayPrintf(1, LABEL_WIDTH, "rotation: ", "%.2f", rotation);
+        dashboard.displayPrintf(2, LABEL_WIDTH, "gyro: ", "%.2f", gyro.getZHeading().value);
         dashboard.displayPrintf(5, LABEL_WIDTH, "gamepad left stick direction true: ", "%.2f", gamepad.getLeftStickDirectionDegrees(true));
         dashboard.displayPrintf(6, LABEL_WIDTH, "gamepad left stick direction false: ", "%.2f", gamepad.getLeftStickDirectionDegrees(false));
         dashboard.displayPrintf(7, LABEL_WIDTH, "gamepad right stick x: ", "%1.2f", gamepad.getRightStickX());
