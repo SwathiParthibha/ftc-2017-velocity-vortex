@@ -129,6 +129,6 @@ public class DriveToBeaconsRedShoot1 extends LinearOpMode {
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(-155);
         auto.shoot(0, 2, 1);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 5);
+        auto.encoderDrive(FASTER_SPEED, 12, 12, 5);
     }
 }

@@ -40,8 +40,12 @@ public class MecanumTest1 extends FtcOpMode {
             telemetry.addLine("Ready to Run");
             telemetry.addData("ODS Light", auto.odsLight.getLightDetected());
             telemetry.addData("ODS Light Raw", auto.odsLight.getRawLightDetected());
+            telemetry.addData("Bottom Color Sensor", auto.bottomColorSensor.alpha());
+            telemetry.addData("Bottom Color Sensor", auto.bottomColorSensor.argb());
             telemetry.addData("Angle", auto.IMUheading());
             telemetry.addData("Distance", auto.getcmUltrasonic(auto.rangeSensor));
+            telemetry.addData("Left red", auto.leftColorSensor.red());
+            telemetry.addData("Right red", auto.rightColorSensor.red());
             telemetry.addData("Front left", auto.frontLeftMotor.getPosition());
             telemetry.addData("Front right", auto.frontRightMotor.getPosition());
             telemetry.addData("Back left", auto.backLeftMotor.getPosition());
@@ -50,14 +54,15 @@ public class MecanumTest1 extends FtcOpMode {
         }
 
         // auto.toWall();
-        auto.toWhiteLine();
+        // auto.toWhiteLine();
         auto.pushButton();
         auto.backup();
         auto.turn(0);
         auto.toWhiteLine();
         auto.pushButton();
         auto.driveBase.mecanumDrive_Polar(.5, 20, 0);
-        while (opModeIsActive());
+        while (opModeIsActive())
+            idle();
     }
 
     public double IMUheading360() {

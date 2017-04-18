@@ -119,7 +119,7 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
                 auto.turn(-3);
         } else
             auto.turn(-90);
-        auto.encoderDrive(FASTER_SPEED, 13, 13, 4);
+        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
         //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
         //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
         auto.toWhiteLine(true); //It advances to the next white line
@@ -128,6 +128,6 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
         auto.pushButton(); //It uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(-155);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 5);
+        auto.encoderDrive(FASTER_SPEED, 12, 12, 5);
     }
 }

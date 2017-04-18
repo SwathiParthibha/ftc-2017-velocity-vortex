@@ -35,12 +35,8 @@ package org.firstinspires.ftc.teamcode.Mrinali;
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDevice;
@@ -53,14 +49,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 import ftclib.FtcDcMotor;
 import ftclib.FtcOpMode;
 import trclib.TrcDriveBase;
-import trclib.TrcMotor;
-import trclib.TrcMotorController;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -102,11 +95,16 @@ public class MecanumAuto {
     double angleZ;
     public ColorSensor leftColorSensor;
     public ColorSensor rightColorSensor;
+    public ColorSensor bottomColorSensor;
+    int colorARGB = 0;
     public I2cDeviceSynchImpl rangeSensor;
     I2cDevice rangeA;
     OpticalDistanceSensor odsLight;
+    double lightFromThread = 0;
+    boolean getLight = false;
 
     static final double WHITE_THRESHOLD = 0.3;
+    int COLOR_SENSOR_THRESHOLD = 60000000;
     double DIST = 14;
     int whiteLineCount = 0;
 
@@ -128,10 +126,10 @@ public class MecanumAuto {
         backRightMotor = new FtcDcMotor("motor_4");
         driveBase = new TrcDriveBase(frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor);
 
-        frontLeftMotor.setInverted(true);
-        frontRightMotor.setInverted(false);
-        backLeftMotor.setInverted(true);
-        backRightMotor.setInverted(false);
+        frontLeftMotor.setInverted(false);
+        frontRightMotor.setInverted(true);
+        backLeftMotor.setInverted(false);
+        backRightMotor.setInverted(true);
 
         frontLeftMotor.resetPosition();
         frontRightMotor.resetPosition();
@@ -154,8 +152,13 @@ public class MecanumAuto {
 
         rightColorSensor = hardwareMap.colorSensor.get("rcs");
 
+        bottomColorSensor = hardwareMap.colorSensor.get("bcs");
+        i2cAddr = I2cAddr.create8bit(0x3e);
+        bottomColorSensor.setI2cAddress(i2cAddr);
+        bottomColorSensor.enableLed(true);
+
         rangeA = hardwareMap.i2cDevice.get("range sensor");// Primary LEGO Light Sensor
-        rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x28), false);
+        rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x30), false);
         rangeSensor.engage();
 
         odsLight = hardwareMap.opticalDistanceSensor.get("odsLight");
@@ -187,7 +190,33 @@ public class MecanumAuto {
         driveBase.stop();
     }
 
+    Runnable lightFromOds = new Runnable() {
+        @Override
+        public void run() {
+            while (opMode.opModeIsActive() && getLight) {
+                lightFromThread = odsLight.getLightDetected();
+            }
+        }
+    };
+    Thread getOdsLight = new Thread(lightFromOds);
+
+    Runnable colorSensorARGB = new Runnable() {
+        @Override
+        public void run() {
+            while (opMode.opModeIsActive() && getLight) {
+                //telemetry.addLine("Thread running");
+                //telemetry.update();
+                colorARGB = bottomColorSensor.argb();
+            }
+        }
+    };
+    Thread getARGB = new Thread(colorSensorARGB);
+
     public void toWhiteLine() throws InterruptedException {
+
+        getLight = true;
+        //getOdsLight.start();
+        //getARGB.start();
 
         whiteLineCount++;
 
@@ -196,7 +225,8 @@ public class MecanumAuto {
             opMode.sleep(1000);
         }
 
-        while (opMode.opModeIsActive() && odsLight.getLightDetected() < WHITE_THRESHOLD) {
+        while (opMode.opModeIsActive() && odsLight.getLightDetected() < WHITE_THRESHOLD
+                && bottomColorSensor.argb() < COLOR_SENSOR_THRESHOLD) {
 
             DbgLog.msg("ODS Sensor Value " + odsLight.getLightDetected());
 
@@ -210,6 +240,8 @@ public class MecanumAuto {
 
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", odsLight.getLightDetected());
+            telemetry.addData("Color", bottomColorSensor.argb());
+            telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
             telemetry.update();
             opMode.idle();
 
@@ -218,11 +250,14 @@ public class MecanumAuto {
 
         driveBase.stop();
         opMode.sleep(200);
-        driveBase.mecanumDrive_Polar(.2, 180, 0, false);
-        while (opMode.opModeIsActive() && odsLight.getLightDetected() < WHITE_THRESHOLD) {
+        driveBase.mecanumDrive_Polar(.08, 180, 0, false);
+        while (opMode.opModeIsActive() && odsLight.getLightDetected() < WHITE_THRESHOLD
+                && bottomColorSensor.argb() < COLOR_SENSOR_THRESHOLD) {
 
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", odsLight.getLightDetected());
+            telemetry.addData("Color", bottomColorSensor.argb());
+            telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
             telemetry.update();
             opMode.idle();
 
@@ -231,6 +266,8 @@ public class MecanumAuto {
         telemetry.log().add("Line 2");
 
         driveBase.stop();
+
+        getLight = false;
     }
 
     public void pushButton() throws InterruptedException {
@@ -247,12 +284,17 @@ public class MecanumAuto {
         time.reset();
 
         boolean wrongColor;
-        if (getcmUltrasonic(rangeSensor) > 16) {
+        if (getcmUltrasonic(rangeSensor) > 9) {
             telemetry.log().add("too far");
-            while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 16) {
-                driveBase.mecanumDrive_Polar(.2, 180, 0);
+            while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 9) {
+                driveBase.mecanumDrive_Polar(.6, 90, 0);
             }
         }
+
+        int frontLeftPos = frontLeftMotor.motor.getCurrentPosition();
+        int frontRightPos = frontRightMotor.motor.getCurrentPosition();
+        int backLeftPos = backLeftMotor.motor.getCurrentPosition();
+        int backRightPos = backRightMotor.motor.getCurrentPosition();
 
         do {
             telemetry.addData("Time", time.seconds());
@@ -312,22 +354,24 @@ public class MecanumAuto {
                     //write the code here to press the left button
                     telemetry.log().add("left is red");
                     telemetry.update();
-                    backRightMotor.setPower(-0.2);
-                    backLeftMotor.setPower(0.2);
+                    // backRightMotor.setPower(-0.2);
+                    // backLeftMotor.setPower(0.2);
+                    driveBase.mecanumDrive_Polar(.4, 90, -.1);
 
                 } else if (rightColorSensor.red() > leftColorSensor.red()) {// && !verifyBlue()){
                     //write the code here to press the right button
                     telemetry.log().add("right is red");
                     telemetry.update();
-                    frontLeftMotor.setPower(-0.2);
-                    frontRightMotor.setPower(0.2);
+                    // frontLeftMotor.setPower(-0.2);
+                    // frontRightMotor.setPower(0.2);
+                    driveBase.mecanumDrive_Polar(.4, 90, .1);
 
                 } else if (leftColorSensor.blue() > leftColorSensor.red()
                         && rightColorSensor.blue() > rightColorSensor.red()) {
                     //blue button has been pressed
                     telemetry.log().add("beacon is blue");
                     telemetry.update();
-                    driveBase.mecanumDrive_Polar(.2, 90, 0);
+                    driveBase.mecanumDrive_Polar(.4, 90, 0);
                     // frontLeftMotor.setPower(-0.1);
                     // backLeftMotor.setPower(-0.1);
                     // frontRightMotor.setPower(-0.1);
@@ -338,7 +382,7 @@ public class MecanumAuto {
                     wrongColor = true;
                 } else if (getcmUltrasonic(rangeSensor) > 10) {
                     telemetry.log().add("too far");
-                    driveBase.mecanumDrive_Polar(.2, 90, 0);
+                    driveBase.mecanumDrive_Polar(.4, 90, 0);
                     // frontLeftMotor.setPower(-0.1);
                     // backLeftMotor.setPower(-0.1);
                     // frontRightMotor.setPower(-0.1);
@@ -351,10 +395,11 @@ public class MecanumAuto {
                 }
             }
             telemetry.update();
-            opMode.sleep(1500);
+            opMode.sleep(1000);
 
-            driveBase.mecanumDrive_Polar(0.2, 0, 0);
-            opMode.sleep(100);
+            runToPos(frontLeftPos, frontRightPos, backLeftPos, backRightPos, 0.3);
+            // driveBase.mecanumDrive_Polar(0.2, 0, 0);
+            // opMode.sleep(100);
             driveBase.stop();
 
             telemetry.addLine("Left blue: " + leftColorSensor.blue() + " | Left red: " + leftColorSensor.red());
@@ -367,6 +412,50 @@ public class MecanumAuto {
                 && (time.seconds() < 4 || wrongColor));
 
         telemetry.log().add("end of the push button method");
+    }
+
+    public void runToPos(int frontLeftPos, int frontRightPos, int backLeftPos, int backRightPos, double power) {
+
+        frontLeftMotor.motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRightMotor.motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeftMotor.motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRightMotor.motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        frontLeftMotor.motor.setTargetPosition(frontLeftPos);
+        frontRightMotor.motor.setTargetPosition(frontRightPos);
+        backLeftMotor.motor.setTargetPosition(backLeftPos);
+        backRightMotor.motor.setTargetPosition(backRightPos);
+
+        frontLeftMotor.motor.setPower(power);
+        frontRightMotor.motor.setPower(power);
+        backLeftMotor.motor.setPower(power);
+        backRightMotor.motor.setPower(power);
+
+        while (opMode.opModeIsActive()
+                && frontLeftMotor.motor.isBusy()
+                && frontRightMotor.motor.isBusy()
+                && backLeftMotor.motor.isBusy()
+                && backRightMotor.motor.isBusy()) {
+            telemetry.addData("Path1", "Running to %7d :%7d :%7d :%7d",
+                    frontLeftPos, frontRightPos, backLeftPos, backRightPos);
+            telemetry.addData("Path2", "Running at %7d :%7d :%7d :%7d",
+                    frontLeftMotor.motor.getCurrentPosition(),
+                    frontRightMotor.motor.getCurrentPosition(),
+                    backLeftMotor.motor.getCurrentPosition(),
+                    backRightMotor.motor.getCurrentPosition()
+            );
+        }
+
+        frontLeftMotor.motor.setPower(0);
+        frontRightMotor.motor.setPower(0);
+        backLeftMotor.motor.setPower(0);
+        backRightMotor.motor.setPower(0);
+
+        frontLeftMotor.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRightMotor.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeftMotor.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRightMotor.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
     public void turn(int turnAngle) throws InterruptedException {
@@ -533,7 +622,7 @@ public class MecanumAuto {
     }
 
     public void backup() {
-        driveBase.mecanumDrive_Polar(0.2, 0, 0, false);
+        driveBase.mecanumDrive_Polar(0.2, -90, 0, false);
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) < DIST) {
             telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
         }
