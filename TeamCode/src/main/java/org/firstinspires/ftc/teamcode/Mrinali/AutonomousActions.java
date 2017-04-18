@@ -366,12 +366,11 @@ public class AutonomousActions {
         ElapsedTime searchTime = new ElapsedTime();
         searchTime.reset();
 
-        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD) {
+        while (opMode.opModeIsActive() && lightSensor.getLightDetected() < WHITE_THRESHOLD && lightSensor2.getLightDetected() < WHITE_THRESHOLD) {
 
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", lightSensor.getLightDetected());
             telemetry.update();
-            opMode.idle();
 
             if (searchTime.seconds() > .2) {
                 if (leftPos == leftMotor.getCurrentPosition()
@@ -383,6 +382,8 @@ public class AutonomousActions {
                 rightPos = rightMotor.getCurrentPosition();
                 searchTime.reset();
             }
+
+            opMode.idle();
         }
 
         // Stop all motors
@@ -834,6 +835,8 @@ public class AutonomousActions {
                 rightMotor.setPower(0.1);
             }
             telemetry.update();
+
+            opMode.idle();
         }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
@@ -1036,12 +1039,16 @@ public class AutonomousActions {
         // reset the timeout time and start motion.
         runtime.reset();
 
+        leftMotor.setPower(Math.signum(leftInches) * Math.abs(speed));
+        rightMotor.setPower(Math.signum(rightInches) * Math.abs(speed));
+        /*
         while (opMode.opModeIsActive() &&    // this loop ensures power is set to both motors
                 (leftMotor.getPower() != Math.signum(leftInches)*Math.abs(speed)
                 || rightMotor.getPower() != Math.signum(rightInches)*Math.abs(speed))) {
             leftMotor.setPower(Math.signum(leftInches) * Math.abs(speed));
             rightMotor.setPower(Math.signum(rightInches) * Math.abs(speed));
         }
+        */
 
         boolean motorSide = false;
         while (opMode.opModeIsActive() &&
@@ -1187,7 +1194,7 @@ public class AutonomousActions {
         encoderDrive(speed, distance, distance, distance + 3);
         //finished running forward, spin up shooters
         ElapsedTime shootTime = new ElapsedTime();
-        while (opMode.opModeIsActive() && shootTime.seconds() < spinupTime);
+        opMode.sleep((int)(spinupTime * 1000));
 
         for (int i = 0; i < balls; i++) {
 
@@ -1197,7 +1204,7 @@ public class AutonomousActions {
             rightArm.setPosition(rightServoPos);
 
             shootTime.reset();
-            while (opMode.opModeIsActive() && shootTime.seconds() < .75);
+            opMode.sleep(750);
 
             leftServoPos = LEFT_OUT_VAL;
             rightServoPos = RIGHT_OUT_VAL;
@@ -1207,7 +1214,7 @@ public class AutonomousActions {
             if (i + 1 < balls) {
                 scooper.setPower(-1);
                 shootTime.reset();  //spins up for next ball
-                while (opMode.opModeIsActive() && shootTime.seconds() < timeBetweenBalls);
+                opMode.sleep((int)(timeBetweenBalls * 1000));
                 scooper.setPower(0);
             }
         }
