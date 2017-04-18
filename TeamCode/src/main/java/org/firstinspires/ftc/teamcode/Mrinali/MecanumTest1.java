@@ -4,22 +4,11 @@
 
 package org.firstinspires.ftc.teamcode.Mrinali;
 
-import com.qualcomm.hardware.adafruit.BNO055IMU;
-import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.I2cAddr;
-import com.qualcomm.robotcore.hardware.I2cDevice;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
-import ftclib.FtcDcMotor;
 import ftclib.FtcOpMode;
-import trclib.TrcDriveBase;
 
 @Autonomous(name = "Mecanum Test 1", group = "Mecanum")
 public class MecanumTest1 extends FtcOpMode {
@@ -43,7 +32,8 @@ public class MecanumTest1 extends FtcOpMode {
             telemetry.addData("Bottom Color Sensor", auto.bottomColorSensor.alpha());
             telemetry.addData("Bottom Color Sensor", auto.bottomColorSensor.argb());
             telemetry.addData("Angle", auto.IMUheading());
-            telemetry.addData("Distance", auto.getcmUltrasonic(auto.rangeSensor));
+            telemetry.addData("Distance Right", auto.getcmUltrasonic(auto.rangeSensorRight));
+            telemetry.addData("Distance Left", auto.getcmUltrasonic(auto.rangeSensorLeft));
             telemetry.addData("Left red", auto.leftColorSensor.red());
             telemetry.addData("Right red", auto.rightColorSensor.red());
             telemetry.addData("Front left", auto.frontLeftMotor.getPosition());

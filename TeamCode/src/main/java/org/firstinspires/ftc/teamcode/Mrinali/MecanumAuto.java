@@ -97,7 +97,8 @@ public class MecanumAuto {
     public ColorSensor rightColorSensor;
     public ColorSensor bottomColorSensor;
     int colorARGB = 0;
-    public I2cDeviceSynchImpl rangeSensor;
+    public I2cDeviceSynchImpl rangeSensorRight;
+    public I2cDeviceSynchImpl rangeSensorLeft;
     I2cDevice rangeA;
     OpticalDistanceSensor odsLight;
     double lightFromThread = 0;
@@ -157,9 +158,13 @@ public class MecanumAuto {
         bottomColorSensor.setI2cAddress(i2cAddr);
         bottomColorSensor.enableLed(true);
 
-        rangeA = hardwareMap.i2cDevice.get("range sensor");// Primary LEGO Light Sensor
-        rangeSensor = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x30), false);
-        rangeSensor.engage();
+        rangeA = hardwareMap.i2cDevice.get("rightMR");// Primary LEGO Light Sensor
+        rangeSensorRight = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x30), false);
+        rangeSensorRight.engage();
+
+        rangeA = hardwareMap.i2cDevice.get("leftMR");// Primary LEGO Light Sensor
+        rangeSensorLeft = new I2cDeviceSynchImpl(rangeA, I2cAddr.create8bit(0x28), false);
+        rangeSensorLeft.engage();
 
         odsLight = hardwareMap.opticalDistanceSensor.get("odsLight");
 
@@ -179,7 +184,7 @@ public class MecanumAuto {
     }
 
     public void toWall() {
-        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > DIST) {
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensorRight) > DIST) {
             driveBase.mecanumDrive_Polar(.7, 60, 0);
             if (odsLight.getLightDetected() > WHITE_THRESHOLD) {
                 telemetry.log().add("Light detected");
@@ -230,9 +235,9 @@ public class MecanumAuto {
 
             DbgLog.msg("ODS Sensor Value " + odsLight.getLightDetected());
 
-            if (getcmUltrasonic(rangeSensor) < 8) { // too close
+            if (getcmUltrasonic(rangeSensorRight) < 8) { // too close
                 driveBase.mecanumDrive_Polar(.3, -90, 0); // move right
-            } else if (getcmUltrasonic(rangeSensor) > 44) {
+            } else if (getcmUltrasonic(rangeSensorRight) > 44) {
                 driveBase.mecanumDrive_Polar(.3, 90, 0); // move left
             } else {
                 driveBase.mecanumDrive_Polar(.15, 0, 0); // drive forward
@@ -241,7 +246,7 @@ public class MecanumAuto {
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", odsLight.getLightDetected());
             telemetry.addData("Color", bottomColorSensor.argb());
-            telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Distance", getcmUltrasonic(rangeSensorRight));
             telemetry.update();
             opMode.idle();
 
@@ -257,7 +262,7 @@ public class MecanumAuto {
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", odsLight.getLightDetected());
             telemetry.addData("Color", bottomColorSensor.argb());
-            telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
+            telemetry.addData("Distance", getcmUltrasonic(rangeSensorRight));
             telemetry.update();
             opMode.idle();
 
@@ -284,9 +289,9 @@ public class MecanumAuto {
         time.reset();
 
         boolean wrongColor;
-        if (getcmUltrasonic(rangeSensor) > 9) {
+        if (getcmUltrasonic(rangeSensorRight) > 9) {
             telemetry.log().add("too far");
-            while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) > 9) {
+            while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensorRight) > 9) {
                 driveBase.mecanumDrive_Polar(.6, 90, 0);
             }
         }
@@ -336,7 +341,7 @@ public class MecanumAuto {
                     //opMode.sleep(4000); // wait 5 seconds total
 
                     wrongColor = true;
-                } else if (getcmUltrasonic(rangeSensor) > 10) {
+                } else if (getcmUltrasonic(rangeSensorRight) > 10) {
                     telemetry.log().add("too far");
                     driveBase.mecanumDrive_Polar(.2, 90, 0);
                     // frontLeftMotor.setPower(-0.1);
@@ -380,7 +385,7 @@ public class MecanumAuto {
                     //opMode.sleep(4000); // wait 5 seconds total
 
                     wrongColor = true;
-                } else if (getcmUltrasonic(rangeSensor) > 10) {
+                } else if (getcmUltrasonic(rangeSensorRight) > 10) {
                     telemetry.log().add("too far");
                     driveBase.mecanumDrive_Polar(.4, 90, 0);
                     // frontLeftMotor.setPower(-0.1);
@@ -623,8 +628,8 @@ public class MecanumAuto {
 
     public void backup() {
         driveBase.mecanumDrive_Polar(0.2, -90, 0, false);
-        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensor) < DIST) {
-            telemetry.addData("Distance", getcmUltrasonic(rangeSensor));
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensorRight) < DIST) {
+            telemetry.addData("Distance", getcmUltrasonic(rangeSensorRight));
         }
         driveBase.stop();
 
