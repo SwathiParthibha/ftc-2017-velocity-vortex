@@ -27,7 +27,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 
-@TeleOp(name = "Two Controller Teleopv6 Blue", group = "Teleop")
+@TeleOp(name = "Two Controller Teleopv6 Red", group = "Teleop")
 //@Disabled
 public class TwoControllerTeleopv6Red extends OpMode {
     private final double SWEEPER_IN_POWER = -0.7;

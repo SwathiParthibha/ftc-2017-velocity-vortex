@@ -85,11 +85,10 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
         while (!isStarted()) {
 
             // Display the light level while we are waiting to start
-            telemetry.addData("Light Level 1", auto.lightSensor.getLightDetected());
+            telemetry.addData("Light Level 1", auto.lightSensor1.getLightDetected());
             telemetry.addData("Light Level 2", auto.lightSensor2.getLightDetected());
             telemetry.addData("Front Ultrasonic", auto.getcmUltrasonic(auto.rangeSensor));
             auto.angleZ = auto.IMUheading();
-            telemetry.addData("Side Ultrasonic", auto.getcmUltrasonic(auto.sideRangeSensor));
             telemetry.addData("Angle", auto.angleZ);
             telemetry.addData("leftColorSensor", auto.leftColorSensor.argb());
             telemetry.addData("rightColorSensor", auto.rightColorSensor.argb());
@@ -119,15 +118,13 @@ public class DriveToBeaconsRedShoot extends LinearOpMode {
                 auto.turn(-3);
         } else
             auto.turn(-90);
-        auto.encoderDrive(FASTER_SPEED, 10, 10, 4);
-        //auto.leftMotor.setPower(auto.APPROACH_SPEED * .4);
-        //auto.rightMotor.setPower(auto.APPROACH_SPEED * .4);
+        auto.encoderDrive(FASTER_SPEED, auto.distanceBetweenBeacons, auto.distanceBetweenBeacons, 4);
         auto.toWhiteLine(true); //It advances to the next white line
         sleep(100);
         auto.twoSensorLineFollow();
         auto.pushButton(); //It uses two color sensors to push the red side of the beacon, and verifies it press the correct side. If it didn't, then it will wait for 5 seconds and try again
         auto.encoderDrive(auto.APPROACH_SPEED, auto.backup - 4, auto.backup - 4, 3); //Then it will back up
         auto.turn(-155);
-        auto.encoderDrive(FASTER_SPEED, 12, 12, 5);
+        auto.encoderDrive(FASTER_SPEED, auto.capBallDistance, auto.capBallDistance, 5);
     }
 }
