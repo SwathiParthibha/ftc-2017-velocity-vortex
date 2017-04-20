@@ -108,6 +108,7 @@ public class PowerManager {
 
     public void reset() {
         pidAlgo.reset();
+        REQUESTED_ETPS = Constants.REQUESTED_ETPS;
         defaultPower=Constants.DEFAULT_POWER;
         currentPower=defaultPower;
     }
