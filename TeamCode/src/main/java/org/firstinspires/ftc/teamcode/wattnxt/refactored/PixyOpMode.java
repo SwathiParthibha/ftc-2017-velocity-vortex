@@ -45,6 +45,8 @@ public class PixyOpMode extends OpMode {
             telemetry.update();
         }
 
+        pixyCam.init();
+
         triggerServo = hardwareMap.servo.get("triggerServo");
         angularServo = hardwareMap.servo.get("pixyyaxis");
         turretServo = hardwareMap.servo.get("pixyyrotation");
