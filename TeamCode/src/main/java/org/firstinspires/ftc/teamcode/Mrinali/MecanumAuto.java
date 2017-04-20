@@ -85,7 +85,7 @@ public class MecanumAuto {
     FtcOpMode opMode;
     Telemetry telemetry;
     AllianceColor color;
-    public TrcDriveBaseIMU driveBase;
+    public TrcDriveBase driveBase;
     public FtcDcMotor frontLeftMotor;
     public FtcDcMotor frontRightMotor;
     public FtcDcMotor backLeftMotor;
@@ -146,7 +146,7 @@ public class MecanumAuto {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
 
-        driveBase = new TrcDriveBaseIMU(frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor, imu);
+        driveBase = new TrcDriveBase(frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor);
 
         leftColorSensor = hardwareMap.colorSensor.get("lcs");
         I2cAddr i2cAddr = I2cAddr.create8bit(0x4c);
