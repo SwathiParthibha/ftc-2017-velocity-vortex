@@ -187,7 +187,7 @@ public class TwoControllerTeleopv7 extends OpMode {
         }
 
 
-        if (gamepad2.left_trigger > 0) {
+        /*if (gamepad2.left_trigger > 0) {
             scooper.setPower(MAX_POWER);
 
             leftServoPos = LEFT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
@@ -199,7 +199,22 @@ public class TwoControllerTeleopv7 extends OpMode {
         } else {
             scooper.setPower(ZERO_POWER);
 
+        }*/
+
+        if (gamepad2.left_bumper) {
+            scooper.setPower(MAX_POWER);
+
+            leftServoPos = LEFT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+            rightServoPos = RIGHT_OUT_VAL;//if we are running the chain up, then extend the servos so they don't break
+            leftArm.setPosition(leftServoPos);
+            rightArm.setPosition(rightServoPos);
+        } else if (gamepad2.left_trigger > 0) {
+            scooper.setPower(MIN_POWER);
+        } else {
+            scooper.setPower(ZERO_POWER);
+
         }
+
 
         //ods value without ball is 0.32 for getLightDetected()
         //the max value is 0.6
@@ -351,13 +366,28 @@ public class TwoControllerTeleopv7 extends OpMode {
 
     private void setLowPower()
     {
-        Constants.REQUESTED_ETPS=120000;
-        Constants.DEFAULT_POWER=0.50;
+        double initialPower=0.62;
+            double MAX_VOLTAGE=13.7;
+
+            double currentVoltage= hardwareMap.voltageSensor.get("drive").getVoltage();
+
+            double scaledPower=MAX_VOLTAGE*initialPower/currentVoltage;
+
+
+        Constants.REQUESTED_ETPS= (int)130000;
+        Constants.DEFAULT_POWER=scaledPower;
     }
     private void setHighPower()
     {
-        Constants.REQUESTED_ETPS=138000;
-        Constants.DEFAULT_POWER=0.68;
+        double initialPower=0.75;
+        double MAX_VOLTAGE=13.7;
+
+        double currentVoltage= hardwareMap.voltageSensor.get("drive").getVoltage();
+
+        double scaledPower=MAX_VOLTAGE*initialPower/currentVoltage;
+
+        Constants.REQUESTED_ETPS= (int)135000;
+        Constants.DEFAULT_POWER=scaledPower;
     }
 
     private void printTelemetry() {
