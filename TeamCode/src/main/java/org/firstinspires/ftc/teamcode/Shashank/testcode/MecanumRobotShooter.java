@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import hallib.HalDashboard;
 
@@ -20,8 +21,11 @@ public class MecanumRobotShooter extends OpMode implements Runnable{
     private final double SHOOT_POSITION_TRIGGER = 0.428;
     private final double START_POSITION_ANGULAR = 0.3;
     private final double START_POSITION_TURRET = 0.50;
+    private final double CLOCKWISE_POSITION_TURRET = 0.40;
+    private final double COUNTERCLOCKWISE_POSITION_TURRET = 0.60;
     private final double SHOOTER_POWER = 1.0;
     private final double REVERSE_SHOOTER_POWER = -0.5;
+    private final double SERVO_INCREMENT = 0.0025;
 
     private Servo triggerServo, angularServo, turretServo;
 
@@ -67,12 +71,26 @@ public class MecanumRobotShooter extends OpMode implements Runnable{
     @Override
     public void loop() {
 
+        if(gamepad1.x){
+            turretServo.setPosition(CLOCKWISE_POSITION_TURRET);
+        } else if (gamepad1.b){
+            turretServo.setPosition(COUNTERCLOCKWISE_POSITION_TURRET);
+        } else {
+            turretServo.setPosition(START_POSITION_TURRET);
+        }
+
+        if(gamepad1.a){
+            angularServo.setPosition(Range.clip(angularServo.getPosition()-SERVO_INCREMENT, 0, 1));
+        } else if (gamepad1.y){
+            angularServo.setPosition(Range.clip(angularServo.getPosition()+SERVO_INCREMENT, 0, 1));
+        }
+
         if(SHOOTER_MOTORS_REVERSE){
-            //leftShooter.setPower(REVERSE_SHOOTER_POWER);
-            //rightShooter.setPower(REVERSE_SHOOTER_POWER);
+            leftShooter.setPower(REVERSE_SHOOTER_POWER);
+            rightShooter.setPower(REVERSE_SHOOTER_POWER);
         } else if (SHOOTER_MOTORS_ACTIVE){
-            //leftShooter.setPower(SHOOTER_POWER);
-            //rightShooter.setPower(SHOOTER_POWER);
+            leftShooter.setPower(SHOOTER_POWER);
+            rightShooter.setPower(SHOOTER_POWER);
         } else {
             leftShooter.setPower(0);
             rightShooter.setPower(0);
@@ -93,9 +111,9 @@ public class MecanumRobotShooter extends OpMode implements Runnable{
     public void run() {
         while (OP_MODE_IS_ACTIVE){
             inputPin = digIn.getState();
-            if(!gamepad1.b) {
+            if(!gamepad1.left_bumper) {
                 SHOOTER_MOTORS_REVERSE = false;
-                if (inputPin && gamepad1.a) {
+                if (inputPin && gamepad1.right_bumper) {
 
                     SHOOTER_MOTORS_ACTIVE = true;
 
@@ -129,11 +147,8 @@ public class MecanumRobotShooter extends OpMode implements Runnable{
                         triggerServo.setPosition(LOADED_POSITION_TRIGGER);
                     }
                 } else {
-                    //SHOOTER_MOTORS_ACTIVE = false;
-                    //SHOOTER_MOTORS_IS_READY = false;
-
-                    SHOOTER_MOTORS_ACTIVE = true;
-                    SHOOTER_MOTORS_IS_READY = true;
+                    SHOOTER_MOTORS_ACTIVE = false;
+                    SHOOTER_MOTORS_IS_READY = false;
 
                     for (long i = System.currentTimeMillis(); System.currentTimeMillis() - i < 250; ) {
                         triggerServo.setPosition(LOADED_POSITION_TRIGGER);
