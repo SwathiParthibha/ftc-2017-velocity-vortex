@@ -85,7 +85,7 @@ public class MecanumAuto {
     FtcOpMode opMode;
     Telemetry telemetry;
     AllianceColor color;
-    public TrcDriveBase driveBase;
+    public TrcDriveBaseIMU driveBase;
     public FtcDcMotor frontLeftMotor;
     public FtcDcMotor frontRightMotor;
     public FtcDcMotor backLeftMotor;
@@ -125,7 +125,6 @@ public class MecanumAuto {
         frontRightMotor = new FtcDcMotor("motor_2");
         backLeftMotor = new FtcDcMotor("motor_1");
         backRightMotor = new FtcDcMotor("motor_4");
-        driveBase = new TrcDriveBase(frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor);
 
         frontLeftMotor.setInverted(false);
         frontRightMotor.setInverted(true);
@@ -146,6 +145,8 @@ public class MecanumAuto {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
+
+        driveBase = new TrcDriveBaseIMU(frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor, imu);
 
         leftColorSensor = hardwareMap.colorSensor.get("lcs");
         I2cAddr i2cAddr = I2cAddr.create8bit(0x4c);
@@ -184,10 +185,15 @@ public class MecanumAuto {
     }
 
     public void toWall() {
-        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensorRight) > DIST) {
-            driveBase.mecanumDrive_Polar(.7, 60, 0);
+        while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensorLeft) > DIST) {
+            if (color == AllianceColor.BLUE)
+                driveBase.mecanumDrive_Polar(.7, -120, 0);
+            else if (color == AllianceColor.RED)
+                driveBase.mecanumDrive_Polar(.7, -60, 0);
+            telemetry.addData("Distance", getcmUltrasonic(rangeSensorLeft));
+            telemetry.update();
             if (odsLight.getLightDetected() > WHITE_THRESHOLD) {
-                telemetry.log().add("Light detected");
+                telemetry.log().add("White detected");
                 break;
             }
             DbgLog.msg("ODS Sensor Value " + odsLight.getLightDetected());
@@ -226,7 +232,10 @@ public class MecanumAuto {
         whiteLineCount++;
 
         if (whiteLineCount == 2) {
-            driveBase.mecanumDrive_Polar(0.3, 0, 0);
+            if (color == AllianceColor.BLUE)
+                driveBase.mecanumDrive_Polar(0.3, 180, 0);
+            else if (color == AllianceColor.RED)
+                driveBase.mecanumDrive_Polar(0.3, 0, 0);
             opMode.sleep(1000);
         }
 
@@ -235,18 +244,28 @@ public class MecanumAuto {
 
             DbgLog.msg("ODS Sensor Value " + odsLight.getLightDetected());
 
-            if (getcmUltrasonic(rangeSensorRight) < 8) { // too close
-                driveBase.mecanumDrive_Polar(.3, -90, 0); // move right
-            } else if (getcmUltrasonic(rangeSensorRight) > 44) {
-                driveBase.mecanumDrive_Polar(.3, 90, 0); // move left
-            } else {
-                driveBase.mecanumDrive_Polar(.15, 0, 0); // drive forward
+            if (color == AllianceColor.BLUE) {
+                if (getcmUltrasonic(rangeSensorLeft) < 8) { // too close
+                    driveBase.mecanumDrive_Polar(.3, 90, 0); // move right
+                } else if (getcmUltrasonic(rangeSensorLeft) > 44) {
+                    driveBase.mecanumDrive_Polar(.3, -90, 0); // move left
+                } else {
+                    driveBase.mecanumDrive_Polar(.15, 180, 0); // drive forward
+                }
+            } else if (color == AllianceColor.RED) {
+                if (getcmUltrasonic(rangeSensorLeft) < 8) { // too close
+                    driveBase.mecanumDrive_Polar(.3, -90, 0); // move right
+                } else if (getcmUltrasonic(rangeSensorLeft) > 44) {
+                    driveBase.mecanumDrive_Polar(.3, 90, 0); // move left
+                } else {
+                    driveBase.mecanumDrive_Polar(.15, 0, 0); // drive forward
+                }
             }
 
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", odsLight.getLightDetected());
             telemetry.addData("Color", bottomColorSensor.argb());
-            telemetry.addData("Distance", getcmUltrasonic(rangeSensorRight));
+            telemetry.addData("Distance", getcmUltrasonic(rangeSensorLeft));
             telemetry.update();
             opMode.idle();
 
@@ -255,23 +274,23 @@ public class MecanumAuto {
 
         driveBase.stop();
         opMode.sleep(200);
-        driveBase.mecanumDrive_Polar(.08, 180, 0, false);
+        if (color == AllianceColor.BLUE)
+            driveBase.mecanumDrive_Polar(.08, 0, 0);
+        else if (color == AllianceColor.RED)
+            driveBase.mecanumDrive_Polar(.08, 180, 0, false);
         while (opMode.opModeIsActive() && odsLight.getLightDetected() < WHITE_THRESHOLD
                 && bottomColorSensor.argb() < COLOR_SENSOR_THRESHOLD) {
 
             // Display the light level while we are looking for the line
             telemetry.addData("Light Level", odsLight.getLightDetected());
             telemetry.addData("Color", bottomColorSensor.argb());
-            telemetry.addData("Distance", getcmUltrasonic(rangeSensorRight));
+            telemetry.addData("Distance", getcmUltrasonic(rangeSensorLeft));
             telemetry.update();
             opMode.idle();
 
         }
-
         telemetry.log().add("Line 2");
-
         driveBase.stop();
-
         getLight = false;
     }
 
@@ -317,22 +336,20 @@ public class MecanumAuto {
                     //write the code here to press the left button
                     telemetry.log().add("left is blue");
                     telemetry.update();
-                    backRightMotor.setPower(-0.2);
-                    backLeftMotor.setPower(0.2);
+                    driveBase.mecanumDrive_Polar(.4, 90, -.1);
 
                 } else if (rightColorSensor.blue() > leftColorSensor.blue()) {// && !verifyBlue()){
                     //write the code here to press the right button
                     telemetry.log().add("right is blue");
                     telemetry.update();
-                    frontLeftMotor.setPower(-0.2);
-                    frontRightMotor.setPower(0.2);
+                    driveBase.mecanumDrive_Polar(.4, 90, .1);
 
                 } else if (leftColorSensor.red() > leftColorSensor.blue() &&
                         rightColorSensor.red() > rightColorSensor.blue()) {
                     //red button has been pressed
                     telemetry.log().add("beacon is red");
                     telemetry.update();
-                    driveBase.mecanumDrive_Polar(.2, 90, 0);
+                    driveBase.mecanumDrive_Polar(.4, 90, 0);
                     // frontLeftMotor.setPower(-0.1);
                     // backLeftMotor.setPower(-0.1);
                     // frontRightMotor.setPower(-0.1);
@@ -343,7 +360,7 @@ public class MecanumAuto {
                     wrongColor = true;
                 } else if (getcmUltrasonic(rangeSensorRight) > 10) {
                     telemetry.log().add("too far");
-                    driveBase.mecanumDrive_Polar(.2, 90, 0);
+                    driveBase.mecanumDrive_Polar(.4, 90, 0);
                     // frontLeftMotor.setPower(-0.1);
                     // backLeftMotor.setPower(-0.1);
                     // frontRightMotor.setPower(-0.1);
@@ -402,7 +419,6 @@ public class MecanumAuto {
             telemetry.update();
             opMode.sleep(1000);
 
-            runToPos(frontLeftPos, frontRightPos, backLeftPos, backRightPos, 0.3);
             // driveBase.mecanumDrive_Polar(0.2, 0, 0);
             // opMode.sleep(100);
             driveBase.stop();
@@ -416,6 +432,7 @@ public class MecanumAuto {
         } while (opMode.opModeIsActive() && !verify()
                 && (time.seconds() < 4 || wrongColor));
 
+        runToPos(frontLeftPos, frontRightPos, backLeftPos, backRightPos, 0.3);
         telemetry.log().add("end of the push button method");
     }
 
@@ -627,16 +644,13 @@ public class MecanumAuto {
     }
 
     public void backup() {
-        driveBase.mecanumDrive_Polar(0.2, -90, 0, false);
+        if (color == AllianceColor.BLUE)
+            driveBase.mecanumDrive_Polar(0.2, 90, 0, false);
+        else if (color == AllianceColor.RED)
+            driveBase.mecanumDrive_Polar(0.2, -90, 0, false);
         while (opMode.opModeIsActive() && getcmUltrasonic(rangeSensorRight) < DIST) {
             telemetry.addData("Distance", getcmUltrasonic(rangeSensorRight));
         }
         driveBase.stop();
-
-    }
-
-    double frontTilt() {
-        angles = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
-        return AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.thirdAngle));
     }
 }
