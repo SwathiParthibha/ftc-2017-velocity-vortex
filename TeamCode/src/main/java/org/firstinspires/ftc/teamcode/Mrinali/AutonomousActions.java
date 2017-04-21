@@ -360,7 +360,7 @@ public class AutonomousActions {
             telemetry.addData("Light Level", lightSensor1.getLightDetected());
             telemetry.update();
 
-            if (searchTime.seconds() > .2) {
+            if (searchTime.seconds() > .1) {
                 if (leftPos == leftMotor.getCurrentPosition()
                         && rightPos == rightMotor.getCurrentPosition()) {
                     leftMotor.setPower(APPROACH_SPEED * .4);

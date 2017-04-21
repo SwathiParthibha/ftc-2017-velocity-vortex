@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.Shashank.statemachine.AllianceColor;
 
 import ftclib.FtcOpMode;
 
-@Autonomous(name = "Mecanum Test 1", group = "Mecanum")
-public class MecanumTest1 extends FtcOpMode {
+@Autonomous(name = "Mecanum Test Blue", group = "Mecanum")
+public class MecanumTestBlue extends FtcOpMode {
 
     MecanumAuto auto = new MecanumAuto(this);
 
@@ -23,7 +23,7 @@ public class MecanumTest1 extends FtcOpMode {
     @Override
     public void runOpMode() throws InterruptedException{
 
-        auto.init(hardwareMap, telemetry, AllianceColor.RED);
+        auto.init(hardwareMap, telemetry, AllianceColor.BLUE);
 
         while (!isStarted()) {
             telemetry.addLine("Ready to Run");
@@ -43,8 +43,8 @@ public class MecanumTest1 extends FtcOpMode {
             telemetry.update();
         }
 
-        // auto.toWall();
-        // auto.toWhiteLine();
+        auto.toWall();
+        auto.toWhiteLine();
         auto.pushButton();
         auto.backup();
         auto.turn(0);
