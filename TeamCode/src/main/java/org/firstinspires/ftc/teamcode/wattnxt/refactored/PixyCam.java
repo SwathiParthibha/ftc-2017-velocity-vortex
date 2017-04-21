@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 
 public class PixyCam implements Runnable {
@@ -21,6 +22,7 @@ public class PixyCam implements Runnable {
 
     private List<Byte> rawData;
     private List<PixyObject> pixyObjects;
+    private Semaphore semaphore = new Semaphore(1);
 
     public PixyCam(int port, int address, DeviceInterfaceModule dim) {
         this.port = port;
@@ -50,14 +52,17 @@ public class PixyCam implements Runnable {
 
     @Override
     public void run() {
-        for (int i = 0; i < 40; i++) {
+        DbgLog.msg("> PIXY: BEFORE FOR LOOP");
+        for (int i = 0; i < 4; i++) {
             init();
             readI2cCache();
-            DbgLog.msg("> PIXY: RAWDATA SIZE: " + rawData.size());
+            //DbgLog.msg("> PIXY: RAWDATA SIZE: " + rawData.size());
             DbgLog.msg("> PIXY: RAWDATA: " + rawData.toString());
-            DbgLog.msg("> PIXY: READCACHE: " + Arrays.toString(readCache));
+            //DbgLog.msg("> PIXY: READCACHE: " + Arrays.toString(readCache));
         }
+        DbgLog.msg("> PIXY: AFTER FOR LOOP");
 
+        DbgLog.msg("> PIXY: BEFORE WHILE LOOP");
         while (rawData.size() >= 14) {
             Byte[] segment = rawData.subList(0, 14).toArray(new Byte[14]);
             byte[] segmentPrimative = new byte[14];
@@ -72,6 +77,8 @@ public class PixyCam implements Runnable {
                 rawData = rawData.subList(14, rawData.size());
             }
         }
+        DbgLog.msg("> PIXY: AFTER WHILE LOOP");
+        DbgLog.msg("> PIXY: pixyObjects size: " + pixyObjects.size());
     }
 
     private void readI2cCache() {
@@ -103,4 +110,5 @@ public class PixyCam implements Runnable {
         }
         return pixyObjects.remove(0);
     }
+
 }

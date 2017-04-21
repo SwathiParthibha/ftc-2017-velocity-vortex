@@ -23,12 +23,14 @@ public class PixyOpMode extends OpMode {
     private final double CLOCKWISE_POSITION_TURRET = 0.49;
     private final double COUNTERCLOCKWISE_POSITION_TURRET = 0.51;
     private final double SERVO_INCREMENT = 0.0025;
+    private int counter = 0;
 
     private Servo triggerServo, angularServo, turretServo;
 
     private static final int PORT = 0;
     private static final int ADDRESS = 0x54;
     private static final int DELAY = 10;
+    private static final int LOOP_DELAY = 300;
     private static final String DIM_NAME = "Pixy dim";
 
     private PixyCam pixyCam;
@@ -60,33 +62,48 @@ public class PixyOpMode extends OpMode {
 
     @Override
     public void loop() {
+        DbgLog.msg("LOOP START: " + counter);
         if (pixyCam.newObjectCount() == 0) {
             return;
         }
+
+
         List<PixyObject> newPixyObjects = new ArrayList<>();
+        int whileCounter = 1;
         while (pixyCam.hasNewObject()) {
+            DbgLog.msg("Amount of times looping through the transfer loop: " + whileCounter);
             newPixyObjects.add(pixyCam.popObject());
+            whileCounter++;
         }
+
+
+        //List<PixyObject> newPixyObjects = pixyCam.popObjects();
+
         String pixyObjectsString = newPixyObjects.size() + "\n";
         for (PixyObject pixyObject : newPixyObjects) {
             pixyObjectsString += pixyObject.toString() + "\n";
         }
 
-        int yAxisDifference = newPixyObjects.get(0).centerY - 90;
-        int xAxisDifference = newPixyObjects.get(0).centerX - 150;
+        int yAxisDifference = 0;
+        int xAxisDifference = 0;
+
+        if(newPixyObjects.size() > 0){
+            yAxisDifference = newPixyObjects.get(0).centerY - 90;
+            xAxisDifference = newPixyObjects.get(0).centerX - 150;
+        }
 
         if(xAxisDifference > 20){
-            turretServo.setPosition(CLOCKWISE_POSITION_TURRET);
+            //turretServo.setPosition(CLOCKWISE_POSITION_TURRET);
         } else if (xAxisDifference < -20){
-            turretServo.setPosition(COUNTERCLOCKWISE_POSITION_TURRET);
+            //turretServo.setPosition(COUNTERCLOCKWISE_POSITION_TURRET);
         } else {
             turretServo.setPosition(START_POSITION_TURRET);
         }
 
         if(yAxisDifference > 10){
-            angularServo.setPosition(angularServo.getPosition() + SERVO_INCREMENT);
+            //angularServo.setPosition(angularServo.getPosition() + SERVO_INCREMENT);
         } else if (yAxisDifference < -10){
-            angularServo.setPosition(angularServo.getPosition() - SERVO_INCREMENT);
+            //angularServo.setPosition(angularServo.getPosition() - SERVO_INCREMENT);
         } else {
             angularServo.setPosition(angularServo.getPosition());
         }
@@ -97,6 +114,13 @@ public class PixyOpMode extends OpMode {
         telemetry.addData("xAxisDifference", xAxisDifference);
         telemetry.addData("New PixyObjects", pixyObjectsString);
         telemetry.update();
+
+        DbgLog.msg("LOOP END: " + counter);
+        counter++;
+        long startTime  = System.currentTimeMillis();
+        while(System.currentTimeMillis() - startTime > LOOP_DELAY){
+            // do nothing
+        }
     }
 
     @Override
