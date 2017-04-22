@@ -16,7 +16,7 @@ import trclib.TrcTaskMgr;
 /**
  * Created by spmeg on 3/28/2017.
  */
-@TeleOp(name = "MRTRCTestOp", group = "TestCode")
+@TeleOp(name = "MRTRCTestOp", group = "TestCodeShooter")
 public class MRTRCTestOp extends OpMode {
     private SWMRGyro gyro = null;
     private HalDashboard dashboard = null;

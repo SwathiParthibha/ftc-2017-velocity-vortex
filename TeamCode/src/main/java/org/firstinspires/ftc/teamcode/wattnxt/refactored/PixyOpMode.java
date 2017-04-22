@@ -12,7 +12,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 @TeleOp(name="PixyOpMode", group="Pixy")
 public class PixyOpMode extends OpMode {
@@ -34,8 +36,12 @@ public class PixyOpMode extends OpMode {
     private static final String DIM_NAME = "Pixy dim";
 
     private PixyCam pixyCam;
-    private ScheduledFuture scheduledFuture = null;
-    private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture pixycamscheduledFuture = null;
+    private ScheduledFuture updateListscheduledFuture = null;
+    private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(2);
+    private List<PixyObject> newPixyObjects = new ArrayList<>();
+
+    private ReentrantLock reentrantLock = new ReentrantLock();
 
     @Override
     public void init() {
@@ -57,8 +63,27 @@ public class PixyOpMode extends OpMode {
         angularServo.setPosition(START_POSITION_ANGULAR);
         turretServo.setPosition(START_POSITION_TURRET);
 
-        scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(pixyCam, 0, DELAY, TimeUnit.MILLISECONDS);;
+        //running the pixycam thread
+        pixycamscheduledFuture = scheduledExecutorService.scheduleAtFixedRate(pixyCam, 0, DELAY, TimeUnit.MILLISECONDS);
+
+        //updating the opmode list every 300 milliseconds, with a second initial delay
+        updateListscheduledFuture =  scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                reentrantLock.lock();
+                newPixyObjects.clear();
+                int whileCounter = 1;
+                while (pixyCam.hasNewObject()) {
+                    DbgLog.msg("Amount of times looping through the transfer loop: " + whileCounter);
+                    newPixyObjects.add(pixyCam.popObject());
+                    whileCounter++;
+                }
+                reentrantLock.unlock();
+            }
+        }, 1000, 300, TimeUnit.MILLISECONDS);
     }
+
+
 
     @Override
     public void loop() {
@@ -67,43 +92,46 @@ public class PixyOpMode extends OpMode {
             return;
         }
 
-
-        List<PixyObject> newPixyObjects = new ArrayList<>();
-        int whileCounter = 1;
-        while (pixyCam.hasNewObject()) {
-            DbgLog.msg("Amount of times looping through the transfer loop: " + whileCounter);
-            newPixyObjects.add(pixyCam.popObject());
-            whileCounter++;
-        }
-
-
-        //List<PixyObject> newPixyObjects = pixyCam.popObjects();
-
+        reentrantLock.lock();
         String pixyObjectsString = newPixyObjects.size() + "\n";
         for (PixyObject pixyObject : newPixyObjects) {
             pixyObjectsString += pixyObject.toString() + "\n";
         }
+        reentrantLock.unlock();
 
         int yAxisDifference = 0;
         int xAxisDifference = 0;
 
         if(newPixyObjects.size() > 0){
-            yAxisDifference = newPixyObjects.get(0).centerY - 90;
+            yAxisDifference = newPixyObjects.get(0).centerY - 120;
             xAxisDifference = newPixyObjects.get(0).centerX - 150;
         }
 
-        if(xAxisDifference > 20){
-            //turretServo.setPosition(CLOCKWISE_POSITION_TURRET);
-        } else if (xAxisDifference < -20){
-            //turretServo.setPosition(COUNTERCLOCKWISE_POSITION_TURRET);
+        if(xAxisDifference > 30){
+            DbgLog.msg("UPDATING SERVO POSITION TURRENT");
+            for (long i = System.currentTimeMillis(); System.currentTimeMillis() - i > 300;){
+                turretServo.setPosition(CLOCKWISE_POSITION_TURRET);
+            }
+        } else if (xAxisDifference < -30){
+            DbgLog.msg("UPDATING SERVO POSITION TURRENT");
+            for (long i = System.currentTimeMillis(); System.currentTimeMillis() - i > 300;){
+                turretServo.setPosition(COUNTERCLOCKWISE_POSITION_TURRET);
+            }
         } else {
             turretServo.setPosition(START_POSITION_TURRET);
         }
 
-        if(yAxisDifference > 10){
-            //angularServo.setPosition(angularServo.getPosition() + SERVO_INCREMENT);
-        } else if (yAxisDifference < -10){
-            //angularServo.setPosition(angularServo.getPosition() - SERVO_INCREMENT);
+        if(yAxisDifference > 30){
+            DbgLog.msg("UPDATING SERVO POSITION ANGULAR");
+            angularServo.setPosition(angularServo.getPosition() + SERVO_INCREMENT);
+            for (long i = System.currentTimeMillis(); System.currentTimeMillis() - i > 300;){
+                angularServo.setPosition(angularServo.getPosition() + SERVO_INCREMENT);
+            }
+        } else if (yAxisDifference < -30){
+            DbgLog.msg("UPDATING SERVO POSITION ANGULAR");
+            for (long i = System.currentTimeMillis(); System.currentTimeMillis() - i > 300;){
+                angularServo.setPosition(angularServo.getPosition() - SERVO_INCREMENT);
+            }
         } else {
             angularServo.setPosition(angularServo.getPosition());
         }
@@ -117,16 +145,13 @@ public class PixyOpMode extends OpMode {
 
         DbgLog.msg("LOOP END: " + counter);
         counter++;
-        long startTime  = System.currentTimeMillis();
-        while(System.currentTimeMillis() - startTime > LOOP_DELAY){
-            // do nothing
-        }
     }
 
     @Override
     public void stop() {
         super.stop();
-        scheduledFuture.cancel(true);
+        pixycamscheduledFuture.cancel(false);
+        updateListscheduledFuture.cancel(false);
         scheduledExecutorService.shutdown();
 
         try {
