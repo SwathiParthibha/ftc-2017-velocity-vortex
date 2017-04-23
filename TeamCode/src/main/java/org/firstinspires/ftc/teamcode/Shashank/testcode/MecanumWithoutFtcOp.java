@@ -138,7 +138,7 @@ public class MecanumWithoutFtcOp extends OpMode implements SWGamePad.ButtonHandl
         if(gamepad.getLeftStickX() == 0 && gamepad.getLeftStickY() == 0)
             magnitude = 0;
 
-        driveBase.mecanumDrive_PolarFieldCentricAdaptiveControl(magnitude, direction, rotation);
+        driveBase.mecanumDrive_PolarFieldCentric(magnitude, direction, rotation);
 
         dashboard.displayPrintf(1, LABEL_WIDTH, "rotation: ", "%.2f", rotation);
         dashboard.displayPrintf(2, LABEL_WIDTH, "gyro: ", "%.2f", gyro.getZHeading().value);
