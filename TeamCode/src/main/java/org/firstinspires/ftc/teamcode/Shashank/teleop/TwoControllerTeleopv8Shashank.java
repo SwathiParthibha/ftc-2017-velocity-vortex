@@ -131,32 +131,45 @@ public class TwoControllerTeleopv8Shashank extends OpMode {
             public void run() {
                 if (gamepad2.b) {
                     if(LEFT_RPM - TARGET_RPM < MAX_RPM_DIFF){
-                        if(LEFT_RPM - TARGET_RPM < MAX_RPM_DIFF*2)
+                        /*if(LEFT_RPM - TARGET_RPM < MAX_RPM_DIFF*2)
                             LEFT_POWER += MOTOR_POWER_INCREMENT*3;
                         else
-                            LEFT_POWER += MOTOR_POWER_INCREMENT;
+                            LEFT_POWER += MOTOR_POWER_INCREMENT;*/
+                        LEFT_POWER += calcDiff(LEFT_RPM, TARGET_RPM);
                     } else if (LEFT_RPM - TARGET_RPM > MAX_RPM_DIFF){
-                        if(LEFT_RPM - TARGET_RPM > MAX_RPM_DIFF*2)
+                        /*if(LEFT_RPM - TARGET_RPM > MAX_RPM_DIFF*2)
                             LEFT_POWER -= MOTOR_POWER_INCREMENT*3;
                         else
-                            LEFT_POWER -= MOTOR_POWER_INCREMENT;
+                            LEFT_POWER -= MOTOR_POWER_INCREMENT;*/
+                        LEFT_POWER -= calcDiff(LEFT_RPM, TARGET_RPM);
                     }
 
                     if(RIGHT_RPM - TARGET_RPM < MAX_RPM_DIFF){
-                        if(RIGHT_RPM - TARGET_RPM < MAX_RPM_DIFF*2)
+                        /*if(RIGHT_RPM - TARGET_RPM < MAX_RPM_DIFF*2)
                             RIGHT_POWER += MOTOR_POWER_INCREMENT*3;
                         else
-                            RIGHT_POWER += MOTOR_POWER_INCREMENT;
+                            RIGHT_POWER += MOTOR_POWER_INCREMENT;*/
+                        RIGHT_POWER += calcDiff(RIGHT_RPM, TARGET_RPM);
                     } else if (RIGHT_RPM - TARGET_RPM > MAX_RPM_DIFF){
-                        if(RIGHT_RPM - TARGET_RPM > MAX_RPM_DIFF*2)
+                        /*if(RIGHT_RPM - TARGET_RPM > MAX_RPM_DIFF*2)
                             RIGHT_POWER -= MOTOR_POWER_INCREMENT*3;
                         else
-                            RIGHT_POWER -= MOTOR_POWER_INCREMENT;
+                            RIGHT_POWER -= MOTOR_POWER_INCREMENT;*/
+                        RIGHT_POWER -= calcDiff(RIGHT_RPM, TARGET_RPM);
                     }
 
                     LEFT_POWER = Range.clip(LEFT_POWER, 0.38, 1);
                     RIGHT_POWER = Range.clip(RIGHT_POWER, 0.38, 1);
                 }
+            }
+
+            private double calcDiff(double value, double target){
+                if(Math.abs(value - target) > MAX_RPM_DIFF*2)
+                    return MOTOR_POWER_INCREMENT*3;
+                if(Math.abs(value - target) < MAX_RPM_DIFF*1.5)
+                    return MOTOR_POWER_INCREMENT*2;
+                else
+                    return MOTOR_POWER_INCREMENT;
             }
         }, 0, 50, TimeUnit.MILLISECONDS);
     }
