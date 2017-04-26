@@ -43,8 +43,8 @@ public class TwoControllerTeleopv8Shashank extends OpMode {
     private final double LEFT_ARMED_VAL = 0.25;
     private final double RIGHT_ARMED_VAL = 0.65;
 
-    private double LEFT_POWER = 0.65;
-    private double RIGHT_POWER = 0.65;
+    private double LEFT_POWER = 0.55;
+    private double RIGHT_POWER = 0.55;
 
     private volatile double LEFT_RPM = 0;
     private volatile double RIGHT_RPM = 0;
@@ -251,6 +251,12 @@ public class TwoControllerTeleopv8Shashank extends OpMode {
             }
             leftArm.setPosition(LEFT_IN_VAL);
             rightArm.setPosition(RIGHT_IN_VAL);
+        }
+
+        if (gamepad2.dpad_up) {
+            SHOOTER_POWER += 0.02;
+        } else if (gamepad2.dpad_down) {
+            SHOOTER_POWER -= 0.02;
         }
 
         if (gamepad2.dpad_up) {
