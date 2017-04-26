@@ -179,6 +179,9 @@ public class TwoControllerTeleopv8Shashank extends OpMode {
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
 
+        if(Math.abs(LEFT_RPM - TARGET_RPM) < MAX_RPM_DIFF && Math.abs(RIGHT_RPM - TARGET_RPM) < MAX_RPM_DIFF){
+            telemetry.addData("INFO", "READY TO SHOOT!!!!!!!!!!!!!!!!!!");
+        }
 
         if (swap) {
             double temp = left;
