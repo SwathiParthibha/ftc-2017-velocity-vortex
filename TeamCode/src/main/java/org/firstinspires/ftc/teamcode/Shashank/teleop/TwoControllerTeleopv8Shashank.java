@@ -37,7 +37,7 @@ public class TwoControllerTeleopv8Shashank extends OpMode {
     private final double ZERO_POWER = 0.0;
 
     private final double LEFT_IN_VAL = 0.56;
-    private final double RIGHT_IN_VAL = 0.37;
+    private final double RIGHT_IN_VAL = 0.33;
     private final double LEFT_OUT_VAL = 0.12;
     private final double RIGHT_OUT_VAL = 0.77;
     private final double LEFT_ARMED_VAL = 0.25;
@@ -243,6 +243,7 @@ public class TwoControllerTeleopv8Shashank extends OpMode {
             leftArm.setPosition(LEFT_OUT_VAL);
             rightArm.setPosition(RIGHT_OUT_VAL);
         } else if (gamepad2.dpad_right) {
+            scooper.setPower(0);
             //scheduledExecutorService.schedule(servoRunnable, 0, TimeUnit.MILLISECONDS);
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < 600){
@@ -266,8 +267,8 @@ public class TwoControllerTeleopv8Shashank extends OpMode {
         }
 
         if(gamepad2.a){
-            leftShooter.setPower(SHOOTER_POWER);
-            rightShooter.setPower(SHOOTER_POWER);
+            leftShooter.setPower(-0.5);
+            rightShooter.setPower(-0.5);
         } else if(gamepad2.b){
             leftShooter.setPower(LEFT_POWER);
             rightShooter.setPower(RIGHT_POWER);

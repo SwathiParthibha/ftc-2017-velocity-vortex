@@ -143,7 +143,7 @@ public class AutonomousActions {
     double capBallDistance = 12;
     private double lightDetected = 0.0;
     private final double LEFT_IN_VAL = 0.56;
-    private final double RIGHT_IN_VAL = 0.34;
+    private final double RIGHT_IN_VAL = 0.33;
     private final double LEFT_OUT_VAL = 0.12;
     private final double RIGHT_OUT_VAL = 0.76;
     private final double SERVO_ADJUSTMENT_VAL_LEFT = (Math.abs(LEFT_IN_VAL - LEFT_OUT_VAL) / 14);
